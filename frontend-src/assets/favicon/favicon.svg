@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" id="Layer_1" x="0px" y="0px" width="512px" height="512px" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><metadata><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/"><rdf:Description><dc:creator>RealFaviconGenerator</dc:creator><dc:source>https://realfavicongenerator.net</dc:source></rdf:Description></rdf:RDF></metadata><style>
+    * {
+        fill: #446B5A;
+    }
+    </style><g id="loom-73-logo">
+        <rect id="ht1_1" x="2.249" y="98.383" width="92.631" height="59.158"></rect>
+        <rect id="ht1_2" x="161.789" y="98.383" width="189.211" height="59.158"></rect>
+        <rect id="ht1_3" x="416.684" y="98.383" width="92.632" height="59.158"></rect>
+
+        <rect id="ht2_1" x="2.249" y="225.804" width="220.173" height="59.158"></rect>
+        <rect id="ht2_2" x="289.578" y="226.421" width="220.174" height="59.158"></rect>
+
+        <rect id="ht3_1" x="2.098" y="354.459" width="92.631" height="59.158"></rect>
+        <rect id="ht3_2" x="161.638" y="354.459" width="189.211" height="59.158"></rect>
+        <rect id="ht3_3" x="416.533" y="354.459" width="92.631" height="59.158"></rect>
+
+        <rect id="vt2_1" x="226.052" y="2" width="59.158" height="92.383"></rect>
+        <rect id="vt2_2" x="226.421" y="161.542" width="59.158" height="188.917"></rect>
+        <rect id="vt2_3" x="226.421" y="417.617" width="59.158" height="92.383"></rect>
+
+        <rect id="vt1_1" x="98.631" y="2" width="59.158" height="219.804"></rect>
+        <rect id="vt1_2" x="98.631" y="288.962" width="59.158" height="221.038"></rect>
+
+        <rect id="vt3_1" x="355" y="2.443" width="59.157" height="219.804"></rect>
+        <rect id="vt3_2" x="355" y="289.404" width="59.157" height="221.039"></rect>
+    </g></svg>

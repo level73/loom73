@@ -1,0 +1,12 @@
+# Main rereouter - sends everything to /public dir with few exceptions
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  #Exclude the craft and test directories from redirection
+  RewriteRule ^(php-exe|tests|scripts|static)($|/) - [L]
+
+  #Route everything else to the public directory
+  RewriteRule ^$ public/ [L]
+  RewriteRule (.*) public/$1 [L]
+
+</IfModule>

@@ -1,0 +1,51 @@
+<?php
+
+use Loom73\Woodframe\Config;
+
+const ROOT_DIR = __DIR__;
+require_once ROOT_DIR . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+require_once ROOT_DIR . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'system.php';
+require_once ROOT_DIR . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'labels.php';
+require_once ROOT_DIR . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'helpers.php';
+require_once ROOT_DIR . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'loom73.php';
+
+$dotenv = Dotenv\Dotenv::createImmutable(ROOT_DIR . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR);
+$dotenv->load();
+
+Config::load(ROOT_DIR . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'modules');
+
+class Shuttle {
+
+    protected static string $version = '0.2';
+    private static string $command_dir = ROOT_DIR . DIRECTORY_SEPARATOR . 'commands';
+    private static array $command_list = [];
+    private static array $command_file_list = [];
+    public  function __construct()
+    {
+        // Load list of commands from command dir
+        foreach (new DirectoryIterator(self::$command_dir) as $command):
+            if($command->isDot()) continue;
+            self::$command_file_list[] = $command->getBasename('.php');
+        endforeach;
+    }
+    public static function showCommands():void {
+        print_r(self::$command_list);
+    }
+    public static function commandsRegister(): array {
+        foreach (self::$command_file_list as $command):
+            $ClassName =  'Loom73\Shuttle\\'. str_replace( ' ', '', ucwords( str_replace('.', ' ', $command)));
+            self::$command_list[$command] = $ClassName;
+        endforeach;
+        return self::$command_list;
+    }
+}
+
+if($argc > 1):
+    $command = $argv[1];
+    $args = array_slice($argv, 2);
+    $shuttle = new Shuttle();
+    $command_list = Shuttle::commandsRegister();
+    $CommandClassName = $command_list[$command];
+    require_once ROOT_DIR . DIRECTORY_SEPARATOR . 'commands' . DIRECTORY_SEPARATOR . $command . '.php';
+    $Operation = new $CommandClassName($args);
+endif;

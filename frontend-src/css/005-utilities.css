@@ -1,0 +1,109 @@
+@layer utilities {
+    /** Debugging - Pretty printing **/
+    .debugger {
+        --debug-color: var(--color-utility-info);
+        display: block;
+        width: 100%;
+        padding: 1.5rem;
+
+        border: 1px solid var(--debug-color);
+        background-color: oklch(from var(--debug-color) l c h / 0.4);
+        color: oklch(from var(--debug-color) l c h);
+        font-size: var(--fontsize-0);
+        & > span {
+            font-family: var(--monospace-font-family);
+            font-weight: 500;
+        }
+        & > hr {
+            height: 1px;
+            margin-block: 0.5rem;
+            background-color: var(--debug-color);
+            border: 0;
+        }
+        & > pre {
+            font-family:var(--monospace-font-family);
+            font-size: var(--fontsize--1);
+        }
+        &.sql {
+            --debug-color: var(--color-utility-warning);
+        }
+        &.string {
+            --debug-color: var(--color-utility-info);
+        }
+    }
+
+    .flash {
+        --feedback-color: var(--color-utility-info);
+        display: block;
+        position: relative;
+        width: 100%;
+        padding: 1.5rem;
+        border: 1px solid var(--feedback-color);
+        background-color: oklch(from var(--feedback-color) l c h / 0.15);
+        color: oklch(from var(--feedback-color) calc(l - 0.2) c h);
+        font-size: var(--fontsize-0);
+        font-weight: bold;
+        &.flash--error {
+            --feedback-color: var(--color-utility-danger);
+        }
+        &.flash--warning {
+            --feedback-color: var(--color-utility-warning);
+        }
+        &.flash--info {
+            --feedback-color: var(--color-utility-info);
+        }
+        &.flash--success {
+            --feedback-color: var(--color-utility-success);
+        }
+        .dismiss {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            cursor: pointer;
+            background: none;
+            color: var(--feedback-color);
+            border: none;
+        }
+    }
+
+    .pretty-print {
+        --debug-color: var(--color-utility-info);
+        border: 1px solid var(--debug-color);
+        background-color: oklch(from var(--debug-color) l c h / 0.25);
+        summary {
+            font-weight: 500;
+            cursor: pointer;
+            &::marker {
+                content: '+';
+                padding-right: 0.5rem;
+                display: inline-block;
+            }
+        }
+        pre {
+            display: block;
+            margin-block-start: 1rem;
+            background-color: var(--color-secondary-dark);
+            color: var(--color-accent-brightest);
+            font-size: var(--fontsize--1);
+            padding: var(--gap);
+            font-family: var(--monospace-font-family);
+        }
+    }
+    .hilite {
+        color: var(--color-accent);
+    }
+
+
+    /** Handy Animations **/
+    /** Bouncy Pop In **/
+    @keyframes popin {
+        from {
+            opacity: 0;
+            transform: scale(0.3) translateY(1.25rem);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+}

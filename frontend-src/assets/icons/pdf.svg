@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 15.0.0, SVG Export Plug-In  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" [
+	<!ENTITY ns_flows "http://ns.adobe.com/Flows/1.0/">
+]>
+<svg version="1.1"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/"
+	 x="0px" y="0px" width="128px" height="128px" viewBox="-29.83301 -14.5 128 128" enable-background="new -29.83301 -14.5 128 128"
+	 xml:space="preserve">
+<defs>
+</defs>
+<path fill="none" stroke="#000000" stroke-width="7" stroke-miterlimit="10" d="M31.97217,26.5
+	c-15.46436,0,18.55225,45.24023,24.7373,34.50391c6.18701-10.7334-52.5708-1.53125-44.83984,10.73633
+	C17.28223,79.4082,47.43311,26.5,31.97217,26.5z"/>
+<polygon fill="none" stroke="#000000" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="
+	64.83398,95.5 3.5,95.5 3.5,3.5 49.5,3.5 49.5,18.83398 64.83398,18.83398 "/>
+<line fill="none" stroke="#000000" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="49.5" y1="3.5" x2="64.83398" y2="18.83398"/>
+</svg>

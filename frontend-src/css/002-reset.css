@@ -1,0 +1,184 @@
+@layer reset {
+    /** Define Root Vars **/
+    :root {
+        /** Color Palette  **/
+        /** Validate contrast for WCAG Conformity **/
+        --color-background: oklch(0.985 0.003 106.448);     /** #FAFAF8 **/
+        --color-surface: oklch(0.958 0.004 91.447);         /** #F2F1EE **/
+        --color-border: oklch(0.874 0.009 84.575);          /** #D8D5CF **/
+        --color-text: oklch(0.252 0 0);                     /** #222222 **/
+        --color-secondary: oklch(0.51 0 0);                 /** #666666 **/
+        --color-secondary-dark: oklch(0.309 0 0);           /** #303030 **/
+        --color-accent: oklch(0.493 0.052 165.154);         /** #446B5A **/
+        --color-accent-bright: oklch(0.7819 0.1301 165.15);
+        --color-accent-brightest: oklch(0.903 0.096 167.313);/** #57D2A3 **/
+        --color-accent-hover: oklch(from var(--color-accent) 70% c h);
+
+        /** Utility colors - used for alerts, messages, toasts and so forth. To be used in conjuction with contrast-color() for accessibility **/
+        --color-utility-danger:  oklch(0.486 0.188 30.089);     /** #B11608 **/
+        --color-utility-warning: oklch(0.636 0.101 49.627);     /** #FFB68E **/
+        --color-utility-success: oklch(0.475 0.143 146.455);    /** #007023 **/
+        --color-utility-info:    oklch(0.524 0.224 260.83);     /** #005CE8 **/
+
+        /** Fontsize Clamps For Responsive Type **/
+        --fontsize--2:  clamp(0.64rem, calc(0.7167rem + -0.099vw), 0.6944rem);
+        --fontsize--1:  clamp(0.8rem, calc(0.847rem + -0.0606vw), 0.8333rem);
+        --fontsize-0:   clamp(1rem, calc(1rem + 0vw), 1rem);
+        --fontsize-1:   clamp(1.2rem, calc(1.1795rem + 0.0909vw), 1.25rem);
+        --fontsize-2:   clamp(1.44rem, calc(1.3899rem + 0.2227vw), 1.5625rem);
+        --fontsize-3:   clamp(1.728rem, calc(1.6359rem + 0.4093vw), 1.9531rem);
+        --fontsize-4:   clamp(2.0736rem, calc(1.9231rem + 0.6687vw), 2.4414rem);
+        --fontsize-5:   clamp(2.4883rem, calc(2.2578rem + 1.0244vw), 3.0518rem);
+        --fontsize-6:   clamp(2.986rem, 2.647rem + 1.5068vw, 3.8147rem);
+
+        /** Paddings and gaps **/
+        --padding: 1.5rem;
+        --spacing: var(--padding); /** This is here for semantics, it should remain consistent with padding. **/
+        --gap: 1.5rem;
+
+        /** Other Utility Properties **/
+        --box-shadow: rgba(0, 0, 0, 0.45) 0px 25px 20px -20px;
+        --backdrop: repeating-conic-gradient(
+                from 0deg at 50% 50%,
+                oklch(from var(--color-secondary-dark) l c h / .3) 0%,
+                oklch(from var(--color-secondary-dark) l c h / .3) 25%,
+                oklch(from var(--color-accent) l c h / .3) 25%,
+                oklch(from var(--color-accent) l c h / .3) 50%);
+
+        --body-font-family: 'IBM Plex Sans', sans-serif;
+        --body-italic-font-family: 'IBM Plex Sans Italic', sans-serif;
+        --monospace-font-family: 'IBM Plex Mono', monospace;
+    }
+
+    /** Fonts **/
+    /* latin-ext */
+    @font-face {
+        font-family: 'IBM Plex Sans';
+        font-style: normal;
+        font-weight: 100 700;
+        font-stretch: 100%;
+        font-display: swap;
+        src: url("../assets/fonts/IBM_Plex_Sans_normal_latin_100_700.woff2") format('woff2');
+        /*unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; */
+    }
+
+
+    /* latin */
+    @font-face {
+        font-family: 'IBM Plex Sans Italic';
+        font-style: italic;
+        font-weight: 100 700;
+        font-stretch: 100%;
+        font-display: swap;
+        src: url("../assets/fonts/IBM-Plex-Sans_latin_100_700_italic.woff2") format('woff2');
+       /* unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; */
+    }
+
+    @font-face {
+        font-family: 'IBM Plex Mono';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url("../assets/fonts/IBM-Plex-Mono_latin_400_normal.woff2") format('woff2');
+        /*unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; */
+    }
+    @font-face {
+        font-family: 'IBM Plex Mono';
+        font-style: normal;
+        font-weight: 500;
+        font-display: swap;
+        src: url("../assets/fonts/IBM-Plex-Mono_latin_500_normal.woff2") format('woff2');
+        /*unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; */
+    }
+
+
+
+    /** Our Minimal Reset **/
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: var(--body-font-family);
+    }
+    html {
+        scroll-behavior: smooth;
+
+    }
+    body {
+        height: 100%;
+        font-family: var(--body-font-family);
+        font-weight: 400;
+        color: var(--color-text);
+        background-color: var(--color-background);
+    }
+
+    /** Accessible visually hidden content **/
+    .sr-only {
+        clip: rect(0 0 0 0);
+        clip-path: inset(50%);
+        height: 1px;
+        overflow: hidden;
+        position: absolute;
+        width: 1px;
+        white-space: nowrap;
+    }
+
+    /** Typography **/
+    h1 {
+        font-size: var(--fontsize-6);
+        letter-spacing: -0.2rem;
+        font-weight: bold;
+    }
+    h2 {
+        font-size: var(--fontsize-4);
+        letter-spacing: -0.1rem;
+        font-weight: 600;
+    }
+    h3 {
+        font-size: var(--fontsize-3);
+        font-weight: 600;
+    }
+    h4 {
+        font-size: var(--fontsize-2);
+        font-weight: 500;
+    }
+    h5, h6, p {
+        font-size: var(--fontsize-0);
+        font-weight: normal;
+    }
+    p.sub {
+        font-size: var(--fontsize--1);
+        color: var(--color-secondary);
+    }
+    p {
+        line-height: 150%;
+    }
+    /** #TODO add lists to the rest **/
+    ol, ul, dl { }
+    li {
+        font-family: var(--body-font-family);
+    }
+    .accent {
+        font-family: var(--monospace-font-family);
+        color: var(--color-accent);
+    }
+
+    main a:not(:has(p)) {
+        color: var(--color-accent);
+        text-decoration: none;
+        display: inline-block;
+        &:hover {
+            text-decoration: underline;
+            color: var(--color-accent-hover);
+        }
+    }
+    .button + .button, button + button {
+        margin-inline-start: var(--spacing);
+    }
+
+    a, input, button, select, textarea {
+        &:active, &:focus {
+            outline: 3px var(--color-accent-hover) solid;
+        }
+    }
+}

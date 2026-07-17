@@ -1,0 +1,464 @@
+@layer components {
+
+    nav.navbar {
+        width: 100%;
+        padding-inline: 1.5rem;
+        padding-block: 0.5rem;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--color-border);
+        a.navbar-brand {
+            display:flex;
+            flex-direction: row;
+            text-decoration: none;
+            color: var(--color-accent);
+            align-items: center;
+            justify-content: center;
+            img {
+                aspect-ratio: 1 / 1;
+                margin-inline-end: 1rem;
+            }
+            &:hover {
+                text-decoration: underline;
+                color: var(--color-accent-hover);
+            }
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: flex-start;
+            li {
+                list-style: none;
+                padding-inline: 1.5rem;
+
+            }
+        }
+        .username {
+            display: inline-block;
+            font-weight: 600;
+            color: var(--color-accent);
+
+        }
+        #toolbar {
+            display: inline-grid;
+            grid-auto-flow: column;
+            grid-template-columns: repeat(auto-fill, 1fr);
+
+            .button, .button+.button {
+                background-color: transparent;
+                color: var(--color-accent);
+                border: none;
+                padding: 0 1rem;
+                margin-inline-start: 0;
+                margin-block-end: 0;
+            }
+        }
+    }
+
+    .popover-menu {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        border: none;
+        background-color: var(--color-background);
+        padding: var(--spacing);
+        gap: var(--gap);
+        inline-size: min(220px, 80vw);
+        box-shadow: var(--box-shadow);
+        inset: auto;
+        @supports(anchor-name: --anchor){
+            margin-block-start: 0.5rem;
+            inset:auto;
+            position-area: bottom;
+        }
+        &:popover-open{
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            .menu-item{
+                padding: 0.5rem 1rem;
+
+                a {
+                    color: var(--color-accent);
+                    text-decoration: none;
+                    &:hover, &:focus{
+                        text-decoration: underline;
+                    }
+                }
+            }
+        }
+    }
+
+    a.button {
+        text-decoration: none;
+        padding: 1rem 2rem;
+        border: 1px solid var(--color-accent);
+        margin-block-end: var(--spacing);
+        background-color: var(--color-accent);
+        color: contrast-color(var(--color-accent));
+    }
+    a.button.hollow {
+        color: var(--color-accent);
+        border: 1px solid var(--color-accent);
+        background-color: transparent;
+    }
+
+    a.button:has(.icon) {
+        line-height: 1;
+    }
+
+
+    p.claim {
+        font-size: calc(var(--fontsize-5) * 1.8);
+        line-height: 110%;
+        letter-spacing: -0.2rem;
+        margin-block: 3rem;
+        max-width: 13ch;
+        .hilite {
+            color: var(--color-accent);
+        }
+        & ~ p.claim {
+            font-size: var(--fontsize-1);
+            line-height: 140%;
+            letter-spacing: 0;
+            margin-block: 3rem;
+            max-width: 42ch;
+            text-wrap: balance;
+        }
+    }
+
+    hr {
+        display: block;
+        margin-block: var(--spacing);
+        height: 0.2rem;
+        background-color: var(--color-accent);
+        border: none;
+        max-width: 10%;
+    }
+
+    .card {
+        h2 {
+            font-size: var(--fontsize-1);
+        }
+        p {}
+    }
+    .badge {
+        background-color: var(--color-secondary-dark);
+        color: var(--color-accent-brightest);
+        font-size: var(--fontsize--1);
+        font-family: var(--monospace-font-family);
+        text-transform: uppercase;
+        padding: 0.25rem 1rem;
+        letter-spacing: 0.1rem;
+        border: 1px solid var(--color-accent);
+        display: inline-block;
+        margin: var(--padding); /** this is funny **/
+
+        &.badge-status {
+            &.status-active { background-color: var(--color-utility-success); color: contrast-color(var(--color-utility-success) ); }
+            &.status-inactive { background-color: var(--color-secondary); color: contrast-color(var(--color-secondary) ); }
+        }
+        &.badge-role {
+            &.role-admin { background-color: var(--color-utility-info); color: contrast-color(var(--color-utility-info) ); }
+            &.role-editor { background-color: var(--color-utility-info); color: contrast-color(var(--color-utility-info) ); }
+            &.role-user { background-color: var(--color-utility-info); color: contrast-color(var(--color-utility-info) ); }
+        }
+    }
+    .grid .badge {
+        margin-block-start: 0;
+        margin-inline-start: 0;
+    }
+
+    /*@scope (table) { */
+    table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            border: 1px solid var(--color-border);
+            margin: var(--spacing);
+            width: calc(100% - (var(--spacing) * 2));
+
+            caption {
+                font-size: var(--fontsize-3);
+                font-weight: 600;
+                text-align: start;
+            }
+            thead {
+                display: table-header-group;
+                padding: 0.25rem;
+                th {
+                    padding: 0.75rem 0.25rem 0.75rem;
+                    text-align: left;
+                    font-size: var(--fontsize--1);
+                    text-transform: uppercase;
+                }
+            }
+            tr {
+                padding: 0.5rem;
+                border: 1px solid var(--color-border);
+            }
+            tbody {
+                tr:nth-child(odd) {
+                    background-color: var(--color-surface);
+                    &:hover {
+                        background-color: var(--color-accent-brightest);
+                    }
+                }
+                tr:hover {
+                    background-color: var(--color-accent-brightest);
+                }
+
+            }
+            td {
+                padding: 0.25rem;
+                &.full-cell {
+                    text-transform: uppercase;
+                    font-size: var(--fontsize--1);
+                    font-weight: 600;
+                    --bg-color: inherit;
+                    background-color: var(--bg-color);
+                    color: contrast-color(var(--bg-color));
+                }
+                &.status-inactive {
+                    --bg-color: var(--color-utility-warning);
+
+                }
+                &.status-active {
+                   --bg-color: color-mix(var(--color-utility-success) 95%, black 5%);
+                }
+                &.role-admin {
+                    --bg-color: color-mix(var(--color-utility-info) 95%, black 5%);
+                }
+                &.role-editor {
+                    --bg-color: color-mix(oklch( from var(--color-utility-info) l c h / 0.75) 95%, black 5%);
+                }
+                &.role-user {
+                    --bg-color: color-mix(oklch( from var(--color-utility-info) l c h / 0.50) 95%, black 5%);
+                }
+            }
+
+        .toolbar {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            .button {
+                margin: 0;
+                padding: 0.5rem;
+                border: 1px solid var(--color-accent);
+                transition: all 0.3s ease-in-out;
+                cursor: pointer;
+                &:hover, &:focus{
+                    background-color: var(--color-accent-hover);
+                    border: 1px solid var(--color-accent-hover);
+                }
+            }
+        }
+
+    }
+    @scope ([data-table]) {
+        th[aria-sort] button {
+            appearance: none;
+            border: 0;
+            background: transparent;
+            padding: 0;
+            font: inherit;
+            color: inherit;
+            cursor: pointer;
+        }
+
+        th[aria-sort] button::after {
+            display: inline-block;
+            margin-left: .4em;
+            opacity: .45;
+        }
+
+        th[aria-sort="none"] button::after {
+            content: "↕";
+        }
+
+        th[aria-sort="ascending"] button::after {
+            content: "↑";
+            opacity: 1;
+        }
+
+        th[aria-sort="descending"] button::after {
+            content: "↓";
+            opacity: 1;
+        }
+
+        .table-pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .table-pagination button[disabled] {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+    }
+
+    @scope (form) {
+        accent-color: var(--color-accent);
+        &.small {
+            max-width: max(40%, 20rem);
+        }
+        legend {}
+        fieldset {
+            border: none;
+        }
+        .form-content {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: min-content auto;
+            margin-block-end: 1.5rem;
+        }
+        .form-group {
+            grid-column: span 2;
+            display: grid;
+            grid: inherit;
+            grid-template-columns: subgrid;
+            align-items: center;
+        }
+
+        .form-group input[type="checkbox"],
+        .form-group input[type="radio"] {
+            justify-self: start;
+        }
+
+
+        .form-group:has(input:focus){
+            outline: 3px solid color-mix(var(--color-accent) 20%, transparent 80%);
+            outline-offset: 2px;
+        }
+        .form-footer {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            align-items: center;
+        }
+        label, legend { text-align: left; width: fit-content; text-wrap: nowrap; }
+        label:has( + *[required])::after{
+            content: "*";
+            color: var(--color-utility-danger);
+        }
+        input, select, textarea {
+            padding-inline: 0.5rem;
+            padding-block: 0.25rem;
+            font-size: var(--fontsize-0);
+            border: 1px solid var(--color-border);
+            font-family: var(--body-font-family);
+
+            &:user-valid {
+                border-color: var(--color-utility-success);
+            }
+            &:user-invalid {
+                border-color: var(--color-utility-danger);
+            }
+        }
+
+        input[type="file"] {
+            padding: 0;
+        }
+        input[type="file"]::file-selector-button {
+            padding-inline: 0.5rem;
+            padding-block: 0.25rem;
+            border: 1px solid var(--color-accent);
+            background-color: var(--color-accent);
+            color: contrast-color(var(--color-accent));
+            font-family: var(--body-font-family);
+            font-size: var(--fontsize-0);
+        }
+
+        .user-invalid-error[data-active-error="true"] {
+            padding: 0.5rem;
+            font-size: var(--fontsize--1);
+            color: var(--color-surface);
+            background-color: var(--color-utility-danger);
+            grid-column: 2;
+        }
+        button[type='submit'] {
+            background-color: var(--color-accent);
+            border: none;
+            padding: 1rem 2rem;
+            font-size: var(--fontsize-0);
+            color: contrast-color(var(--color-accent));
+            align-self: end;
+            cursor: pointer;
+            &:hover, &:focus, &:active {
+                background-color: var(--color-accent-hover);
+                color: contrast-color(var(--color-accent-hover));
+            }
+        }
+        button[type='reset'] {
+            background-color: var(--color-secondary);
+            border: none;
+            padding: 1rem 2rem;
+            font-size: var(--fontsize-0);
+            color: contrast-color(var(--color-surface));
+            align-self: end;
+            cursor: pointer;
+            &:hover, &:focus, &:active {
+                background-color: var(--color-accent-hover);
+                color: contrast-color(var(--color-accent-hover));
+            }
+        }
+        input + .icon {
+            margin-block: 0.25rem;
+        }
+    }
+
+    @scope(dialog){
+        margin: auto;
+        padding: var(--padding);
+        text-transform: initial;
+        min-width: 35vw;
+        max-width: 90vw;
+        &::backdrop {
+            background-image: var(--backdrop);
+            background-size: 0.5rem 0.5rem;
+            background-repeat: repeat;
+        }
+
+        .buttons {
+            display: grid;
+            gap: var(--spacing);
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            margin-block-start: var(--spacing);
+        }
+        button.modal-button, button.modal-button[type="submit"] {
+            font-size: var(--fontsize-0);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            &.close{
+                background: transparent;
+                border: 1px solid var(--color-accent);
+                color: var(--color-accent);
+                &:hover, &:focus, &:active {
+                    background-color: var(--color-accent);
+                    color: contrast-color(var(--color-accent));
+                }
+            }
+
+
+        }
+        button.modal-button[type="submit"]{
+            background-color: var(--color-utility-danger);
+            color: contrast-color(var(--color-utility-danger));
+            &:hover, &:focus, &:active {
+                background-color: oklch(from var(--color-utility-danger) 0.5 c h);
+                color: contrast-color(oklch(from var(--color-utility-danger) 0.5 c h));
+            }
+        }
+    }
+}

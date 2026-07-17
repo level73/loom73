@@ -1,0 +1,79 @@
+@layer specific {
+
+    body.main.index figure {
+        text-align: center;
+        margin-block: 2rem;
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        figcaption {
+            margin-block: 1.5rem;
+            font-family: var(--body-italic-font-family);;
+            font-style: italic;
+            color: var(--color-secondary)
+        }
+    }
+
+    .card.icon-container {
+
+        outline: 1px solid var(--color-border);
+        background-color: var(--color-background);
+        border-collapse: collapse;
+        padding: 1.5rem;
+        place-items: center;
+        text-align: center;
+        opacity: 0;
+        transform: translateY(1.25rem) scale(0.3);
+
+        span.icon-name {
+            display: block;
+            color: var(--color-secondary);
+            font-size: var(--fontsize--1);
+            font-family: var(--monospace-font-family);
+            text-transform: lowercase;
+            margin-block-start: 1rem;
+        }
+
+    }
+    .is-visible > * {
+        animation: popin 0.5s cubic-bezier(0.3, 1.5, 0.7, 1) forwards;
+        animation-delay: calc( var(--i)  * 40ms);
+    }
+    @media (prefers-reduced-motion:reduce) {
+        .icon-container {
+            opacity: 1;
+            transform: none;
+        }
+        .is-visible > * {
+            animation: none;
+        }
+    }
+
+    body .coding-window {
+        display: block;
+        position: relative;
+        background: var(--color-secondary-dark);
+        border-top: 1rem solid var(--color-text);
+
+        color: var(--color-surface);
+        padding-block: 1rem 4rem;
+        padding-inline: 1rem 1rem;
+        font-size: var(--fontsize-1);
+
+        & > span {
+            display: inline-block;
+            padding-block: 0.25rem;
+            font-family: var(--monospace-font-family);
+        }
+        .shuttle-username{
+            color: oklch(from var(--color-utility-warning) calc(l + 0.25) c h);
+        }
+        .shuttle-path{
+            color: oklch(from var(--color-utility-success) calc(l + 0.25) c h);;
+        }
+        .shuttle-inline-symbol {
+            color: var(--color-accent-brightest);
+        }
+    }
+}

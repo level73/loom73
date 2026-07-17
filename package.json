@@ -1,0 +1,25 @@
+{
+  "name": "loom73",
+  "version": "6.0.0",
+  "description": "A continuously evolving foundation of conventions, reusable components, and architectural patterns, woven from years of practical experience in designing and building web applications. It provides a reliable framework for creating robust solutions without reinventing the wheel for every project.",
+  "license": "ISC",
+  "author": "Level73",
+  "type": "commonjs",
+  "main": "public_html/public/index.php",
+  "scripts": {
+    "build": "cd frontend-src && grunt build",
+    "build:assets": "cd frontend-src && grunt optimize",
+    "build:deploy": "cd frontend-src && grunt deploy",
+    "watch": "cd frontend-src && grunt dev"
+  },
+  "devDependencies": {
+    "grunt": "^1.6.1",
+    "grunt-contrib-concat": "^2.1.0",
+    "grunt-contrib-uglify": "^5.2.2",
+    "grunt-contrib-watch": "^1.1.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-cwebp": "^3.0.0",
+    "grunt-css": "^0.5.4",
+    "grunt-svgmin": "^7.0.0"
+  }
+}
