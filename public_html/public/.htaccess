@@ -51,4 +51,13 @@
   <FilesMatch "\.(jpg|jpeg|gif|png|webp|avif|svg|ico|css|js|woff2|woff|eot|ttf|otf)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
+
+  # Block from crawling/indexing
+  Header set X-Robots-Tag "noindex, nofollow, noarchive"
 </IfModule>
+
+# BasicAuth, becasue this stuff is in dev
+AuthType Basic
+AuthName "Loom73"
+AuthUserFile /var/www/loom73.lvl73.it/.htpasswd
+Require valid-user
