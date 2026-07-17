@@ -12,4 +12,7 @@ mkdir -p storage/cache
 
 chmod -R ug+rwX storage
 
+find storage -type d -exec chmod 2775 {} \;
+find storage -type f -exec chmod 664 {} \;
+
 echo "After deploy completed for $APP_PATH"

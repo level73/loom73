@@ -33,8 +33,6 @@ class UserAdmin {
         $Model = new User();
         $user = $Model->create($Data);
 
-        var_dump($user);
-
         if(!$user->success):
 
             echo $CLI->cout_color('Something went wrong, please try again later', 'red');
