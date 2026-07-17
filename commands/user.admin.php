@@ -35,14 +35,15 @@ class UserAdmin {
 
         if(!$user->success):
 
-            echo $CLI->cout_color('Something went wrong, please try again later', 'red');
+            echo $CLI->cout_color('Something went wrong, please try again later', 'red') . PHP_EOL;
             print_r($Data);
             return false;
         else:
             $Session = new Session();
             $Session->createSession($user->insertId);
-            echo $CLI->cout_color('User has been created', 'green');
+            echo $CLI->cout_color('User has been created', 'green') . PHP_EOL;
             return true;
         endif;
+
     }
 }

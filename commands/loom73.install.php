@@ -9,6 +9,13 @@ class Loom73Install  {
 
     protected PDO $pdo;
 
+    protected array $paths = [
+        ROOT_DIR . '/storage',
+        ROOT_DIR . '/storage/uploads',
+        ROOT_DIR . '/storage/logs',
+        ROOT_DIR . '/storage/cache',
+    ];
+
     public function __construct(?array $args) {
 
 
@@ -209,7 +216,23 @@ class Loom73Install  {
         }
         catch (Errata $e) {
             echo $cli->cout_color($e->errorMessage(), 'red') . PHP_EOL;
-            return false;
         }
+
+
+        echo "Creating storage directories...".PHP_EOL;
+        foreach ($this->paths as $path) {
+            if (!is_dir($path)) {
+                $dir = mkdir($path, 02775, true);
+                if($dir): echo "Storage path "; echo $cli->cout_color($dir, 'yellow') . " created" . PHP_EOL;
+                else: echo $cli->cout_color("Storage path {$path} not created", 'red') . PHP_EOL;
+                endif;
+            }
+
+            chmod($path, 02775);
+            if (!is_writable($path)) {
+                echo $cli->cout_color("Warning: directory is not writable: {$path}\n", 'red') . PHP_EOL;
+            }
+        }
+
     }
 }

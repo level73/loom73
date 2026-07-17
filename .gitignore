@@ -12,20 +12,7 @@
 Thumbs.db
 
 # Runtime storage
-/storage/*
-!/storage/.gitkeep
-
-!/storage/uploads/
-/storage/uploads/*
-!/storage/uploads/.gitkeep
-
-!/storage/logs/
-/storage/logs/*
-!/storage/logs/.gitkeep
-
-!/storage/cache/
-/storage/cache/*
-!/storage/cache/.gitkeep
+/storage/
 
 # Build intermediates
 /frontend-src/concat.css
