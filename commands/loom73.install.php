@@ -164,7 +164,7 @@ class Loom73Install  {
                                          * User who uploaded the asset.
                                          * This is different from the owner.
                                          */
-                                        `uploaded_by` BIGINT UNSIGNED DEFAULT NULL,
+                                        `uploaded_by` BIGINT DEFAULT NULL,
                                     
                                         `modified_at` DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
                                         `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
