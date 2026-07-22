@@ -8,6 +8,7 @@ use Loom73\Beam\User;
 use Loom73\Heddle\Session;
 use Loom73\Woodframe\Config;
 use Loom73\Woodframe\Ctrl;
+use Loom73\Woodframe\Logger;
 use Loom73\Woodframe\Mailman;
 use Loom73\Yarn\AssetStorage;
 use Loom73\Yarn\AssetUploader;
@@ -22,6 +23,8 @@ class UserCtrl extends Ctrl
     protected User $User;
     protected Session $Session;
     public ?string $provider = 'user';
+
+    protected ?string $ledgerOwnerType = 'user';
 
     public function __construct(
         string $model,
@@ -94,6 +97,15 @@ class UserCtrl extends Ctrl
 
         $this->Auth->authorize($profile->idauth_user);
 
+        $this->recordAction(
+            action: 'auth.login',
+            ownerType: $this->ledgerOwnerType,
+            ownerId: (string) $profile->idauth_user,
+            summary: 'User logged in',
+            actorId: (int) $profile->idauth_user,
+        );
+
+
         $this->redirectWithSuccess('/main', [
             'message' => MSG_ACCESS_SUCCESS,
             'data' => $profile,
@@ -106,9 +118,17 @@ class UserCtrl extends Ctrl
      */
     public function logout(): void
     {
-        unset($_SESSION[$_SERVER['APPNAME']][$_SERVER['SESSION_KEY']]);
+        $profile = $this->user?->first();
+        if ($profile):
+            $this->recordAction(
+                action: 'auth.logout',
+                ownerType: $this->ledgerOwnerType,
+                ownerId: (string) $profile->id,
+                summary: 'User logged out'
+            );
+        endif;
 
-        session_destroy();
+        $this->Auth->logout();
 
         $this->redirect('/user/login');
     }
@@ -166,17 +186,21 @@ class UserCtrl extends Ctrl
             $emailMessage
         );
 
-        /*
-         * Preserves the original behaviour:
-         * Mailman::sendMail() appears to return false on success.
-         */
-        if (!$mail === true) {
+        if ($mail === true):
+
+            $this->recordAnonymousAction(
+                action: 'auth.recover',
+                ownerType: $this->ledgerOwnerType,
+                ownerId: (string) $profile->id,
+                summary: 'Password reset request',
+            );
+
             $this->redirectWithSuccess('/user/recover', [
                 'message' => MSG_RECOVERY_EMAIL_SENT,
                 'data' => null,
                 'error' => null,
             ]);
-        }
+        endif;
 
         $this->redirectWithError('/user/recover', [
             'message' => MSG_EMAIL_FAILED_SEND,
@@ -306,6 +330,13 @@ class UserCtrl extends Ctrl
             ]);
         }
 
+        $this->recordAnonymousAction(
+            action: 'auth.password_reset',
+            ownerType: $this->ledgerOwnerType,
+            ownerId: (string) $profile->idauth_user,
+            summary: 'Password reset executed',
+        );
+
         $this->redirectWithSuccess('/user/login', [
             'message' => MSG_USER_RECOVERY_SUCCESS,
             'data' => null,
@@ -377,6 +408,10 @@ class UserCtrl extends Ctrl
         if (!empty($data)) {
             $update = $this->User->updateById($data, $userId);
 
+            $metadata = [
+                'updated_fields' => array_keys((array) $data),
+            ];
+
             if ($update->fails()) {
                 $this->redirectWithError('/user/profile', [
                     'message' => MSG_PROFILE_UPDATE_FAILED,
@@ -398,7 +433,18 @@ class UserCtrl extends Ctrl
                         : null,
                 ]);
             }
+            $metadata['avatar_updated'] = true;
         }
+
+        // Ledger Record Action
+        $this->recordAction(
+            action: 'user.profile_update',
+            ownerType: $this->ledgerOwnerType,
+            ownerId: (string) $userId,
+            summary: 'User profile updated',
+            metadata: $metadata,
+        );
+
 
         $this->redirectWithSuccess('/user/profile', [
             'message' => MSG_PROFILE_UPDATE_SUCCESS,
@@ -482,9 +528,9 @@ class UserCtrl extends Ctrl
     {
         $this->requireAuth();
 
-        if (!$this->isPost(notEmpty: true)) {
+        if (!$this->isPost(notEmpty: true)):
             return;
-        }
+        endif;
 
         $id = $this->posted('id', FILTER_VALIDATE_INT, null);
 
@@ -505,26 +551,66 @@ class UserCtrl extends Ctrl
             );
         }
 
-        if ($isUpdate) {
-            $result = $this->User->updateById($data, (int) $id);
+        /*
+         * Update existing user.
+         */
+        if ($isUpdate):
+            $result = $this->User->updateById(
+                $data,
+                (int) $id
+            );
+
+            if ($result->passes()):
+                $updatedFields = array_values(
+                    array_diff(
+                        array_keys($data),
+                        ['password']
+                    )
+                );
+
+                $this->recordAction(
+                    action: 'user.update',
+                    ownerType: $this->ledgerOwnerType,
+                    ownerId: (string) $id,
+                    summary: 'User updated',
+                    metadata: [
+                        'updated_fields' => $updatedFields,
+                    ]
+                );
+            endif;
 
             $this->evaluateResponse(
                 result: $result,
                 id: (int) $id,
                 data: $data
             );
-        }
+        endif;
 
+        /*
+         * Create new user.
+         */
         $result = $this->User->create($data);
 
-        if ($result->fails()) {
+        if ($result->fails()):
             $this->evaluateResponse(
                 result: $result,
                 data: $data
             );
-        }
+        endif;
 
-        $userId  = $result->insertId;
+        $userId = $result->insertId;
+
+        /*
+         * At this point the user has been successfully created.
+         * Any subsequent system operation is independent from the
+         * semantic user action recorded by Ledger.
+         */
+        $this->recordAction(
+            action: 'user.create',
+            ownerType: $this->ledgerOwnerType,
+            ownerId: (string) $userId,
+            summary: 'User created'
+        );
 
         /*
          * We create a default session record for the newly created user.
@@ -545,14 +631,10 @@ class UserCtrl extends Ctrl
     public function list(): void
     {
         $this->requireAdmin();
-
         $this->set('title', MSG_TITLES['H_USER_LIST']);
-
         $userList = $this->User->allProfiles();
-
         $this->set('UserList', $userList);
     }
-
 
 
     /*
@@ -564,61 +646,53 @@ class UserCtrl extends Ctrl
     protected function verifyPassword(string $password, object $user): bool
     {
         $combinedPassword = $password . $user->salt;
-
         return password_verify($combinedPassword, $user->password);
     }
 
     protected function recoveryCodeExpired(object $user): bool
     {
-        if (empty($user->recovery_created_at)) {
+        if (empty($user->recovery_created_at)):
             return true;
-        }
-
+        endif;
         $createdAt = strtotime($user->recovery_created_at);
-
-        if (!$createdAt) {
+        if (!$createdAt) :
             return true;
-        }
-
+        endif;
         $expiresAt = $createdAt + (RECOVERY_CODE_TIMEOUT * 60);
-
         return time() > $expiresAt;
     }
 
     protected function userPayloadFromPost(bool $requirePassword = false): array
     {
         $fields = $this->User->getFields();
-
         $data = [];
 
-        foreach ($fields as $field) {
+        foreach ($fields as $field) :
             $name = $field['name'];
 
-            if ($this->shouldIgnoreUserField($name)) {
+            if ($this->shouldIgnoreUserField($name)) :
                 continue;
-            }
+            endif;
 
-            if ($name === 'password') {
+            if ($name === 'password') :
                 $passwordData = $this->passwordPayloadFromPost(
                     required: $requirePassword
                 );
-
                 $data = array_merge($data, $passwordData);
-
                 continue;
-            }
+            endif;
 
             $value = $this->post($name, null);
 
-            if ($value === null || $value === '') {
+            if ($value === null || $value === '') :
                 continue;
-            }
+            endif;
 
             $data[$name] = [
                 'value' => $this->posted($name),
                 'type' => $field['type'],
             ];
-        }
+        endforeach;
 
         return $data;
     }
@@ -640,25 +714,25 @@ class UserCtrl extends Ctrl
         $password = $this->posted('password', false, null);
         $confirmPassword = $this->posted('confirm_password', false, null);
 
-        if ($password === null || $password === '') {
-            if ($required) {
+        if ($password === null || $password === '') :
+            if ($required) :
                 throw new InvalidArgumentException('Password is required.');
-            }
+            endif;
 
             return [];
-        }
+        endif;
 
-        if ($confirmPassword === null || $confirmPassword === '') {
-            if ($required) {
+        if ($confirmPassword === null || $confirmPassword === '') :
+            if ($required) :
                 throw new InvalidArgumentException('Password confirmation is required.');
-            }
+            endif;
 
             return [];
-        }
+        endif;
 
-        if (!hash_equals($password, $confirmPassword)) {
+        if (!hash_equals($password, $confirmPassword)) :
             throw new InvalidArgumentException('Password confirmation does not match.');
-        }
+        endif;
 
         $salt = bin2hex(random_bytes(16));
         $combinedPassword = $password . $salt;
@@ -678,9 +752,9 @@ class UserCtrl extends Ctrl
 
     protected function debugError(QueryResult $result): ?array
     {
-        if (($_SERVER['DEBUG'] ?? 0) <= 0 || $result->passes()) {
+        if (($_SERVER['DEBUG'] ?? 0) <= 0 || $result->passes()):
             return null;
-        }
+        endif;
 
         $exception = $result->exception();
 
@@ -691,50 +765,5 @@ class UserCtrl extends Ctrl
                 : null,
             'trace' => $exception?->getTrace(),
         ];
-    }
-
-    /**
-     * Temporary Yarn test endpoint.
-     *
-     * Move to a development-only controller or remove once AssetUploader exists.
-     */
-    public function upload_tester(): void
-    {
-        if (!$this->isPost(notEmpty: true)) {
-            return;
-        }
-
-        $config = Config::get('yarn');
-
-        $file = $_FILES['avatar'] ?? null;
-
-        if (!$file) {
-            return;
-        }
-
-        $validator = new AssetValidator($config);
-        $validation = $validator->validateUploadedFile($file);
-
-        if ($validation->fails()) {
-            echo '<pre>';
-            print_r($validation->errors);
-            echo '</pre>';
-            exit;
-        }
-
-        $storage = new AssetStorage($config);
-
-        $stored = $storage->storeUploadedFile(
-            tmpPath: $file['tmp_name'],
-            extension: $validation->extension,
-            originalName: $validation->originalName,
-        );
-
-        echo '<pre>';
-        print_r([
-            'validation' => $validation,
-            'stored' => $stored,
-        ]);
-        echo '</pre>';
     }
 }

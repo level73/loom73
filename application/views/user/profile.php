@@ -2,8 +2,6 @@
     <section>
         <h1><?php echo $title; ?> for <span class="hilite"><?php echo $user->data[0]->username; ?></span></h1>
 
-        <?php prettyPrint($avatar->first()); ?>
-
         <?php $avatarFile = $avatar?->first(); ?>
 
         <?php if ($avatarFile): ?>

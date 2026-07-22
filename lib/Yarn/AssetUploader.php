@@ -128,7 +128,7 @@ class AssetUploader
     /**
      * Upload many files in one go. The method return an array of AssetUploadResult objects
      * @param array $files the array of files normalized by Ctrl::uploadedFiles()
-     * @param int|null $ownerType The Owner of the resource, at the system level (i.e. the table or logical entity in the database)
+     * @param string|null $ownerType The Owner of the resource, at the system level (i.e. the logical entity in the database)
      * @param string|null $ownerId Id of the Owner (unique identifier of the record within the logical)
      * @param string|null $ownerSlot Slot of the owner (avatar, report, pictures...)
      * @param int|null $assetType
@@ -139,7 +139,7 @@ class AssetUploader
      */
     public function uploadMany(
         array $files,
-        ?int $ownerType = null,
+        ?string $ownerType = null,
         ?string $ownerId = null,
         ?string $ownerSlot = null,
         ?int $assetType = null,

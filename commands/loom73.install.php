@@ -202,6 +202,38 @@ class Loom73Install  {
                                       DEFAULT CHARSET=utf8mb4
                                       COLLATE=utf8mb4_unicode_ci";
 
+                $sql["add_ledger"] = "CREATE TABLE IF NOT EXISTS `ledger_events` (
+                                            `idledger_event` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+                                        
+                                            `actor_user` BIGINT NULL,
+                                        
+                                            `action` VARCHAR(120) NOT NULL,
+                                        
+                                            `owner_type` VARCHAR(100) NOT NULL,
+                                            `owner_id` VARCHAR(100) NOT NULL,
+                                        
+                                            `summary` VARCHAR(255) NOT NULL,
+                                            `metadata` JSON DEFAULT NULL,
+                                        
+                                            `ip_address` VARCHAR(45) DEFAULT NULL,
+                                            `user_agent` VARCHAR(255) DEFAULT NULL,
+                                        
+                                            `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                        
+                                            PRIMARY KEY (`idledger_event`),
+                                        
+                                            KEY `actor_user` (`actor_user`),
+                                            KEY `action` (`action`),
+                                            KEY `created_at` (`created_at`),
+                                            KEY `owner` (`owner_type`, `owner_id`),
+                                        
+                                            CONSTRAINT `fk_ledger_event_actor`
+                                                FOREIGN KEY (`actor_user`)
+                                                REFERENCES `auth_user` (`idauth_user`)
+                                        ) ENGINE=InnoDB
+                                        DEFAULT CHARSET=utf8mb4
+                                        COLLATE=utf8mb4_unicode_ci";
+
 
                 foreach($sql as $k => $sql_operation) :
                     echo "Running " . $cli->cout_color($k, 'yellow') . " operation on database..." . PHP_EOL;
@@ -223,7 +255,7 @@ class Loom73Install  {
         foreach ($this->paths as $path) {
             if (!is_dir($path)) {
                 $dir = mkdir($path, 02775, true);
-                if($dir): echo "Storage path "; echo $cli->cout_color($dir, 'yellow') . " created" . PHP_EOL;
+                if($dir): echo "Storage path "; echo $cli->cout_color($path, 'yellow') . " created" . PHP_EOL;
                 else: echo $cli->cout_color("Storage path {$path} not created", 'red') . PHP_EOL;
                 endif;
             }

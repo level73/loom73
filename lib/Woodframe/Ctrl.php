@@ -7,6 +7,7 @@ use JetBrains\PhpStorm\NoReturn;
 use Loom73\Beam\Model;
 use Loom73\Beam\QueryResult;
 use Loom73\Heddle\Auth;
+use Loom73\Ledger\Ledger;
 use Loom73\Yarn\Asset;
 use Loom73\Yarn\AssetUploader;
 use Loom73\Yarn\AssetUploadResult;
@@ -36,6 +37,7 @@ abstract class Ctrl
     protected ?Auth $Auth = null;
 
     protected ?QueryResult $user = null;
+    protected ?Ledger $Ledger = null;
 
     protected ?string $provider = null;
 
@@ -580,11 +582,70 @@ abstract class Ctrl
         $this->redirect($url);
     }
 
+    /** Ledger Helpers */
+    protected function ledger(): Ledger
+    {
+        return $this->Ledger ??= new Ledger();
+    }
+    protected function recordAction(
+        string $action,
+        string $ownerType,
+        string $ownerId,
+        string $summary,
+        array $metadata = [],
+        ?int $actorId = null
+    ): bool
+    {
+        //$actorId = $this->user?->first()?->id;
+        $actorId ??= $this->user?->first()?->id;
+
+        if (!$actorId):
+            Logger::error(
+                'Ledger',
+                'Unable to determine actor for action',
+                [
+                    'action' => $action,
+                    'owner_type' => $ownerType,
+                    'owner_id' => $ownerId,
+                ]
+            );
+
+            return false;
+        endif;
+
+        return $this->ledger()->record(
+            actorId: (int) $actorId,
+            action: $action,
+            ownerType: $ownerType,
+            ownerId: $ownerId,
+            summary: $summary,
+            metadata: $metadata
+        );
+    }
+
+    protected function recordAnonymousAction(
+        string $action,
+        string $ownerType,
+        string $ownerId,
+        string $summary,
+        array $metadata = []
+    ): bool {
+        return $this->ledger()->record(
+            actorId: null,
+            action: $action,
+            ownerType: $ownerType,
+            ownerId: $ownerId,
+            summary: $summary,
+            metadata: $metadata
+        );
+    }
+
+
     public function __destruct()
     {
-        if ($this->shouldRender) {
+        if ($this->shouldRender) :
             $this->_template->render();
-        }
+        endif;
     }
 }
 

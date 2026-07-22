@@ -109,6 +109,8 @@ function Loom73(): void {
     // Load module configs
     Config::load(ROOT_DIR . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'modules');
 
+
+
     // Capture URL
     global $url;
 

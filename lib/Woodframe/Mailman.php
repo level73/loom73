@@ -44,6 +44,10 @@ class Mailman
             self::$Mail->send();
             return true;
         } catch (Exception $e) {
+            Logger::error(
+                'Mailman',
+                'Email sending failed: ' . $e->getCode() . "::" . $e->getMessage()
+            );
             return $e;
         }
     }

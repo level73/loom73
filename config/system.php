@@ -4,7 +4,6 @@ const LOOM73 = [
     'directories' => [
         'lib' => '.class',
         'commands' => '',
-        'auth' => '.class',
         'application' . DIRECTORY_SEPARATOR . 'models' => '',
         'application' . DIRECTORY_SEPARATOR . 'controllers' => '',
     ]

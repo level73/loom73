@@ -5,6 +5,7 @@
 # Environment / secrets
 /config/.env
 .env
+.htpasswd
 
 # IDE / OS
 /.idea/

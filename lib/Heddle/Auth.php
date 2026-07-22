@@ -103,4 +103,13 @@ class Auth extends Session
 
         return crypt($token, $salt);
     }
+
+    public function logout(): void
+    {
+        $_SESSION = [];
+
+        if (session_status() === PHP_SESSION_ACTIVE):
+            session_destroy();
+        endif;
+    }
 }
