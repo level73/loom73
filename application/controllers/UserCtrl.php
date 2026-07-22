@@ -191,7 +191,7 @@ class UserCtrl extends Ctrl
             $this->recordAnonymousAction(
                 action: 'auth.recover',
                 ownerType: $this->ledgerOwnerType,
-                ownerId: (string) $profile->id,
+                ownerId: (string) $profile->idauth_user,
                 summary: 'Password reset request',
             );
 

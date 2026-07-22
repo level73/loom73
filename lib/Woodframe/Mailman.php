@@ -46,7 +46,10 @@ class Mailman
         } catch (Exception $e) {
             Logger::error(
                 'Mailman',
-                'Email sending failed: ' . $e->getCode() . "::" . $e->getMessage()
+                'Email sending failed: ' . $e->getCode() . "::" . $e->getMessage(),
+                [
+                    'mailer_error' => self::$Mail->ErrorInfo,
+                ]
             );
             return $e;
         }

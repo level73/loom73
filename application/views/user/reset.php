@@ -4,8 +4,7 @@
         <?php partial('messages'); ?>
         <form method="post" action="/user/reset-save" class="small">
             <?php csrf(); ?>
-            <input type="hidden" name="recovery" value="<?= htmlspecialchars($hash, ENT_QUOTES, 'UTF-8') ?>">
-            <?php prettyPrint($user); ?>
+            <input type="hidden" name="recovery" value="<?php echo htmlspecialchars($hash, ENT_QUOTES, 'UTF-8') ?>">
             <div class="form-content">
                 <div class="form-group">
                     <label for="password">New Password</label>
