@@ -56,8 +56,3 @@
   Header set X-Robots-Tag "noindex, nofollow, noarchive"
 </IfModule>
 
-# BasicAuth, becasue this stuff is in dev
-AuthType Basic
-AuthName "Loom73"
-AuthUserFile /var/www/loom73.lvl73.it/.htpasswd
-Require valid-user
