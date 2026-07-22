@@ -12,6 +12,6 @@ return [
      *
      * 0 = keep events indefinitely.
      */
-    'retention' => 0,
+    'retention' => 5,
 
 ];
