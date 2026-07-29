@@ -200,6 +200,24 @@
         &.image::after {
             mask-image: url('../assets/icons/image.svg');
         }
+        &.view::after {
+            mask-image: url('../assets/icons/view.svg');
+        }
+        &.cli::after {
+            mask-image: url('../assets/icons/cli.svg');
+        }
+        &.padlock::after {
+            mask-image: url('../assets/icons/padlock.svg');
+        }
+        &.routes::after {
+            mask-image: url('../assets/icons/routes.svg');
+        }
+        &.api::after {
+            mask-image: url('../assets/icons/api.svg');
+        }
+        &.path::after {
+            mask-image: url('../assets/icons/path.svg');
+        }
 
         /** Transforms - use these instead of another icon file. */
         &.r30::after{

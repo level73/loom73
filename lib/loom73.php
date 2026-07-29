@@ -71,32 +71,26 @@ function directoryLooper(string $className): bool
 /** Loom73 Autoloader */
 function Loom73_autoloader(string $className): void
 {
-    try {
-        if (namespaceLoader($className)) {
-            return;
-        }
 
-        $shortClassName = explode("\\", $className);
-        $shortClassName = array_pop($shortClassName);
-
-        if (directoryLooper($shortClassName)) {
-            return;
-        }
-
-        if (($_SERVER['DEBUG'] ?? 0) > 0) {
-            $error = error_get_last();
-            var_dump($error);
-            Debugger::dbg(debug_backtrace());
-        }
-
-
-        throw new Errata(
-            'Class <span class="fatal">' . $shortClassName . '</span> not found',
-            500
-        );
-    } catch (Errata $e) {
-        echo $e->errorMessage();
+    if (namespaceLoader($className)) {
+        return;
     }
+
+    $shortClassName = explode("\\", $className);
+    $shortClassName = array_pop($shortClassName);
+
+    if (directoryLooper($shortClassName)) {
+        return;
+    }
+    /*
+     * Class not found.
+     *
+     * The autoloader must fail silently.
+     * The caller or PHP itself will determine whether
+     * the missing class is actually an error.
+     */
+
+    return;
 }
 
 spl_autoload_register('Loom73_autoloader');

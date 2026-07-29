@@ -16,15 +16,12 @@ export const Loom73Forms = {
     messages: {
         mandatory: 'This field is required. ',
         invalidEmail: 'This email is invalid. Please check your email address and retry. ',
-
         tooLong(field) {
             return 'This is too long, the field accepts maximum ' + field.getAttribute('maxlength') + ' characters. ';
         },
-
         tooShort(field) {
             return 'This is too short, it needs to be at least ' + field.getAttribute('minlength') + ' characters long. ';
         },
-
         passwordsDontMatch: 'The passwords don\'t match. '
     },
 
@@ -45,7 +42,6 @@ export const Loom73Forms = {
 
     initForm(form) {
         form.setAttribute('novalidate', '');
-
         form.addEventListener('submit', event => {
             event.preventDefault();
 

@@ -76,4 +76,53 @@
             color: var(--color-accent-brightest);
         }
     }
+    .callout{
+        margin-block: calc(var(--spacing) * 2);
+        text-align: left;
+        font-size: var(--fontsize-3);
+        text-wrap: balance;
+        font-family: var(--body-italic-font-family);
+    }
+    /** Grid of small square cards, icon + label */
+    .components {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: var(--padding);
+        & > div {
+            border: 1px solid var(--color-border);
+            padding: var(--padding);
+            text-align: center;
+            place-items: center;
+            & > span {
+                display: block;
+                font-size: var(--fontsize--2);
+                text-transform: uppercase;
+                font-family: var(--monospace-font-family);
+            }
+        }
+    }
+
+    .card.architecture-card {
+        border: 1px solid var(--color-border);
+        padding: var(--spacing);
+        h3 {
+            font-size: var(--fontsize-1);
+            font-family: var(--monospace-font-family);
+            padding-bottom: calc(var(--spacing) / 2);
+        }
+    }
+    .card.principle {
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+        gap: calc(var(--spacing) / 2);
+        i {
+            justify-self: end;
+        }
+    }
+    .card.ts {
+        padding: var(--padding);
+        border: 1px solid var(--color-border);
+        background: var(--color-surface);
+
+    }
 }

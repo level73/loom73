@@ -131,4 +131,38 @@ class User extends Model
             ],
         ]);
     }
+    /**-------- API MODELS --------**/
+    public function apiList(): QueryResult
+    {
+        $sql = '
+            SELECT
+                u.username AS username,
+                r.role AS role
+            FROM ' . $this->tableName() . ' AS u
+            LEFT JOIN `auth_role` AS r
+                ON r.idauth_role = u.role
+            WHERE u.status = ' . STATUS_ACTIVE . '
+            ORDER BY u.username ASC';
+        return $this->query($sql);
+    }
+
+    public function apiByUsername(string $username): QueryResult
+    {
+        $sql = "
+        SELECT
+            u.username,
+            r.role AS role,
+            u.created_at AS last_access
+        FROM auth_user AS u
+        LEFT JOIN auth_role AS r
+            ON r.idauth_role = u.role
+        WHERE u.username = :username
+          AND u.status = 2
+        LIMIT 1
+    ";
+
+        return $this->query(
+            $sql, [ 'username' => $username ]
+        );
+    }
 }

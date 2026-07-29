@@ -152,6 +152,7 @@
     }
     p {
         line-height: 150%;
+        padding-block-end: calc(var(--padding) / 2);
     }
     /** #TODO add lists to the rest **/
     ol, ul, dl { }

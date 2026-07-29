@@ -66,17 +66,13 @@ class Loom73Table {
 
     getSearchInput() {
         const tableId = this.table.id;
-
         if (!tableId) return null;
-
         return document.querySelector(`[data-table-search="#${tableId}"]`);
     }
 
     getPaginationElement() {
         const tableId = this.table.id;
-
         if (!tableId) return null;
-
         return document.querySelector(`[data-table-pagination="#${tableId}"]`);
     }
 
@@ -136,7 +132,6 @@ class Loom73Table {
             const button = event.target.closest('[data-table-page]');
 
             if (!button) return;
-
             event.preventDefault();
 
             const action = button.dataset.tablePage;
@@ -145,7 +140,6 @@ class Loom73Table {
             if (action === 'previous') {
                 this.state.page = Math.max(1, this.state.page - 1);
             }
-
             if (action === 'next') {
                 this.state.page = Math.min(totalPages, this.state.page + 1);
             }
@@ -170,7 +164,6 @@ class Loom73Table {
 
         return this.rows.filter(row => {
             const text = this.getSearchableText(row);
-
             return text.includes(this.state.query);
         });
     }
@@ -240,7 +233,6 @@ class Loom73Table {
         }
 
         this.pagination.hidden = false;
-
         if (this.state.page > totalPages) {
             this.state.page = totalPages;
         }
@@ -256,11 +248,9 @@ class Loom73Table {
                     ${previousDisabled}>
                     Previous
                 </button>
-
                 <span aria-live="polite">
                     Page ${this.state.page} of ${totalPages}
                 </span>
-
                 <button
                     type="button"
                     data-table-page="next"
@@ -273,7 +263,6 @@ class Loom73Table {
 
     getTotalPages() {
         const totalMatchingRows = this.getMatchingRows().length;
-
         return Math.max(
             1,
             Math.ceil(totalMatchingRows / this.state.pageSize)
@@ -282,11 +271,9 @@ class Loom73Table {
 
     getSortableValue(cell) {
         if (!cell) return '';
-
         if (cell.dataset.sortValue !== undefined) {
             return cell.dataset.sortValue.trim();
         }
-
         return cell.textContent.trim();
     }
 
@@ -294,11 +281,9 @@ class Loom73Table {
         if (type === 'number') {
             return this.toNumber(valueA) - this.toNumber(valueB);
         }
-
         if (type === 'date') {
             return this.toDate(valueA) - this.toDate(valueB);
         }
-
         return valueA.localeCompare(valueB, document.documentElement.lang || 'en', {
             sensitivity: 'base',
             numeric: true
@@ -311,7 +296,6 @@ class Loom73Table {
             .replace(',', '.');
 
         const number = parseFloat(normalized);
-
         return Number.isNaN(number) ? 0 : number;
     }
 

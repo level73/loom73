@@ -11,8 +11,11 @@ class Debugger
         if(!empty($error)):
             echo '<div class="debugger">';
             foreach($error as $e):
+                $file = $e['file'] ?? '';
+                $line = $e['line'] ?? '';
+
                 echo '<details>';
-                    echo '<summary>' . $e['file'] . ': line ' . $e['line'] . ' (function: ' . $e['function'] . ')</summary>';
+                    echo '<summary>' . $file . ': line ' . $line . ' (function: ' . $e['function'] . ')</summary>';
                     echo '<pre>';
                         print_r($e);
                     echo '</pre>';

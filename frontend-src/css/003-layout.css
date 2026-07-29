@@ -51,6 +51,26 @@
                 grid-template-columns: 1fr;
             }
         }
+        &.grid-4-col {
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            @media (max-width: 48rem) {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        &.grid-2_3-col {
+            grid-template-columns: 2fr 1fr;
+            @media (max-width: 48rem) {
+                grid-template-columns: 1fr;
+            }
+        }
+        &.grid-20 {
+            grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+            @media (max-width: 48rem) {
+                grid-template-columns: repeat(auto-fit, minmax(min(10rem, 100%), 1fr));
+            }
+        }
+
         &.grid-25 {
             grid-template-columns: repeat(auto-fit, minmax(min(26rem, 100%), 1fr));
             @media (max-width: 48rem) {
@@ -60,8 +80,15 @@
         &.grid-6_5{
             grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr));
         }
+
+        &.with-gap {
+            gap: var(--spacing);
+        }
     }
 
+    .center-block{
+        place-self: center;
+    }
 
 
 

@@ -22,7 +22,7 @@
             <ul>
                 <li class="menu-item"><a href="/user/list">All Users</a></li>
                 <li class="menu-item"><a href="/user/create">Add a new User</a></li>
-                <li class="menu-item"><a href="/user/edit">Edit your Profile</a></li>
+                <li class="menu-item"><a href="/user/profile">Edit your Profile</a></li>
             </ul>
         </div>
 
