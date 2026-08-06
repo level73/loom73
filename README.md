@@ -313,7 +313,6 @@ These elements are excluded from deployment and are never overwritten by a core 
 
 ```text
 application/        application controllers, models, and views
-auth/               authentication-related application resources
 commands/           Shuttle commands
 config/             configuration files and .env example
 deploy/             deployment scripts and rsync exclusions
