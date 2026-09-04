@@ -40,6 +40,17 @@ class Loom73Table {
             pageSize: this.getPageSize()
         };
 
+        this.paginationOptions = {
+            icons: {
+                next: 'stitch--chevron r270',
+                prev: 'stitch--chevron r90',
+            },
+            labels: {
+                prev: 'prev',
+                next: 'next',
+            }
+        };
+
         this.searchInput = this.getSearchInput();
         this.pagination = this.getPaginationElement();
     }
@@ -246,7 +257,8 @@ class Loom73Table {
                     type="button"
                     data-table-page="previous"
                     ${previousDisabled}>
-                    Previous
+                    <i class="stitch ${this.paginationOptions.icons.prev}" aria-hidden="true"></i>
+                    ${this.paginationOptions.labels.prev}
                 </button>
                 <span aria-live="polite">
                     Page ${this.state.page} of ${totalPages}
@@ -254,8 +266,9 @@ class Loom73Table {
                 <button
                     type="button"
                     data-table-page="next"
-                    ${nextDisabled}>
-                    Next
+                    ${nextDisabled}>                    
+                    ${this.paginationOptions.labels.next}
+                    <i class="stitch ${this.paginationOptions.icons.next}" aria-hidden="true"></i>
                 </button>
             </div>
         `;

@@ -93,6 +93,20 @@
         color: var(--color-accent);
     }
 
+    /** Color Utilities **/
+    /** Theme ID **/
+    .color-accent {        color: var(--color-accent); }
+    .color-accent-hover {  color: var(--color-accent-hover); }
+    .color-surface {       color: var(--color-surface); }
+    .color-accent-bright { color: var(--color-accent-bright); }
+    .color-border {        color: var(--color-border); }
+    .color-secondary {     color: var(--color-secondary); }
+    .color-text {          color: var(--color-text); }
+    /** State **/
+    .color-danger {    color: var(--color-utility-danger); }
+    .color-warning {   color: var(--color-utility-warning); }
+    .color-info {      color: var(--color-utility-info); }
+    .color-success {   color: var(--color-utility-success); }
 
     /** Handy Animations **/
     /** Bouncy Pop In **/

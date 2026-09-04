@@ -10,4 +10,9 @@ class Loom73Info extends Shuttle {
         echo 'Shuttle version: ' . $cli->cout_color(self::$version, 'green') . PHP_EOL;
         echo 'Loom73 version: ' . $cli->cout_color(LOOM73['version'], 'green') . PHP_EOL;
     }
+
+
+    private function checkPHP(): void {
+
+    }
 }

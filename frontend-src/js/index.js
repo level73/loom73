@@ -19,5 +19,6 @@ const Loom73 = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+    document.documentElement.classList.add('loom73-ready');
     Loom73.init();
 });

@@ -1,8 +1,8 @@
 @layer components {
 
-    nav.navbar {
+    header#main-header {
         width: 100%;
-        padding-inline: 1.5rem;
+        padding-inline: calc(var(--spacing) + 5%);
         padding-block: 0.5rem;
         display: flex;
         flex-direction: row;
@@ -25,18 +25,7 @@
                 color: var(--color-accent-hover);
             }
         }
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            justify-content: flex-start;
-            li {
-                list-style: none;
-                padding-inline: 1.5rem;
 
-            }
-        }
         .username {
             display: inline-block;
             font-weight: 600;
@@ -58,6 +47,97 @@
             }
         }
     }
+
+    .navbar-toggler {
+        display: none;
+    }
+
+    .navbar {
+        display: flex;
+        align-items: start;
+        gap: var(--spacing, 1.5rem);
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .navbar .navbar-menu {
+        list-style: none;
+
+        display: flex;
+        flex-direction: row;
+        li {
+            display: flex;
+            padding-inline: calc(var(--spacing) / 2);
+            a {
+                color: var(--color-accent);
+                text-decoration: none;
+                &:hover, &:focus, &:visited {
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+    /*li.nav-item:has(> ul.sub-nav):hover{
+        ul.sub-nav {
+            display: block;
+        }
+    }*/
+
+
+    ul.sub-nav {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 36px;
+        background: var(--color-background);
+        border: 1px solid var(--color-border);
+        padding: calc(var(--padding) / 2);
+        li {
+            padding: 0.25rem;
+        }
+    }
+    li.nav-item:hover>ul.sub-nav {
+        display: block;
+    }
+
+    @media (width < 48rem) {
+        .loom73-ready .navbar-toggler {
+            display: inline-flex;
+
+            border: none;
+            background: transparent;
+        }
+        .loom73-ready .navbar {
+            position: absolute;
+            z-index: 1000;
+            inset-block-start: 50px;
+            inset-inline: 0;
+
+            background: var(--color-surface);
+            height: calc(100vh - 50px);
+
+            padding: var(--spacing);
+        }
+        .loom73-ready .navbar[hidden] {
+            display: none;
+        }
+        .loom73-ready .navbar-menu {
+            display: grid;
+            list-style: none;
+            li { padding: calc(var(--spacing) / 4); flex-direction: column; }
+            li a { font-size: var(--fontsize-1);}
+        }
+
+        .loom73-ready .navbar-menu ul.sub-nav {
+            display: block;
+            position: relative;
+            top: 0;
+            background: none;
+            border: none;
+        }
+    }
+
 
     .popover-menu {
         grid-template-columns: 1fr;
@@ -98,27 +178,38 @@
         }
     }
 
-    a.button {
+    .button {
         text-decoration: none;
         padding: 1rem 2rem;
         border: 1px solid var(--color-accent);
         margin-block-end: var(--spacing);
         background-color: var(--color-accent);
         color: contrast-color(var(--color-accent));
+        font-size: var(--fontsize-0);
+        @media screen and (width  <= 48rem){
+            padding-inline: 1rem;
+            padding-block: 0.5rem;
+        }
     }
-    a.button.hollow {
+    .button.hollow {
         color: var(--color-accent);
         border: 1px solid var(--color-accent);
         background-color: transparent;
+        transition: all 0.2s linear;
+        &:hover {
+            cursor: pointer;
+            background-color: var(--color-accent);
+            color: var(--color-background);
+        }
     }
 
-    a.button:has(.icon) {
+    .button:has(.icon) {
         line-height: 1;
     }
 
 
     p.claim {
-        font-size: calc(var(--fontsize-5) * 1.8);
+        font-size: calc(var(--fontsize-5) * 1.6);
         line-height: 110%;
         letter-spacing: -0.2rem;
         margin-block: 3rem;
@@ -134,6 +225,12 @@
             max-width: 42ch;
             text-wrap: balance;
         }
+    }
+
+    p.intro {
+        font-size: var(--fontsize-2);
+        margin-block: var(--spacing);
+        max-width: 18ch;
     }
 
     hr {
@@ -178,13 +275,103 @@
         margin-inline-start: 0;
     }
 
+     /**
+     * Loom73 Tooltip
+     *
+     * Structural tooltip behavior only.
+     * Visual appearance belongs to the active theme.
+     */
+
+    .loom73-tooltip {
+        position: fixed;
+        z-index: 1000;
+        width: max-content;
+        max-width: min(18rem, calc(100vw - 1rem));
+        overflow-wrap: break-word;
+        white-space: normal;
+        pointer-events: auto;
+    }
+
+    .loom73-tooltip[hidden] {
+        display: none;
+    }
+
+    /**
+     * Plain theme — Tooltip
+     */
+
+    .loom73-tooltip {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid rgb(255 255 255 / 10%);
+        border-radius: 0.25rem;
+        background: #202428;
+        color: #ffffff;
+        box-shadow:
+                0 0.25rem 1rem
+                rgb(0 0 0 / 20%);
+
+        font-size: var(--fontsize--1);
+        font-weight: 400;
+        line-height: 1.4;
+        text-align: start;
+    }
+
+    /**
+     * Tooltip arrow
+     */
+    .loom73-tooltip::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        width: 0.5rem;
+        height: 0.5rem;
+        background: inherit;
+        transform: translateX(-50%) rotate(45deg);
+    }
+
+    .loom73-tooltip[data-placement="top"]::after {
+        top: calc(100% - 0.25rem);
+    }
+
+    .loom73-tooltip[data-placement="bottom"]::after {
+        bottom: calc(100% - 0.25rem);
+    }
+
+    ul.checklist {
+
+        margin-inline-start: var(--spacing);
+        padding-inline-start: var(--padding);
+        font-size: var(--fontsize-1);
+        li {
+            padding-inline: var(--padding);
+            padding-block: calc(var(--padding) / 2);
+            &::marker {
+                content: url(../assets/checklist-checkmark.png);
+            }
+            ul {
+                padding-inline-start: calc(var(--padding) / 2);
+                margin-inline-start: var(--spacing);
+                margin-block-start: calc(var(--spacing) / 2);
+            }
+        }
+
+        &.small {
+            font-size: var(--fontsize-0);
+            li {
+                padding-block-start: 0;
+                padding-inline-start: calc(var(--padding) / 2);
+            }
+        }
+    }
+
+
     /*@scope (table) { */
     table {
             border-collapse: collapse;
             border-spacing: 0;
             border: 1px solid var(--color-border);
-            margin: var(--spacing);
-            width: calc(100% - (var(--spacing) * 2));
+            margin: var(--spacing) 0;
+            width: 100%;
 
             caption {
                 font-size: var(--fontsize-3);
@@ -242,6 +429,9 @@
                 }
                 &.role-user {
                     --bg-color: color-mix(oklch( from var(--color-utility-info) l c h / 0.50) 95%, black 5%);
+                }
+                & > .button {
+                    margin-block-end: 0;
                 }
             }
 
@@ -305,6 +495,29 @@
         .table-pagination button[disabled] {
             opacity: .45;
             cursor: not-allowed;
+        }
+        td a.button {
+            place-self: center;
+            display: flex;
+            margin-block-end: 0;
+        }
+    }
+    @scope (div.table-pagination){
+        text-align: center;
+        button {
+            padding-block: calc(var(--padding) / 2);
+            padding-inline: var(--padding);
+            font-size: var(--fontsize-0);
+            border: none;
+            background: none;
+            text-transform: uppercase;
+            color: var(--color-accent);
+            cursor: pointer;
+            transition: all 0.2s linear;
+            &:hover, &:focus, &:not([disabled]){
+                transform: scale(1.05);
+            }
+
         }
     }
 
@@ -460,35 +673,67 @@
                 color: contrast-color(oklch(from var(--color-utility-danger) 0.5 c h));
             }
         }
-    }
-}
-
-footer {
-    border-top: 1px solid var(--color-border);
-    background-color: var(--color-surface);
-    padding: var(--padding) 5%;
-
-    h3 {
-        font-family: var(--monospace-font-family);
-        font-size: var(--fontsize-1);
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: -0.1rem;
-        display: inline-block;
-
-    }
-    ul {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        li {
-            padding-block: 0.5rem;
-            .footer-nav-item {
-              color: var(--color-text);
-              text-decoration: var(--color-text) dotted;
-
-            }
+        button[data-dialog-close] {
+            border: none;
+            background: none;
+            display: flex;
+            justify-self: end;
         }
     }
-    p {font-size: var(--fontsize--1);}
+
+    footer {
+        border-top: 1px solid var(--color-border);
+        background-color: var(--color-surface);
+        padding: var(--padding) 5%;
+
+        h3 {
+            font-family: var(--monospace-font-family);
+            font-size: var(--fontsize-1);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: -0.1rem;
+            display: inline-block;
+
+        }
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            li {
+                padding-block: 0.5rem;
+                .footer-nav-item {
+                    color: var(--color-text);
+                    text-decoration: var(--color-text) dotted;
+
+                }
+            }
+        }
+        p {font-size: var(--fontsize--1);}
+    }
+
+    .code-example {
+        display: grid;
+        margin-block: var(--spacing);
+        padding: var(--padding);
+        border: 1px solid var(--color-border);
+        text-align: center;
+        justify-content: center;
+        justify-items: center;
+        align-items: center;
+        h4 {
+            margin-block-end: var(--spacing);
+            text-transform: uppercase;
+            font-family: var(--monospace-font-family);
+        }
+        pre {
+            display: block;
+            margin-block: var(--spacing);
+        }
+        .helper {
+            font-size: var(--fontsize--1);
+            color: var(--color-secondary);
+            font-family: var(--body-italic-font-family);
+            max-width: 80%;
+        }
+    }
 }

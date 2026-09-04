@@ -1,0 +1,169 @@
+@layer stitch {
+
+    .stitch {
+        --stitch-base-size: 1.25em;
+        --stitch-scale: 1;
+        --stitch-rotation: 0deg;
+        --stitch-color: currentColor;
+
+        display: inline-grid;
+
+        width: var(--stitch-size, calc(var(--stitch-base-size) * var(--stitch-scale)));
+        height: var(--stitch-size, calc( var(--stitch-base-size) * var(--stitch-scale)));
+
+        line-height: 0;
+        vertical-align: text-bottom;
+
+        background-color: transparent;
+
+
+        mask-repeat: no-repeat;
+        mask-position: center;
+        mask-size: contain;
+
+        /** Set up the actual icons now **/
+        &::after{
+            width: inherit;
+            height: inherit;
+            display: inline-block;
+            content: " ";
+            mask-size: contain;
+            background-color: var(--stitch-color);
+            transform-origin: center;
+            transform: rotate(var(--stitch-rotation));
+        }
+
+        /** Icon Library **/
+        &.stitch--arrow::after {
+            mask-image: url('../assets/icons/arrow.svg');
+        }
+        &.stitch--bin::after {
+            mask-image: url('../assets/icons/bin.svg');
+        }
+        &.stitch--caret::after {
+            mask-image: url('../assets/icons/caret.svg');
+        }
+        &.stitch--check::after {
+            mask-image: url('../assets/icons/check.svg');
+        }
+        &.stitch--chevron::after {
+            mask-image: url('../assets/icons/chevron.svg');
+        }
+        &.stitch--cog::after {
+            mask-image: url('../assets/icons/cog.svg');
+        }
+        &.stitch--cube::after {
+            mask-image: url('../assets/icons/cube.svg');
+        }
+        &.stitch--danger::after {
+            mask-image: url('../assets/icons/danger.svg');
+        }
+        &.stitch--database::after {
+            mask-image: url('../assets/icons/database.svg');
+        }
+        &.stitch--document::after {
+            mask-image: url('../assets/icons/document.svg');
+        }
+        &.stitch--download::after {
+            mask-image: url('../assets/icons/download.svg');
+        }
+        &.stitch--error::after {
+            mask-image: url('../assets/icons/error.svg');
+        }
+        &.stitch--info::after {
+            mask-image: url('../assets/icons/info.svg');
+        }
+        &.stitch--layers::after {
+            mask-image: url('../assets/icons/layers.svg');
+        }
+        &.stitch--leaf::after {
+            mask-image: url('../assets/icons/leaf.svg');
+        }
+        &.stitch--login::after {
+            mask-image: url('../assets/icons/login.svg');
+        }
+        &.stitch--logout::after {
+            mask-image: url('../assets/icons/logout.svg');
+        }
+        &.stitch--mail::after {
+            mask-image: url('../assets/icons/mail.svg');
+        }
+        &.stitch--menu::after {
+            mask-image: url('../assets/icons/menu.svg');
+        }
+        &.stitch--minus::after {
+            mask-image: url('../assets/icons/minus.svg');
+        }
+        &.stitch--outbound::after {
+            mask-image: url('../assets/icons/outbound.svg');
+        }
+        &.stitch--pdf::after {
+            mask-image: url('../assets/icons/pdf.svg');
+        }
+        &.stitch--pencil::after {
+            mask-image: url('../assets/icons/pencil.svg');
+        }
+        &.stitch--plus::after {
+            mask-image: url('../assets/icons/plus.svg');
+        }
+        &.stitch--puzzle::after {
+            mask-image: url('../assets/icons/puzzle.svg');
+        }
+        &.stitch--question::after {
+            mask-image: url('../assets/icons/question.svg');
+        }
+        &.stitch--save::after {
+            mask-image: url('../assets/icons/save.svg');
+        }
+        &.stitch--search::after {
+            mask-image: url('../assets/icons/search.svg');
+        }
+        &.stitch--spreadsheet::after {
+            mask-image: url('../assets/icons/spreadsheet.svg');
+        }
+        &.stitch--times::after {
+            mask-image: url('../assets/icons/times.svg');
+        }
+        &.stitch--user::after {
+            mask-image: url('../assets/icons/user.svg');
+        }
+        &.stitch--image::after {
+            mask-image: url('../assets/icons/image.svg');
+        }
+        &.stitch--view::after {
+            mask-image: url('../assets/icons/view.svg');
+        }
+        &.stitch--cli::after {
+            mask-image: url('../assets/icons/cli.svg');
+        }
+        &.stitch--padlock::after {
+            mask-image: url('../assets/icons/padlock.svg');
+        }
+        &.stitch--routes::after {
+            mask-image: url('../assets/icons/routes.svg');
+        }
+        &.stitch--api::after {
+            mask-image: url('../assets/icons/api.svg');
+        }
+        &.stitch--path::after {
+            mask-image: url('../assets/icons/path.svg');
+        }
+    }
+
+    @scope (.stitch) {
+        :scope.x1\.5 { --stitch-scale: 1.5; }
+        :scope.x2    { --stitch-scale: 2; }
+        :scope.x3    { --stitch-scale: 3; }
+        :scope.x4    { --stitch-scale: 4; }
+        :scope.x5    { --stitch-scale: 5; }
+        :scope.x6    { --stitch-scale: 6; }
+
+        :scope.r45::after   { --stitch-rotation: 45deg; }
+        :scope.r90::after   { --stitch-rotation: 90deg; }
+        :scope.r135::after  { --stitch-rotation: 135deg; }
+        :scope.r180::after  { --stitch-rotation: 180deg; }
+        :scope.r225::after  { --stitch-rotation: 225deg; }
+        :scope.r270::after  { --stitch-rotation: 270deg; }
+        :scope.r315::after  { --stitch-rotation: 315deg; }
+    }
+}
