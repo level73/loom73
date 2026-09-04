@@ -1,7 +1,7 @@
 @layer layout {
 
     main {
-
+        min-height: 90vh;
 
 
     }
@@ -10,6 +10,7 @@
         max-width: 90%;
         border-left: 1px solid var(--color-border);
         border-right: 1px solid var(--color-border);
+        height: 100%;
         &.breakout {
             max-width: 100%;
             border: none;
@@ -29,6 +30,11 @@
                 }
                 & > div:nth-child(even){
                     border-right: 1px solid var(--color-border);
+                }
+
+                & > div {
+                    border-right: 1px solid var(--color-border);
+                    border-left: 1px solid var(--color-border);
                 }
             }
         }
@@ -51,15 +57,38 @@
                 grid-template-columns: 1fr;
             }
         }
+        &.grid-3-col {
+            grid-template-columns: 1fr 1fr 1fr;
+            @media (max-width: 48rem) {
+                grid-template-columns: 1fr;
+            }
+        }
         &.grid-4-col {
             grid-template-columns: 1fr 1fr 1fr 1fr;
             @media (max-width: 48rem) {
                 grid-template-columns: 1fr;
             }
         }
-
+        &.grid-1_2-col {
+            grid-template-columns: 1fr 2fr;
+            @media (max-width: 48rem) {
+                grid-template-columns: 1fr;
+            }
+        }
         &.grid-2_3-col {
             grid-template-columns: 2fr 1fr;
+            @media (max-width: 48rem) {
+                grid-template-columns: 1fr;
+            }
+        }
+        &.grid-3_1 {
+            grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+            @media (max-width: 48rem) {
+                grid-template-columns: 1fr;
+            }
+        }
+        &.grid-1_3 {
+            grid-template-columns: minmax(0, 1fr) minmax(0, 3fr);
             @media (max-width: 48rem) {
                 grid-template-columns: 1fr;
             }
@@ -67,32 +96,82 @@
         &.grid-20 {
             grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
             @media (max-width: 48rem) {
-                grid-template-columns: repeat(auto-fit, minmax(min(10rem, 100%), 1fr));
+                grid-template-columns:  1fr;
             }
         }
 
         &.grid-25 {
             grid-template-columns: repeat(auto-fit, minmax(min(26rem, 100%), 1fr));
             @media (max-width: 48rem) {
-                grid-template-columns: repeat(auto-fit, minmax(min(10rem, 100%), 1fr));
+                grid-template-columns: 1fr;
+                /*grid-template-columns: repeat(auto-fit, minmax(min(10rem, 100%), 1fr));*/
             }
         }
         &.grid-6_5{
             grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr));
         }
 
+        &.grid-1-2-1-col {
+            grid-template-columns: 1fr 2fr 1fr;
+            @media (max-width: 48rem) {
+                grid-template-columns: 1fr;
+                /*grid-template-columns: repeat(auto-fit, minmax(min(10rem, 100%), 1fr));*/
+            }
+        }
+        &.grid-2-1-1-col {
+            grid-template-columns: 2fr 1fr 1fr;
+            @media (max-width: 48rem) {
+                grid-template-columns: 1fr;
+                /*grid-template-columns: repeat(auto-fit, minmax(min(10rem, 100%), 1fr));*/
+            }
+        }
+
         &.with-gap {
             gap: var(--spacing);
         }
-    }
 
+        &.bordered {
+            border-top: 1px solid var(--color-border);
+        }
+
+        &.center-content {
+            place-items: center;
+        }
+        header.with-badge {
+            display: grid;
+            grid-template-columns: 6fr 1fr;
+            grid-template-rows: repeat(2, 1fr);
+            grid-column-gap: 0;
+            grid-row-gap: 0;
+
+            h2 { grid-area: 1 / 1 / 2 / 2; }
+            span.badge {
+                grid-area: 1 / 2 / 2 / 3;
+                text-align: center;
+            }
+            hr{ grid-area: 2 / 1 / 3 / 3; }
+        }
+    }
+    .flex {
+        display: flex;
+        &.column {
+            flex-direction: column;
+        }
+        &.row {
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+        &.justified {
+            align-items: center;
+            justify-content: space-between;
+        }
+        &.vbottom {
+            align-items: baseline;
+        }
+        /* &.vtop { align-items: top; }*/
+    }
     .center-block{
         place-self: center;
     }
-
-
-
-
-
 
 }

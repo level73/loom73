@@ -3,27 +3,37 @@
  * Lightweight UI utilities:
  * - Dialog open / close
  * - Dismissible elements
- * - Once-in-view reveal
  * - Tooltips
+ * - Once-in-view reveal
+ * - Responsive navigations (hamburger pattern)
  *
  * Usage:
  *   import { Loom73UI } from './ui.js';
  *   Loom73UI.init();
  */
-const initializedTooltips = new WeakSet();
+
+
+const initializedNavigations = new WeakSet();
+let tooltipElement = null;
+let activeTooltipTrigger = null;
+let tooltipHideTimer = null;
+let tooltipsInitialized = false;
+
 export const Loom73UI = {
 
     init(options = {}) {
         this.options = {
             inViewThreshold: 0.25,
             inViewRootMargin: '0px',
+            navigationBreakpoint: '48rem',
             ...options
         };
 
         this.initDialogs();
+        this.initTooltips();
         this.initDismissibles();
         this.initInView();
-        this.initTooltips();
+        this.initResponsiveNavigation();
     },
 
     /**
@@ -73,6 +83,335 @@ export const Loom73UI = {
                 dialog.removeAttribute('open');
             }
         });
+    },
+
+    /**
+     * Initializes the Loom73 tooltip behavior.
+     *
+     * Tooltip triggers are identified by the `[data-tooltip]` attribute.
+     * The attribute value is used as plain-text tooltip content.
+     *
+     * A single tooltip element is created at runtime and shared by all
+     * triggers. When a tooltip is active, the trigger is associated with
+     * it through `aria-describedby`, preserving any existing descriptions.
+     *
+     * Tooltips:
+     * - open on pointer hover or keyboard focus;
+     * - remain visible while the pointer is over the tooltip itself;
+     * - close when pointer and focus leave the tooltip context;
+     * - close when Escape is pressed;
+     * - never receive or move keyboard focus;
+     * - contain descriptive text only, not interactive content.
+     *
+     * Event delegation is used so dynamically added `[data-tooltip]`
+     * elements work without requiring reinitialization.
+     *
+     * This method is idempotent and may safely be called more than once.
+     *
+     * @returns {void}
+     */
+    initTooltips() {
+        if (tooltipsInitialized) {
+            return;
+        }
+
+        tooltipElement = document.createElement('div');
+
+        tooltipElement.id = 'loom73-tooltip';
+        tooltipElement.className = 'loom73-tooltip';
+        tooltipElement.setAttribute('role', 'tooltip');
+        tooltipElement.hidden = true;
+
+        document.body.appendChild(tooltipElement);
+
+        const getTrigger = (target) => {
+            if (!(target instanceof Element)) {
+                return null;
+            }
+
+            return target.closest('[data-tooltip]');
+        };
+
+        const clearHideTimer = () => {
+            if (tooltipHideTimer === null) {
+                return;
+            }
+
+            window.clearTimeout(tooltipHideTimer);
+            tooltipHideTimer = null;
+        };
+
+        const addDescription = (trigger) => {
+            const describedBy = (
+                trigger.getAttribute('aria-describedby') ?? ''
+            )
+                .split(/\s+/)
+                .filter(Boolean);
+
+            if (!describedBy.includes(tooltipElement.id)) {
+                describedBy.push(tooltipElement.id);
+            }
+
+            trigger.setAttribute(
+                'aria-describedby',
+                describedBy.join(' ')
+            );
+        };
+
+        const removeDescription = (trigger) => {
+            const describedBy = (
+                trigger.getAttribute('aria-describedby') ?? ''
+            )
+                .split(/\s+/)
+                .filter(
+                    (id) => id && id !== tooltipElement.id
+                );
+
+            if (describedBy.length === 0) {
+                trigger.removeAttribute('aria-describedby');
+                return;
+            }
+
+            trigger.setAttribute(
+                'aria-describedby',
+                describedBy.join(' ')
+            );
+        };
+
+        const positionTooltip = (trigger) => {
+            if (tooltipElement.hidden) {
+                return;
+            }
+
+            const triggerRect = trigger.getBoundingClientRect();
+            const tooltipRect = tooltipElement.getBoundingClientRect();
+
+            const gap = 8;
+            const viewportMargin = 8;
+
+            let top = (
+                triggerRect.top
+                - tooltipRect.height
+                - gap
+            );
+
+            let placement = 'top';
+
+            if (top < viewportMargin) {
+                top = triggerRect.bottom + gap;
+                placement = 'bottom';
+            }
+
+            let left = (
+                triggerRect.left
+                + (triggerRect.width / 2)
+                - (tooltipRect.width / 2)
+            );
+
+            const maxLeft = (
+                window.innerWidth
+                - tooltipRect.width
+                - viewportMargin
+            );
+
+            left = Math.max(
+                viewportMargin,
+                Math.min(left, maxLeft)
+            );
+
+            tooltipElement.style.top = `${top}px`;
+            tooltipElement.style.left = `${left}px`;
+
+            tooltipElement.dataset.placement = placement;
+        };
+
+        const showTooltip = (trigger) => {
+            const content = trigger.dataset.tooltip?.trim();
+
+            if (!content) {
+                return;
+            }
+
+            clearHideTimer();
+
+            if (
+                activeTooltipTrigger
+                && activeTooltipTrigger !== trigger
+            ) {
+                removeDescription(activeTooltipTrigger);
+            }
+
+            activeTooltipTrigger = trigger;
+
+            /*
+             * textContent is deliberate:
+             * data-tooltip is plain descriptive text,
+             * never executable or interactive markup.
+             */
+            tooltipElement.textContent = content;
+            tooltipElement.hidden = false;
+
+            addDescription(trigger);
+            positionTooltip(trigger);
+        };
+
+        const hideTooltip = () => {
+            clearHideTimer();
+
+            if (activeTooltipTrigger) {
+                removeDescription(activeTooltipTrigger);
+            }
+
+            activeTooltipTrigger = null;
+
+            tooltipElement.hidden = true;
+            tooltipElement.textContent = '';
+
+            delete tooltipElement.dataset.placement;
+        };
+
+        const scheduleHide = () => {
+            clearHideTimer();
+
+            tooltipHideTimer = window.setTimeout(() => {
+                if (
+                    activeTooltipTrigger
+                    && activeTooltipTrigger.matches(':hover')
+                ) {
+                    return;
+                }
+
+                if (
+                    activeTooltipTrigger
+                    && document.activeElement === activeTooltipTrigger
+                ) {
+                    return;
+                }
+
+                if (tooltipElement.matches(':hover')) {
+                    return;
+                }
+
+                hideTooltip();
+            }, 100);
+        };
+
+        document.addEventListener(
+            'pointerover',
+            (event) => {
+                const trigger = getTrigger(event.target);
+
+                if (!trigger) {
+                    return;
+                }
+
+                showTooltip(trigger);
+            }
+        );
+
+        document.addEventListener(
+            'pointerout',
+            (event) => {
+                const trigger = getTrigger(event.target);
+
+                if (!trigger) {
+                    return;
+                }
+
+                const relatedTarget = event.relatedTarget;
+
+                if (
+                    relatedTarget instanceof Node
+                    && trigger.contains(relatedTarget)
+                ) {
+                    return;
+                }
+
+                scheduleHide();
+            }
+        );
+
+        document.addEventListener(
+            'focusin',
+            (event) => {
+                const trigger = getTrigger(event.target);
+
+                if (!trigger) {
+                    return;
+                }
+
+                showTooltip(trigger);
+            }
+        );
+
+        document.addEventListener(
+            'focusout',
+            (event) => {
+                const trigger = getTrigger(event.target);
+
+                if (!trigger) {
+                    return;
+                }
+
+                scheduleHide();
+            }
+        );
+
+        document.addEventListener(
+            'keydown',
+            (event) => {
+                if (event.key !== 'Escape') {
+                    return;
+                }
+
+                if (!activeTooltipTrigger) {
+                    return;
+                }
+
+                hideTooltip();
+            }
+        );
+
+        tooltipElement.addEventListener(
+            'pointerenter',
+            () => {
+                clearHideTimer();
+            }
+        );
+
+        tooltipElement.addEventListener(
+            'pointerleave',
+            () => {
+                scheduleHide();
+            }
+        );
+
+        window.addEventListener(
+            'resize',
+            () => {
+                if (!activeTooltipTrigger) {
+                    return;
+                }
+
+                positionTooltip(activeTooltipTrigger);
+            }
+        );
+
+        window.addEventListener(
+            'scroll',
+            () => {
+                if (!activeTooltipTrigger) {
+                    return;
+                }
+
+                positionTooltip(activeTooltipTrigger);
+            },
+            {
+                passive: true
+            }
+        );
+
+        tooltipsInitialized = true;
     },
 
     /**
@@ -162,72 +501,140 @@ export const Loom73UI = {
         });
     },
 
+    /**
+     * Responsive Navigation
+     * Markup:
+     * <header data-responsive-nav>
+     *   <button data-nav-toggle></button>
+     *   <nav data-nav-panel>
+     *       <ul>
+     *           <li><a></a></li>
+     *       </ul>
+     *   </nav>
+     * </header>
+     */
 
-    initTooltips(root = document) {
-        const tooltips = root.querySelectorAll('[data-tooltip]');
-        console.log(tooltips);
-        tooltips.forEach((tooltip) => {
-            if (initializedTooltips.has(tooltip)) {
+    initResponsiveNavigation(root = document) {
+        const navigations = root.querySelectorAll(
+            '[data-responsive-nav]'
+        );
+
+        navigations.forEach((navigation) => {
+            if (initializedNavigations.has(navigation)) {
                 return;
             }
 
-            const trigger = tooltip.querySelector(
-                '[data-tooltip-trigger]'
+            const toggle = navigation.querySelector(
+                '[data-nav-toggle]'
             );
 
-            const content = tooltip.querySelector(
-                '[data-tooltip-content]'
+            const panel = navigation.querySelector(
+                '[data-nav-panel]'
             );
 
-            if (!(trigger instanceof HTMLElement)) {
+            if (!(toggle instanceof HTMLButtonElement)) {
                 return;
             }
 
-            if (!(content instanceof HTMLElement)) {
+            if (!(panel instanceof HTMLElement)) {
                 return;
             }
 
-            const show = () => {
-                content.hidden = false;
+            const media = window.matchMedia(
+                `(min-width: ${this.options.navigationBreakpoint})`
+            );
+
+            const isOpen = () => {
+                return toggle.getAttribute('aria-expanded') === 'true';
             };
 
-            const hide = () => {
-                content.hidden = true;
+            const open = () => {
+                toggle.setAttribute('aria-expanded', 'true');
+                toggle.querySelector('.stitch').classList.add('stitch--times');
+                toggle.querySelector('.stitch').classList.remove('stitch--menu');
+                panel.hidden = false;
+                navigation.dataset.navOpen = 'true';
             };
 
-            tooltip.addEventListener('pointerenter', show);
+            const close = ({ restoreFocus = false } = {}) => {
+                toggle.setAttribute('aria-expanded', 'false');
+                toggle.querySelector('.stitch').classList.add('stitch--menu');
+                toggle.querySelector('.stitch').classList.remove('stitch--times');
+                navigation.dataset.navOpen = 'false';
 
-            tooltip.addEventListener('pointerleave', () => {
-                if (!tooltip.contains(document.activeElement)) {
-                    hide();
+                if (!media.matches) {
+                    panel.hidden = true;
+                }
+
+                if (restoreFocus) {
+                    toggle.focus();
+                }
+            };
+
+            const synchronize = () => {
+                if (media.matches) {
+                    toggle.setAttribute('aria-expanded', 'false');
+                    navigation.dataset.navOpen = 'false';
+                    panel.hidden = false;
+                    return;
+                }
+
+                close();
+            };
+
+            toggle.addEventListener('click', () => {
+                if (isOpen()) {
+                    close();
+                    return;
+                }
+
+                open();
+            });
+
+            navigation.addEventListener('keydown', (event) => {
+                if (event.key !== 'Escape' || !isOpen()) {
+                    return;
+                }
+
+                close({
+                    restoreFocus: true
+                });
+            });
+
+            panel.addEventListener('click', (event) => {
+                const link = event.target.closest('a');
+
+                if (!(link instanceof HTMLAnchorElement)) {
+                    return;
+                }
+
+                if (!media.matches) {
+                    close();
                 }
             });
 
-            tooltip.addEventListener('focusin', show);
+            document.addEventListener('pointerdown', (event) => {
+                if (!isOpen()) {
+                    return;
+                }
 
-            tooltip.addEventListener('focusout', (event) => {
                 if (
-                    event.relatedTarget instanceof Node
-                    && tooltip.contains(event.relatedTarget)
+                    event.target instanceof Node
+                    && navigation.contains(event.target)
                 ) {
                     return;
                 }
 
-                hide();
+                close();
             });
 
-            trigger.addEventListener('keydown', (event) => {
-                if (event.key !== 'Escape') {
-                    return;
-                }
+            media.addEventListener('change', synchronize);
 
-                hide();
-                trigger.focus();
-            });
-
-            initializedTooltips.add(tooltip);
+            synchronize();
+            initializedNavigations.add(navigation);
         });
     },
+
 
     revealInViewElement(element) {
         const className = element.dataset.inview;

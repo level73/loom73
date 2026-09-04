@@ -13,7 +13,8 @@ module.exports = function(grunt) {
                     'css/004-components.css',
                     'css/005-utilities.css',
                     'css/006-specific.css',
-                    'css/007-icons.css'
+                    /*'css/007-icons.css',*/
+                    'css/008-stitch.css',
                 ],
                 dest: 'concat.css'
             }

@@ -1,14 +1,35 @@
-<header>
-    <nav class="navbar">
+<header id="main-header" data-responsive-nav>
+
         <a href="/" class="navbar-brand" aria-label="Loom73 Logo - Back to homepage">
             <img src="/assets/loom73.svg" width="32" height="32" alt="Loom73 Logo - Back to homepage">
             Loom73
         </a>
-        <ul>
-            <li class="nav-item">What is it</li>
-            <li class="nav-item">Docs</li>
-            <li class="nav-item">Contact</li>
-        </ul>
+
+
+        <button class="navbar-toggler" type="button" aria-controls="main-navigation" aria-expanded="false" data-nav-toggle>
+            <i class="stitch stitch--menu color-text x1.5" aria-hidden="true"></i>
+            <span class="sr-only">Menu</span>
+        </button>
+        <nav class="navbar" id="main-navigation" aria-label="Main navigation" data-nav-panel>
+            <ul id="navigation-menu" class="navbar-menu">
+                <li class="nav-item"><a href="/">Overview</a></li>
+                <li class="nav-item"><a href="/main/architecture">Architecture</a></li>
+                <li class="nav-item">
+                    <a href="/components">Components <i class="stitch stitch--caret" aria-hidden="true"></i></a>
+                    <ul class="sub-nav">
+                        <li class="nav-item"><a href="/components/shuttle">Shuttle</a></li>
+                        <li class="nav-item"><a href="/components/stitch-icons">Stitch Icons</a></li>
+                        <li class="nav-item"><a href="/components/tables">Tables</a></li>
+                        <li class="nav-item"><a href="/components/forms">Forms</a></li>
+                        <li class="nav-item"><a href="/components/ui-utilities">UI Utilities</a></li>
+
+                    </ul>
+                </li>
+                <li class="nav-item"><a href="/main/technical-requirements">Tech</a></li>
+                <li class="nav-item">Docs</li>
+                <li class="nav-item">Github</li>
+            </ul>
+        </nav>
         <?php if(isset($user) && $is_authenticated === true): ?>
         <div class="user-info">
             hello, <span class="username"><?php echo $user->data[0]->username; ?></span>

@@ -111,16 +111,16 @@ function flashIcon($type): void
 {
     switch ($type):
         case 'success':
-            echo '<i class="icon check"></i>';
+            echo '<i class="stitch stitch--check x1.5"></i>';
             break;
         case 'danger':
-            echo '<i class="icon error"></i>';
+            echo '<i class="stitch stitch--error x1.5"></i>';
             break;
         case 'warning':
-            echo '<i class="icon danger"></i>';
+            echo '<i class="stitch stitch--danger x1.5"></i>';
             break;
         case 'info':
-            echo '<i class="icon info"></i>';
+            echo '<i class="stitch stitch--info x1.5"></i>';
             break;
         default:
             break;
