@@ -4,12 +4,13 @@
  * - Dialog open / close
  * - Dismissible elements
  * - Once-in-view reveal
+ * - Tooltips
  *
  * Usage:
  *   import { Loom73UI } from './ui.js';
  *   Loom73UI.init();
  */
-
+const initializedTooltips = new WeakSet();
 export const Loom73UI = {
 
     init(options = {}) {
@@ -22,6 +23,7 @@ export const Loom73UI = {
         this.initDialogs();
         this.initDismissibles();
         this.initInView();
+        this.initTooltips();
     },
 
     /**
@@ -157,6 +159,73 @@ export const Loom73UI = {
             group.elements.forEach(element => {
                 observer.observe(element);
             });
+        });
+    },
+
+
+    initTooltips(root = document) {
+        const tooltips = root.querySelectorAll('[data-tooltip]');
+        console.log(tooltips);
+        tooltips.forEach((tooltip) => {
+            if (initializedTooltips.has(tooltip)) {
+                return;
+            }
+
+            const trigger = tooltip.querySelector(
+                '[data-tooltip-trigger]'
+            );
+
+            const content = tooltip.querySelector(
+                '[data-tooltip-content]'
+            );
+
+            if (!(trigger instanceof HTMLElement)) {
+                return;
+            }
+
+            if (!(content instanceof HTMLElement)) {
+                return;
+            }
+
+            const show = () => {
+                content.hidden = false;
+            };
+
+            const hide = () => {
+                content.hidden = true;
+            };
+
+            tooltip.addEventListener('pointerenter', show);
+
+            tooltip.addEventListener('pointerleave', () => {
+                if (!tooltip.contains(document.activeElement)) {
+                    hide();
+                }
+            });
+
+            tooltip.addEventListener('focusin', show);
+
+            tooltip.addEventListener('focusout', (event) => {
+                if (
+                    event.relatedTarget instanceof Node
+                    && tooltip.contains(event.relatedTarget)
+                ) {
+                    return;
+                }
+
+                hide();
+            });
+
+            trigger.addEventListener('keydown', (event) => {
+                if (event.key !== 'Escape') {
+                    return;
+                }
+
+                hide();
+                trigger.focus();
+            });
+
+            initializedTooltips.add(tooltip);
         });
     },
 

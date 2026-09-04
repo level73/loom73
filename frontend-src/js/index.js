@@ -17,7 +17,10 @@ const Loom73 = {
         Loom73UI.init();
     }
 };
+/** Boot it up! **/
+Loom73.init();
 
-document.addEventListener('DOMContentLoaded', () => {
+
+/**document.addEventListener('DOMContentLoaded', () => {
     Loom73.init();
-});
+}); */
