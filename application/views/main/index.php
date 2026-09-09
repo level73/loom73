@@ -199,7 +199,7 @@
                 <h2 class="balance">Start with the decisions<br />that should not need<br />to be made again.</h2>
                 <hr />
                 <p>Loom73 collects the recurring decisions that should <strong><em>not</em></strong> need<br />to be reconsidered at the beginning of every project.</p>
-                <a class="button" href="#">View on Github <span class="stitch stitch--arrow"></span></a> <a class="button hollow" href="#">Read the docs <span class="stitch stitch--arrow"></span></a>
+                <a class="button" href="https://github.com/level73/loom73" target="_blank">View on Github <span class="stitch stitch--arrow"></span></a> <a class="button hollow" href="https://github.com/level73/loom73/blob/main/documentation/index.md" target="_blank">Read the docs <span class="stitch stitch--arrow"></span></a>
             </div>
         </div>
     </section>
