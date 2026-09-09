@@ -73,7 +73,7 @@
                 <li>rsync deployment</li>
             </ul>
 
-            <a class="button hollow">View the docs <i class="stitch stitch--arrow" aria-hidden="true"></i></a>
+            <a class="button hollow" href="https://github.com/level73/loom73/blob/main/documentation/deployment.md" target="_blank">View the docs <i class="stitch stitch--arrow" aria-hidden="true"></i></a>
         </div>
 
     </section>

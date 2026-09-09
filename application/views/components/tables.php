@@ -600,11 +600,11 @@
             </nav>
         </div>
     </section>
-    <section class="grid breakout">
+    <section class="grid">
         <div>
             <h2>References</h2>
             <hr />
-            <a class="button hollow">Read the docs <i class="stitch stitch--arrow"></i></a>
+            <a class="button hollow" href="https://github.com/level73/loom73/blob/main/documentation/frontend/tables.md" target="_blank">Read the docs <i class="stitch stitch--arrow"></i></a>
         </div>
     </section>
 </main>

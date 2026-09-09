@@ -46,6 +46,13 @@
             <p id="frontend-validation-status" role="status" aria-live="polite" aria-atomic="true"></p>
         </div>
     </section>
+    <section class="grid">
+        <div>
+            <h2>References</h2>
+            <hr />
+            <a class="button hollow" href="https://github.com/level73/loom73/blob/main/documentation/frontend/forms.md" target="_blank">Read the docs <i class="stitch stitch--arrow"></i></a>
+        </div>
+    </section>
 </main>
 <script>
     const exampleForm = document.getElementById('frontend-validation-example');

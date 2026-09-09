@@ -113,4 +113,12 @@
             </ul>
         </div>
     </section>
+
+    <section class="grid">
+        <div>
+            <h2>References</h2>
+            <hr />
+            <a class="button hollow" href="https://github.com/level73/loom73/blob/main/documentation/shuttle.md" target="_blank">Read the docs <i class="stitch stitch--arrow"></i></a>
+        </div>
+    </section>
 </main>
