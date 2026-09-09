@@ -11,9 +11,9 @@ module.exports = function(grunt) {
                     'css/002-reset.css',
                     'css/003-layout.css',
                     'css/004-components.css',
-                    'css/005-utilities.css',
-                    'css/006-specific.css',
-                    /*'css/007-icons.css',*/
+                    'css/005-ui.css',
+                    'css/006-utilities.css',
+                    'css/007-specific.css',
                     'css/008-stitch.css',
                 ],
                 dest: 'concat.css'

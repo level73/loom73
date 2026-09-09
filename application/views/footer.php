@@ -15,12 +15,13 @@
             <h3>Explore</h3>
             <ul>
                 <li><a href="/" class="footer-nav-item">Overview</a></li>
-                <li><a href="" class="footer-nav-item">Architecture</a></li>
-                <li><a href="" class="footer-nav-item">Components</a></li>
-                <li><a href="" class="footer-nav-item">Technical note</a></li>
+                <li><a href="/main/architecture" class="footer-nav-item">Architecture</a></li>
+                <li><a href="/components" class="footer-nav-item">Components</a></li>
+                <li><a href="/main/technical-requirements" class="footer-nav-item">Technical note</a></li>
 
             </ul>
         </div>
+        <!--
         <div>
             <h3>Resources</h3>
             <ul>
@@ -38,7 +39,7 @@
                 <li><a href="" class="footer-nav-item">Contribute</a></li>
             </ul>
         </div>
-
+        -->
     </div>
 
 </footer>

@@ -1,4 +1,4 @@
-<main>
+<main id="main-content">
     <section class="grid grid-1_2-col">
         <div>
             <h1>Technical</h1>
@@ -8,7 +8,7 @@
             </p>
         </div>
         <figure>
-            <img src="/assets/raster/tech-spec.webp" class="image" alt="Ink drawing of the various components needed to assemble a medieval loom.">
+            <img  width="1672" height="941" src="/assets/raster/tech-spec.webp" class="image" alt="Ink drawing of the various components needed to assemble a medieval loom.">
             <figcaption>The various parts that compose a loom.</figcaption>
         </figure>
     </section>

@@ -106,21 +106,27 @@ function idfield($id): void {
 }
 
 /** Frontend Helpers */
-/** Add an Icon in the Flash Messages */
-function flashIcon($type): void
+/** Add an Icon in the Flash Messages
+ * @param string $type can be success, danger, warning, info
+ * @param string $size null or a Stitch icon size multiplier
+ * */
+function flashIcon(
+    $type,
+    $size = null
+): void
 {
     switch ($type):
         case 'success':
-            echo '<i class="stitch stitch--check x1.5"></i>';
+            echo '<i class="stitch stitch--check ' . (!is_null($size) ? $size : ''). '"></i>';
             break;
         case 'danger':
-            echo '<i class="stitch stitch--error x1.5"></i>';
+            echo '<i class="stitch stitch--error ' . (!is_null($size) ? $size : ''). '"></i>';
             break;
         case 'warning':
-            echo '<i class="stitch stitch--danger x1.5"></i>';
+            echo '<i class="stitch stitch--danger ' . (!is_null($size) ? $size : ''). '"></i>';
             break;
         case 'info':
-            echo '<i class="stitch stitch--info x1.5"></i>';
+            echo '<i class="stitch stitch--info ' . (!is_null($size) ? $size : ''). '"></i>';
             break;
         default:
             break;

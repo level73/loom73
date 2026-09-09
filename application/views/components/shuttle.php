@@ -1,4 +1,4 @@
-<main>
+<main id="main-content">
     <section class="grid grid-1_2-col">
 
         <div>
@@ -16,7 +16,7 @@
         </div>
         <div>
             <figure>
-                <img src="/assets/raster/shuttle.webp" class="image" alt="A wooden shuttle from an 1800s loom.">
+                <img width="1672" height="941" src="/assets/raster/shuttle.webp" class="image" alt="A wooden shuttle from an 1800s loom.">
                 <figcaption>The Shuttle</figcaption>
             </figure>
         </div>
@@ -26,7 +26,7 @@
             <span class="stitch stitch--cli x6 color-accent" aria-hidden="true"></span>
             <div>
                 <h4>Health & Info</h4>
-                <p>Check Loom73 and Shuttle versions. Look up instance health, such as PHP versions, database connections, runtime directory permissions.</p>
+                <p>Check Loom73 instance health, such as PHP versions, database connections, runtime directory permissions and more.</p>
             </div>
         </div>
         <div class="grid grid-1_2-col with-gap">

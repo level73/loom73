@@ -13,17 +13,29 @@ class ComponentsCtrl extends Ctrl
 
     }
 
+    public function shuttle(): void
+    {
+        $this->set('title', "Shuttle");
+        $this->set('meta_description', "The CLI tool for common Loom73 operations.");
+
+    }
+
     public function stitch_icons(): void
     {
         $this->set('title', "Stitch Icons");
         $this->set('meta_description', "Stitch - the Loom73 icons family");
 
     }
-
     public function tables(): void
     {
         $this->set('title', "Tables");
         $this->set('meta_description', "An example of how the Loom73 Data Tables component works.");
 
     }
+    public function forms(): void
+    {
+        $this->set('title', "Forms");
+        $this->set('meta_description', "An example of how the Loom73 Frontend Form validation works.");
+    }
+
 }

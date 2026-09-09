@@ -1,180 +1,165 @@
 # Namespacing Loom73
 
-## Base namespace
-
 The base namespace is:
 
 ```php
 Loom73\
 ```
 
-Loom73 namespaces are organized around the loom metaphor. They are not intended to mirror the filesystem mechanically. They describe the conceptual responsibility of each component.
+Loom73 uses names inspired by the parts of a loom to describe broad architectural responsibilities. The metaphor provides orientation; concrete class names remain direct and technical.
 
-The namespace tells us **what kind of work a class performs**, not simply where the file happens to live.
-
-Loom73 uses namespacing to preserve clarity, not to create unnecessary abstraction. The metaphor belongs primarily to the architectural modules; class names should remain direct, technical and readable.
+```text
+Namespaces carry the metaphor.
+Classes carry the responsibility.
+```
 
 Good:
 
 ```php
-Loom73\Yarn\AssetUploader
 Loom73\Beam\QueryResult
+Loom73\Yarn\AssetUploader
 Loom73\Woodframe\OwnerRegistry
 ```
 
-Less good:
+Avoid names whose meaning depends on understanding an internal metaphor:
 
 ```php
 Loom73\Yarn\ThreadSpinner
 Loom73\Beam\LightCaster
 ```
 
-The namespace may be poetic. The class should say what it does.
+## Principles
 
----
-
-## Namespace principles
-
-Loom73 follows a small set of namespace principles:
+Loom73 namespaces follow a few rules:
 
 ```text
 Namespaces describe responsibility.
-Namespaces should not hide application logic.
-Core modules should remain reusable.
-Application code should remain visibly application-specific.
-The framework should support conventions, not impose a cage.
+Reusable mechanisms stay separate from application decisions.
+Application logic remains visible.
+Simple behavior should not be abstracted merely to fit a namespace.
 ```
 
-A namespace is not a service container, not an ORM boundary, and not a reason to over-abstract code that is better left explicit.
-
-The guiding rule is:
-
-```text
-Use namespaces to make the architecture legible.
-Do not use namespaces to make simple things look sophisticated.
-```
-
----
+The namespace structure does not introduce a service container, plugin system or mandatory dependency-injection layer.
 
 ## Autoloading
 
-Loom73 supports namespaced classes under the base namespace:
+Loom73 currently uses its own autoloader.
+
+A namespaced class such as:
 
 ```php
-Loom73\
+Loom73\Yarn\AssetUploader
 ```
 
-The autoloader resolves namespaced classes primarily from the reusable library area, while still allowing legacy or application-specific loading where needed.
-
-The intended direction is:
+is first resolved to:
 
 ```text
-Loom73\Woodframe\*
-Loom73\Beam\*
-Loom73\Heddle\*
-Loom73\Yarn\*
-Loom73\Shuttle\*
-Loom73\Ledger\*
+lib/Yarn/AssetUploader.php
 ```
 
-mapped from the reusable core/library structure.
+If no matching library file exists, Loom73 searches the directories configured in `LOOM73['directories']`, including:
 
-Application-specific code may live under the application layer while still using the `Loom73\Weave\` namespace when appropriate.
+```text
+lib/
+commands/
+application/models/
+application/controllers/
+```
 
----
+The fallback uses the class basename. Class names should therefore remain unique across these directories.
 
-# Core namespaces
+Application code does not have to live under `lib/`. A class may be physically application-specific while still using the namespace that best describes its responsibility.
+
+For example:
+
+```text
+application/controllers/UserCtrl.php
+    → Loom73\Weave\Controllers\UserCtrl
+
+application/models/User.php
+    → Loom73\Beam\User
+```
+
+The first coordinates an HTTP request. The second performs persistence work for the application.
 
 ## `Loom73\Woodframe\`
 
-`Woodframe` is the structural frame of Loom73.
+Woodframe contains the structural foundation shared by the rest of Loom73.
 
-It contains the stable foundation shared by the rest of the system: configuration, base controllers, templates, debug helpers, generic utilities and registries that describe application-wide conventions.
-
-Typical responsibilities:
-
-```text
-configuration access
-base controller behavior
-template/rendering support
-debugging helpers
-shared framework utilities
-application-level registries
-```
-
-Examples:
+Current classes include:
 
 ```php
 Loom73\Woodframe\Config
 Loom73\Woodframe\Ctrl
 Loom73\Woodframe\Template
+Loom73\Woodframe\Flash
+Loom73\Woodframe\Logger
+Loom73\Woodframe\Mailman
 Loom73\Woodframe\OwnerRegistry
+Loom73\Woodframe\Debugger
+Loom73\Woodframe\Errata
+```
+
+Its responsibilities include:
+
+```text
+configuration
+base controller behavior
+template composition
+flash messages
+mail delivery
+operational logging
+shared registries
+debugging and error support
+```
+
+Woodframe should contain mechanisms that are useful across multiple parts of the application. Domain-specific decisions belong elsewhere.
+
+### Configuration
+
+Module configuration files live in:
+
+```text
+config/modules/
+```
+
+Each file returns an array. `Config` loads these files and exposes values through dot notation:
+
+```php
+Config::get('database.default');
+Config::get('yarn.storage_path');
+Config::get('ledger.enabled', false);
 ```
 
 ### OwnerRegistry
 
-`OwnerRegistry` belongs to `Woodframe`, not to `Yarn`.
-
-This is an important architectural decision.
-
-Owners are logical application entities:
+`OwnerRegistry` defines the logical entities that other components may reference:
 
 ```text
 user
 project
 partner
 event
-case
 document
 ```
 
-They may be used by assets, audit logs, metadata, lexicons, relations or future modules. For this reason, ownership is not an asset-specific concept.
+Owners are wider than asset ownership. Yarn and Ledger may both consult the registry, so the registry belongs to Woodframe.
 
-`Yarn` may consult `OwnerRegistry`, but `OwnerRegistry` must not depend on `Yarn`.
-
-Dependency direction:
+The dependency direction is:
 
 ```text
 Woodframe\OwnerRegistry
-  used by Yarn
-  used by Ledger
-  used by future metadata systems
+    ↓
+Yarn, Ledger and application code
 ```
 
-not:
-
-```text
-Yarn owns the concept of owners
-```
-
-The owner registry defines logical application ownership. It does not replace database relations, and it does not make every owner type a database table.
-
----
+Woodframe must not depend on Yarn or Ledger to understand what an owner is.
 
 ## `Loom73\Beam\`
 
-`Beam` is the persistence and data-access layer.
+Beam is the persistence and data-access layer.
 
-It provides database connection handling, query results and a small base model layer. It is intentionally lightweight.
-
-Beam is not an ORM.
-
-Beam is not a query-builder-first abstraction.
-
-Beam exists to offer a stable minimum layer over PDO while keeping SQL visible where SQL is the clearest tool.
-
-Typical responsibilities:
-
-```text
-PDO connection management
-base model helpers
-query execution
-query result wrapping
-small CRUD primitives
-explicit SQL support
-```
-
-Examples:
+Current core classes include:
 
 ```php
 Loom73\Beam\Connection
@@ -182,125 +167,142 @@ Loom73\Beam\Model
 Loom73\Beam\QueryResult
 ```
 
-The base model may provide ordinary helpers such as:
+Concrete application models may also use the Beam namespace when their primary responsibility is data access.
+
+Beam provides:
 
 ```text
-getById
-getBy
-create
-updateById
-updateWhere
-deleteById
-softDeleteById
+shared PDO connection handling
+prepared statements
+normalized query results
+small CRUD primitives
+identifier validation
+soft-delete helpers
+explicit SQL support
 ```
 
-But concrete models should still write explicit SQL for:
-
-```text
-joins
-reports
-aggregations
-domain-specific reads
-performance-sensitive queries
-complex filters
-```
-
-The design principle is:
+Beam is not an ORM and does not attempt to replace SQL with a universal query builder.
 
 ```text
 Beam reduces repetition.
 It does not hide the database.
 ```
 
-### QueryResult
+### Connection
 
-`QueryResult` represents the outcome of a persistence operation.
+`Connection::pdo()` returns the shared PDO instance, creating it on first use.
 
-It allows the application to distinguish between:
+`Connection::make()` creates an independent PDO connection from the configured database connection or from an explicitly supplied configuration array.
 
-```text
-successful query with data
-successful query with no data
-failed query
-insert result
-update result
-database exception
+`Connection::set()` and `Connection::reset()` allow the shared connection to be replaced or cleared.
+
+`Connection::ping()` prepares and executes `SELECT 1`. It is intended for operational health checks such as:
+
+```bash
+php shuttle loom73.info
 ```
 
-This keeps controllers and services from relying directly on raw PDO return values or scattered exception handling.
+A connection health check returns a boolean. It is not a domain query and does not require a `QueryResult`.
 
----
+### Model
+
+`Model` provides common operations such as:
+
+```text
+getById
+getBy
+all
+create
+updateById
+updateWhere
+updateRawWhere
+deleteById
+softDeleteById
+restoreById
+getFields
+```
+
+Concrete models should write explicit SQL when a query expresses:
+
+```text
+joins
+unions
+subqueries
+aggregations
+reports
+domain-specific reads
+performance-sensitive behavior
+```
+
+Values must be bound as parameters. Dynamic identifiers must pass through the identifier validation provided by Model.
+
+### QueryResult
+
+Database operations return a `QueryResult` containing:
+
+```text
+success
+rows
+data
+insertId
+error
+```
+
+Typical usage:
+
+```php
+$result = $this->User->getById($id);
+
+if ($result->fails()):
+    // Handle the database failure.
+endif;
+
+if ($result->isEmpty()):
+    // The query succeeded but found no record.
+endif;
+
+$user = $result->first();
+```
+
+`QueryResult` represents query execution outcomes. Invalid API usage and programming errors may still throw exceptions.
 
 ## `Loom73\Heddle\`
 
-`Heddle` handles authentication, sessions, authorization and access control.
+Heddle handles authentication, sessions and authorization.
 
-It contains the machinery that decides who is present, what role they have, and what they are allowed to do.
+Current classes include:
 
-Typical responsibilities:
+```php
+Loom73\Heddle\Auth
+Loom73\Heddle\Session
+```
+
+Its responsibilities include:
 
 ```text
-login
-logout
+login and logout
 session validation
 authenticated profile retrieval
 role checks
 ability checks
-authorization guards
 ```
 
-Examples:
-
-```php
-Loom73\Heddle\Session
-Loom73\Heddle\Auth
-```
-
-`Auth` may expose methods such as:
-
-```php
-isLoggedIn()
-getProfile()
-hasRole()
-can()
-```
-
-Authorization should remain explicit at the controller or use-case level.
-
-For example:
+The base controller makes the authentication context available, but routes remain public until a controller explicitly applies a guard:
 
 ```php
 $this->requireAuth();
+$this->requireAdmin();
+$this->requireEditor();
 $this->requireAbility('manage_users');
 ```
 
-Public routes remain public unless a controller method explicitly requires authentication or a specific ability.
-
-The presence of `Auth` in the base controller does not make the whole application private. It only makes the authentication context available.
-
----
+Heddle determines authentication and authorization state. Controllers decide which application actions require that state.
 
 ## `Loom73\Yarn\`
 
-`Yarn` manages uploaded assets and file resources.
+Yarn manages uploaded files as application resources.
 
-It handles validation, storage, asset metadata, owner-slot policies, upload orchestration and controlled delivery of files stored outside the public web root.
-
-Typical responsibilities:
-
-```text
-upload validation
-MIME/type validation
-storage outside webroot
-asset metadata registration
-asset type resolution
-owner slot policy checks
-single-slot replacement
-file delivery
-download/inline response handling
-```
-
-Examples:
+Current classes include:
 
 ```php
 Loom73\Yarn\Asset
@@ -310,194 +312,83 @@ Loom73\Yarn\AssetStorage
 Loom73\Yarn\AssetPolicy
 Loom73\Yarn\AssetUploader
 Loom73\Yarn\AssetDelivery
+Loom73\Yarn\AssetValidationResult
+Loom73\Yarn\AssetUploadResult
+```
+
+Yarn owns:
+
+```text
+upload validation
+MIME and extension validation
+storage outside the public web root
+asset metadata
+owner-slot policy
+single-slot replacement
+visibility
+inline and attachment delivery
 ```
 
 Yarn distinguishes between:
 
 ```text
 owner_type
+    logical kind of owning entity
+
 owner_id
+    identifier of that entity
+
 owner_slot
+    contextual position of the asset
+
 asset_type
+    semantic file classification stored in the database
 ```
 
 Example:
 
 ```text
 owner_type = user
-owner_id = 1
+owner_id = 12
 owner_slot = avatar
 asset_type = image_avatar
 ```
 
-Where:
-
-```text
-owner_type
-  logical application owner, validated through OwnerRegistry
-
-owner_id
-  identifier of the owned object
-
-owner_slot
-  contextual placement of the file in relation to the owner
-
-asset_type
-  semantic file type, stored as a DB-backed asset type
-```
-
-`owner_type` is not a database foreign key. It is a logical application key.
-
-`asset_type` is a database-backed semantic classification.
-
-### Asset controllers
-
-HTTP controllers for assets do not belong inside `Yarn`.
-
-For example:
-
-```php
-AssetCtrl
-```
-
-belongs to the application/controller layer, because it is a route-facing HTTP bridge.
-
-The separation is:
+HTTP routing does not belong to Yarn. For example:
 
 ```text
 Yarn\AssetDelivery
-  knows how to deliver a file
+    validates and emits a file response
 
 Weave\Controllers\AssetCtrl
-  knows how to respond to an HTTP request
+    handles the route, authentication and response choice
 ```
-
-This keeps `Yarn` reusable and free from application routing assumptions.
-
----
-
-## `Loom73\Weave\`
-
-`Weave` is the application orchestration layer.
-
-It contains the code that connects incoming requests, application decisions, models, services, views and responses.
-
-Typical responsibilities:
-
-```text
-application controllers
-request orchestration
-use-case coordination
-application-specific services
-API handlers
-view data preparation
-redirect and response flow
-```
-
-Examples:
-
-```php
-Loom73\Weave\Controllers\UserCtrl
-Loom73\Weave\Controllers\AssetCtrl
-```
-
-`Weave` is where the application is allowed to be specific.
-
-It is the place where reusable Loom73 primitives are combined into actual behavior:
-
-```text
-Auth context from Heddle
-data access from Beam
-asset handling from Yarn
-configuration from Woodframe
-audit logging from Ledger
-```
-
-A controller in `Weave` should not become a dumping ground, but it is allowed to express the actual flow of the application clearly.
-
-The rule is:
-
-```text
-Reusable mechanisms live in core namespaces.
-Application decisions live in Weave.
-```
-
----
-
-## `Loom73\Shuttle\`
-
-`Shuttle` provides command-line tooling and project automation.
-
-It is responsible for tasks that are better performed from the CLI than from the web application.
-
-Typical responsibilities:
-
-```text
-installation commands
-database setup
-seed data
-admin user creation
-runtime directory initialization
-maintenance commands
-cleanup routines
-developer utilities
-```
-
-Examples:
-
-```php
-Loom73\Shuttle\Installer
-Loom73\Shuttle\Command
-```
-
-`Shuttle` is not only a database installer.
-
-The install command represents the initialization of a Loom73 instance. It may therefore create:
-
-```text
-database tables
-seed data
-runtime directories
-initial users
-required registry values
-```
-
-For example, `storage/` is runtime state and should be created by Shuttle during installation, not deployed from GitHub.
-
-The principle is:
-
-```text
-Deploy code.
-Install runtime state.
-```
-
----
 
 ## `Loom73\Ledger\`
 
-`Ledger` is the audit and activity logging namespace.
+Ledger records meaningful application actions.
 
-It is intended for recording relevant operations performed inside the application.
-
-Typical responsibilities:
-
-```text
-audit events
-activity logs
-actor/action/owner tracking
-change summaries
-security-relevant records
-administrative traceability
-```
-
-Expected examples:
+Current classes include:
 
 ```php
 Loom73\Ledger\Ledger
 Loom73\Ledger\LedgerEvent
 ```
 
-Ledger should be able to record events such as:
+An event may record:
+
+```text
+actor
+action
+owner type and identifier
+summary
+metadata
+IP address
+user agent
+creation time
+```
+
+Examples of suitable actions:
 
 ```text
 auth.login
@@ -509,170 +400,153 @@ asset.deactivate
 asset.download
 ```
 
-Ledger may use `OwnerRegistry` to validate logical owners, but `OwnerRegistry` must not depend on Ledger.
+Ledger is an audit trail. Operational failures belong to `Woodframe\Logger`.
 
-Dependency direction:
+A Ledger failure must not invalidate an application action that has otherwise completed successfully.
 
-```text
-Ledger uses Woodframe\OwnerRegistry
-```
+## `Loom73\Weave\`
 
-not:
+Weave is the application orchestration layer.
 
-```text
-OwnerRegistry knows about Ledger
-```
-
-Ledger is especially important for CRM, backoffice and light CMS use cases, where administrative actions need to remain traceable.
-
----
-
-# Application-specific code
-
-Loom73 separates the reusable blueprint from the application built on top of it.
-
-A typical project may contain:
-
-```text
-/application
-  controllers/
-  models/
-  views/
-```
-
-This area is project-specific.
-
-It may use the `Loom73\Weave\` namespace for controllers and orchestration classes, but it should remain conceptually distinct from the reusable core modules.
-
-Application-specific models may extend `Loom73\Beam\Model`, but their domain logic belongs to the application, not to Beam itself.
-
----
-
-# Namespace boundaries
-
-## Woodframe vs Yarn
-
-`OwnerRegistry` belongs to `Woodframe`.
-
-`AssetPolicy` belongs to `Yarn`.
-
-Why?
-
-```text
-OwnerRegistry defines logical application owners.
-AssetPolicy defines how assets may attach to those owners.
-```
-
-The owner concept is wider than assets.
-
----
-
-## Yarn vs Weave
-
-`AssetUploader` belongs to `Yarn`.
-
-`AssetCtrl` belongs to `Weave`.
-
-Why?
-
-```text
-AssetUploader performs upload orchestration.
-AssetCtrl handles HTTP routing, guards and responses.
-```
-
-Yarn should remain usable without assuming a specific routing layer.
-
----
-
-## Beam vs application models
-
-`Beam\Model` belongs to `Beam`.
-
-Concrete domain models belong to the application.
-
-Why?
-
-```text
-Beam provides persistence primitives.
-Application models express domain-specific data access.
-```
-
-Beam should not become a universal ORM.
-
----
-
-## Heddle vs controller guards
-
-`Auth` belongs to `Heddle`.
-
-`requireAuth()` and `requireAbility()` may live in the base controller.
-
-Why?
-
-```text
-Heddle knows authentication and authorization.
-Controllers decide which routes require which abilities.
-```
-
-This keeps access control explicit.
-
----
-
-# Naming discipline
-
-Loom73 uses evocative namespace names, but class names should remain practical.
-
-The metaphor should help orient the architecture. It should not obscure behavior.
-
-Recommended style:
+Controllers currently use:
 
 ```php
-Loom73\Yarn\AssetUploader
-Loom73\Yarn\AssetDelivery
-Loom73\Beam\QueryResult
-Loom73\Woodframe\Config
-Loom73\Heddle\Auth
+Loom73\Weave\Controllers
 ```
 
-Avoid names that require interpretation before reading the code.
+Weave combines reusable Loom73 components into project-specific behavior:
 
-The goal is that a developer returning to the project after two years can still understand what each class does without remembering an internal mythology.
+```text
+request handling
+controller actions
+authorization decisions
+model and service coordination
+view preparation
+redirects
+JSON responses
+binary responses
+```
+
+Reusable mechanisms belong to their core namespaces. Decisions about what the application does belong to Weave.
+
+## `Loom73\Shuttle\`
+
+Shuttle contains command-line tooling.
+
+The reusable CLI helper lives at:
+
+```php
+Loom73\Shuttle\CLI
+```
+
+Command classes live in:
+
+```text
+commands/
+```
+
+and use the same namespace:
+
+```php
+Loom73\Shuttle
+```
+
+Shuttle handles tasks such as:
+
+```text
+instance installation
+health inspection
+administrator creation
+asset-type creation
+Ledger cleanup
+maintenance and diagnostics
+```
+
+Shuttle should remain a small command resolver and a collection of explicit commands rather than becoming a general console framework.
+
+## Dependency direction
+
+The intended dependency flow is:
+
+```text
+Woodframe
+    shared structure and registries
+
+Beam
+    persistence primitives
+
+Heddle
+    authentication and authorization
+
+Yarn
+    asset lifecycle
+
+Ledger
+    auditing
+
+Weave
+    application orchestration
+
+Shuttle
+    command-line operations across the instance
+```
+
+More concretely:
+
+```text
+Weave may use Woodframe, Beam, Heddle, Yarn and Ledger.
+Yarn may use Beam and Woodframe.
+Ledger may use Beam and Woodframe.
+Heddle may use Beam.
+Core components must not depend on application controllers.
+```
+
+## Naming discipline
+
+The metaphor should make the architecture memorable without making the code cryptic.
+
+Use direct class names:
+
+```php
+AssetUploader
+AssetDelivery
+QueryResult
+OwnerRegistry
+Logger
+Auth
+```
+
+In controllers, Loom73 distinguishes dependencies from runtime data:
+
+```php
+$this->User;       // model or service
+$this->Asset;      // model or service
+$this->Auth;       // reusable component
+
+$user;             // record or runtime value
+$asset;            // record or runtime value
+$result;           // operation result
+```
+
+This convention is intentional and should be applied consistently.
+
+## Summary
+
+```text
+Woodframe  structural foundation
+Beam       persistence
+Heddle     authentication and access
+Yarn       uploaded resources
+Ledger     audit trail
+Weave      application orchestration
+Shuttle    command-line operations
+```
+
+The governing rule remains:
+
+```text
+Use namespaces to make responsibility legible.
+Do not use them to make simple code look sophisticated.
+```
 
 ---
-
-# Summary
-
-```text
-Loom73\Woodframe
-  framework structure, configuration, base utilities, registries
-
-Loom73\Beam
-  database connection, base model, query result, persistence primitives
-
-Loom73\Heddle
-  authentication, sessions, roles, abilities, access control
-
-Loom73\Yarn
-  asset validation, upload, storage, delivery, asset policies
-
-Loom73\Weave
-  application orchestration, controllers, use cases, route-facing logic
-
-Loom73\Shuttle
-  CLI tooling, installation, maintenance, automation
-
-Loom73\Ledger
-  audit events, activity logging, traceability
-```
-
-The overall rule:
-
-```text
-Woodframe holds the frame.
-Beam carries persistence.
-Heddle controls access.
-Yarn manages resources.
-Weave composes the application.
-Shuttle installs and maintains the instance.
-Ledger records what happened.
-```

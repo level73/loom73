@@ -2,9 +2,7 @@
 
 Shuttle is the Loom73 command-line tool.
 
-It provides quick operational commands for installing, inspecting and maintaining a Loom73 instance from the CLI.
-
-Shuttle belongs to the `Loom73\Shuttle` namespace and follows the same general principle as the rest of the blueprint:
+It installs, inspects and maintains a Loom73 instance through small, explicit commands.
 
 ```text
 Small tools.
@@ -12,382 +10,394 @@ Clear conventions.
 No unnecessary machinery.
 ```
 
-Shuttle is not only a database utility. It is the operational bridge between deployed code and a usable Loom73 instance.
-
----
-
 ## Running Shuttle
 
-Shuttle commands should be run from the application root.
+Run commands from the application root:
 
 ```bash
 cd /var/www/example.com
 php shuttle <command>
 ```
 
-On deployed instances, Shuttle should normally be run as the deployment user, for example:
+On a deployed instance, use the deployment user. Avoid using `root` or the web-server user for ordinary administration.
 
 ```bash
 sudo -iu deploy
 cd /var/www/example.com
-php shuttle <command>
+php shuttle loom73.info
 ```
 
-Avoid running Shuttle as `root` unless a command explicitly requires it.
+Shuttle loads:
 
-Avoid running Shuttle as `www-data`. The web server user should run the application, not administer the instance.
+```text
+Composer dependencies
+config/system.php
+config/labels.php
+config/.env
+config/modules/*.php
+```
 
----
+before resolving the requested command.
 
 ## Available commands
 
-At this stage Shuttle supports three main commands.
+The current command set is:
 
----
+```text
+loom73.info
+loom73.install
+user.admin
+asset_type.new
+ledger.cleanup
+session.cleaner
+```
 
 ### `loom73.info`
 
-Returns basic version information about Loom73 and Shuttle.
+Inspect the current instance:
 
 ```bash
 php shuttle loom73.info
 ```
 
-This command is useful to quickly verify that the CLI is reachable and that the installed blueprint version is the expected one.
+The command reports:
 
----
+```text
+Loom73 version
+SYSTEM_STATUS environment
+PHP version
+
+environment-file health
+module configuration
+database connection
+storage directory availability and permissions
+
+required PHP extensions
+installed runtime dependency versions
+
+Ledger configuration
+Gauge configuration
+```
+
+The database check uses:
+
+```php
+Connection::ping()
+```
+
+which prepares and executes:
+
+```sql
+SELECT 1
+```
+
+The final status is one of:
+
+```text
+HEALTHY
+HEALTHY WITH WARNINGS
+UNHEALTHY
+```
+
+An unhealthy result exits with status code `1`. A healthy result, including one with warnings, exits with status code `0`.
+
+Warnings include incomplete environment values. Errors include a missing `.env`, failed database connection, missing or unwritable runtime directories, missing required extensions, or missing runtime packages.
+
+`Gauge` is reported as `not configured` until the planned component and its configuration are added.
 
 ### `loom73.install`
 
-Performs a clean Loom73 installation.
+Install the database structure and runtime directories:
 
 ```bash
 php shuttle loom73.install
 ```
 
-This command initializes the instance.
+This is a destructive clean-install command. It asks for confirmation and may drop and recreate Loom73 tables.
 
-Depending on the current project configuration, it may:
+It currently initializes:
 
 ```text
-create database tables
-drop and recreate existing tables during development
-insert required seed data
-create runtime directories
-prepare storage/uploads
-prepare storage/logs
-prepare storage/cache
+authentication tables
+roles and seed data
+asset types
+assets
+Ledger events
+storage/
+storage/uploads/
+storage/logs/
+storage/cache/
 ```
 
-`loom73.install` is intentionally broader than a database installer. The command installs the runtime shape of the instance, not only its schema.
+Use it for a new instance or a deliberately disposable development database.
 
-The guiding rule is:
+Do not use it as an update mechanism for an existing production database.
+
+The future release path will distinguish:
+
+```text
+loom73.install
+    create a new instance
+
+loom73.update
+    evolve an existing instance
+```
+
+After installation, run:
+
+```bash
+php shuttle user.admin
+```
+
+### `user.admin`
+
+Create an administrator interactively:
+
+```bash
+php shuttle user.admin
+```
+
+Shuttle asks for:
+
+```text
+username
+email
+password
+```
+
+It creates the user with the administrator role and initializes a session record.
+
+The command requires a working database and should normally be run after `loom73.install`.
+
+### `asset_type.new`
+
+Create a Yarn asset type:
+
+```bash
+php shuttle asset_type.new
+```
+
+Shuttle asks for:
+
+```text
+slug
+label
+description
+```
+
+Asset types provide semantic classifications such as:
+
+```text
+image_avatar
+project_report
+informed_consent
+```
+
+They are distinct from owner slots. An owner slot describes where an asset belongs; an asset type describes what the file represents.
+
+### `ledger.cleanup`
+
+Apply the configured Ledger retention policy:
+
+```bash
+php shuttle ledger.cleanup
+```
+
+The retention period is read from:
+
+```php
+Config::get('ledger.retention');
+```
+
+Interactive execution displays the configured period and asks for confirmation.
+
+For scheduled or otherwise non-interactive execution, pass:
+
+```bash
+php shuttle ledger.cleanup --force
+```
+
+To request permanent removal of all Ledger records:
+
+```bash
+php shuttle ledger.cleanup --purge
+```
+
+For non-interactive purging:
+
+```bash
+php shuttle ledger.cleanup --purge --force
+```
+
+A retention value of `0` means that automatic retention cleanup is disabled.
+
+The application administrator must configure any cron schedule separately. Shuttle does not install cron entries.
+
+### `session.cleaner`
+
+Run the current PHP-session diagnostic cleaner:
+
+```bash
+php shuttle session.cleaner
+```
+
+The current command opens the CLI session, invokes PHP session garbage collection, destroys that session and prints diagnostic session data.
+
+It does not purge Loom73 authentication-session rows from the database and should not be documented or scheduled as a complete application-session cleanup mechanism.
+
+Treat it as a development or diagnostic command until a production session-cleanup contract is defined.
+
+## Command resolution
+
+Command files live in:
+
+```text
+commands/
+```
+
+The filename is the command name:
+
+```text
+commands/database.update.php
+    → php shuttle database.update
+```
+
+Dots separate words when Shuttle resolves the class:
+
+```text
+database.update
+    → Loom73\Shuttle\DatabaseUpdate
+```
+
+The file must contain the resolved class:
+
+```php
+<?php
+
+namespace Loom73\Shuttle;
+
+class DatabaseUpdate
+{
+    public function __construct(?array $args = null)
+    {
+        $this->run($args ?? []);
+    }
+
+    private function run(array $args): void
+    {
+        // Command logic.
+    }
+}
+```
+
+Shuttle passes command-line arguments after the command name as an array to the constructor.
+
+Existing commands that do not need arguments may ignore it.
+
+A command does not need to extend a common base class.
+
+## CLI helper
+
+The reusable helper is:
+
+```php
+Loom73\Shuttle\CLI
+```
+
+It currently provides:
+
+```php
+cout_color()
+confirm()
+ask()
+```
+
+### Colored output
+
+```php
+$CLI = new CLI();
+
+echo $CLI->cout_color(
+    'Operation completed.',
+    'green'
+) . PHP_EOL;
+```
+
+Supported named colors include:
+
+```text
+red
+green
+yellow
+blue
+magenta
+cyan
+light grey
+dark grey
+light red
+light green
+light yellow
+light blue
+light magenta
+light cyan
+```
+
+### Questions
+
+Read a free-form answer:
+
+```php
+$name = $CLI->ask('Enter the name: ');
+```
+
+Request confirmation:
+
+```php
+if (!$CLI->confirm('Continue?')):
+    echo 'Cancelled.' . PHP_EOL;
+    return;
+endif;
+```
+
+`confirm()` accepts `y`, `yes`, `n` and `no`, repeating the question for any other input.
+
+## Command design
+
+A Shuttle command should:
+
+```text
+perform one recognizable operation
+make destructive behavior explicit
+confirm destructive interactive operations
+require explicit flags for destructive automation
+return a non-zero exit code on failure
+avoid browser or web-session assumptions
+avoid exposing passwords and secrets
+```
+
+Small commands may keep their flow in the constructor. Larger commands should delegate to private methods.
+
+Shuttle is intentionally small. Shared abstractions should be introduced only after more than one real command needs them.
+
+## Deployment relationship
+
+Deployment and installation are separate operations:
+
+```text
+GitHub Actions
+    builds and sends application code
+
+Shuttle
+    initializes or maintains runtime state
+
+VPS
+    owns configuration, database data, uploads and logs
+```
+
+The core rule is:
 
 ```text
 Deploy code.
 Install runtime state.
+Preserve instance data.
 ```
-
-Runtime directories such as `storage/` are not deployed from GitHub and are not part of the repository. They belong to the live instance and are created by Shuttle.
-
-Expected runtime structure:
-
-```text
-storage/
-  uploads/
-  logs/
-  cache/
-```
-
----
-
-### `user.admin`
-
-Creates a new Admin user in the system.
-
-```bash
-php shuttle user.admin
-```
-
-This command is usually run after `loom73.install`, when the database exists but no administrative user has been created yet.
-
-Typical first-install flow:
-
-```bash
-cd /var/www/example.com
-
-php shuttle loom73.install
-php shuttle user.admin
-```
-
-After creating the Admin user, log into the application and perform a basic smoke test.
-
----
-
-## Creating new commands
-
-To create a new Shuttle command, add a new PHP file inside the `commands` directory.
-
-The file name defines the command name.
-
-Multiple words must be dot-separated.
-
-Example:
-
-```text
-commands/database.update.php
-```
-
-This file will be executed as:
-
-```bash
-php shuttle database.update
-```
-
----
-
-## Command class naming
-
-The command file must contain a class whose name is the capitalized version of the file name, without dots.
-
-Example:
-
-```text
-database.update.php
-```
-
-must contain:
-
-```php
-DatabaseUpdate
-```
-
-Another example:
-
-```text
-user.admin.php
-```
-
-must contain:
-
-```php
-UserAdmin
-```
-
-The convention is important because Shuttle uses predictable naming to resolve commands without extra configuration.
-
----
-
-## Command namespace
-
-Command classes should live under:
-
-```php
-Loom73\Shuttle
-```
-
-Example:
-
-```php
-<?php
-
-namespace Loom73\Shuttle;
-
-class DatabaseUpdate
-{
-    public function __construct()
-    {
-        // Command logic here.
-    }
-}
-```
-
-A command class does not strictly need to extend the main `Shuttle` class.
-
-It may extend a base class only when it actually needs shared behavior. The default expectation is simpler:
-
-```text
-one command
-one file
-one class
-one constructor-driven operation
-```
-
----
-
-## Command execution model
-
-Inside the command class, define a constructor and place the command logic there.
-
-Example:
-
-```php
-<?php
-
-namespace Loom73\Shuttle;
-
-class Loom73Info
-{
-    public function __construct()
-    {
-        echo "Loom73 version: 6.0.0" . PHP_EOL;
-        echo "Shuttle version: 1.0.0" . PHP_EOL;
-    }
-}
-```
-
-This keeps commands small and direct.
-
-For larger commands, the constructor may delegate to private methods:
-
-```php
-<?php
-
-namespace Loom73\Shuttle;
-
-class DatabaseUpdate
-{
-    public function __construct()
-    {
-        $this->run();
-    }
-
-    private function run(): void
-    {
-        // Command flow here.
-    }
-}
-```
-
-The constructor should remain readable. If a command grows too much, split the logic into clearly named private methods or reusable Shuttle helpers.
-
----
-
-## The CLI helper
-
-Shuttle includes a small `CLI` helper class for terminal output and interactive prompts.
-
-It can be used to:
-
-```text
-colorize CLI output
-ask confirmation questions
-handle simple interactive flows
-```
-
-Example:
-
-```php
-<?php
-
-namespace Loom73\Shuttle;
-
-class ExampleCommand
-{
-    public function __construct()
-    {
-        $cli = new CLI();
-
-        echo $cli->cout_color(
-            "Hey there, I'm going to be red!",
-            "red"
-        );
-
-        if ($cli->confirm("Are you sure you want to do this?")) {
-            echo "Confirmed." . PHP_EOL;
-        }
-    }
-}
-```
-
-The CLI helper is intentionally small. It is there to make command output readable, not to become a full console framework.
-
----
-
-## Command design principles
-
-Shuttle commands should be:
-
-```text
-explicit
-small
-safe by default
-easy to run again when possible
-clear about destructive operations
-```
-
-Commands that drop tables, reset data or delete files should ask for confirmation unless they are clearly designed for automated development environments.
-
-A command should tell the operator what it is about to do.
-
-Good command behavior:
-
-```text
-show the operation
-ask when destructive
-fail loudly when configuration is missing
-print a clear success message
-```
-
-Bad command behavior:
-
-```text
-silently delete data
-hide errors
-depend on web sessions
-require browser context
-```
-
----
-
-## Deployment relationship
-
-Shuttle complements the deployment workflow.
-
-Deployment sends code to the server.
-
-Shuttle prepares the instance.
-
-The separation is important:
-
-```text
-GitHub Actions
-  builds and deploys code
-
-Shuttle
-  installs runtime state
-
-The VPS
-  stores .env, database, uploads, logs and cache
-```
-
-`storage/` should not be synced during deploy.
-
-`config/.env` should not be synced during deploy.
-
-Both belong to the server instance.
-
----
-
-## Summary
-
-```text
-php shuttle loom73.info
-  shows Loom73 and Shuttle version information
-
-php shuttle loom73.install
-  installs database structure and runtime directories
-
-php shuttle user.admin
-  creates a new Admin user
-```
-
-To add a new command:
-
-```text
-create commands/my.command.php
-define Loom73\Shuttle\MyCommand
-run php shuttle my.command
-```
-
-Shuttle keeps Loom73 operational without turning the blueprint into a heavy framework.

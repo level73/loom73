@@ -1,4 +1,4 @@
-<main>
+<main id="main-content">
     <section class="grid grid-1_2-col">
         <div>
             <h1>Architecture</h1>
@@ -7,7 +7,7 @@
         </div>
         <div>
             <figure>
-                <img class="img-fluid" src="/assets/raster/medieval-loom-scheme.webp" alt="A schematic depiction of a medieval loom. Main components are labeled and explained, particular attention to the shuttle element.">
+                <img  width="1672" height="941" class="img-fluid" src="/assets/raster/medieval-loom-scheme.webp" alt="A schematic depiction of a medieval loom. Main components are labeled and explained, particular attention to the shuttle element.">
                 <figcaption>A schematic depiction of a medieval loom.</figcaption>
             </figure>
         </div>
@@ -100,7 +100,7 @@
                 </ul>
             </div>
             <figure>
-                <img src="/assets/mvc.svg" class="image" alt="Diagram of the MVC architecture">
+                <img width="400" height="400" src="/assets/mvc.svg" loading="lazy" class="image" alt="Diagram of the MVC architecture">
                 <figcaption>Model - View - Controller</figcaption>
             </figure>
         </div>

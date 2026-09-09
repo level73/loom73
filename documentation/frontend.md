@@ -1,21 +1,197 @@
-# Loom73 Frontend Features
+# Loom73 Frontend
 
-## Javascript
-The full, minified JS that ships to the browser with Loom73 is < 4kb. 
+Loom73 provides a small browser-side foundation built with semantic HTML, layered CSS and Vanilla JavaScript modules.
 
-### Form Validation
-Loom73 ships natively with frontend form validation. To enable it, you should add the `novalidate` attribute to the form you want to be validated by the script.
+It does not include a JavaScript framework or a general-purpose CSS framework. The supplied frontend is intended to provide useful defaults and reusable behavior while remaining easy to inspect, replace or adapt in an application fork.
 
-### Table Sorting & Searching
-Loom73 ships natively with Table Sorting and Searching. 
+## Frontend references
 
-#### Table Sorting
-1. Add the `data-sortable-table` attribute to the table
-2. Add the `data-sortable` attribute to the table head cells. This attribute should have one of these three options as a value:
-   1. `text` for text entries, such as emails
-   2. `number` for numerical sorting
-   3. `date` for dates
-3. To have Loom73 properly sort based on numeric and date values, leverage the `data-sort-value` attribute in the table body cells, and include the formatted value for numerical data (as in - you have USD currency prepended to the number in the table cell), as well as data in ISO 8601 format for dates (YYYY-MM-DD).  
+The frontend documentation is divided by responsibility:
 
-#### Table Searching
-Add a form and an input field with the `data-table-search` attribute, and add the table selector as a value.
+- [Forms](frontend/forms.md) — constraint validation, accessible error feedback and form events.
+- [Tables](frontend/tables.md) — client-side search, sorting and pagination.
+- [UI utilities](frontend/ui.md) — dialogs, tooltips, dismissible elements, InView and responsive navigation.
+- [Stitch icons](frontend/stitch.md) — the CSS-driven SVG icon collection.
+
+The public Components pages provide live examples. These documents describe the markup contracts, configuration and implementation limits.
+
+## Source structure
+
+Frontend source files live under:
+
+```text
+frontend-src/
+├── css/
+├── js/
+├── assets/
+└── Gruntfile.js
+```
+
+Compiled browser assets are written to:
+
+```text
+public_html/public/
+├── css/main.min.css
+├── js/index.min.js
+├── js/forms.min.js
+├── js/table.min.js
+├── js/ui.min.js
+└── assets/
+```
+
+Application views should load the compiled files rather than files from `frontend-src`.
+
+## JavaScript initialization
+
+The frontend entry point is:
+
+```text
+frontend-src/js/index.js
+```
+
+It initializes the three JavaScript modules after the document is ready:
+
+```js
+Loom73Forms.init();
+Loom73Tables.init();
+Loom73UI.init();
+```
+
+It also adds the following class to the root HTML element:
+
+```text
+loom73-ready
+```
+
+This class allows CSS enhancements to distinguish a JavaScript-enabled page from the unenhanced document.
+
+The compiled entry point is loaded as a module:
+
+```html
+<script type="module" src="/js/index.min.js" defer></script>
+```
+
+The default initializer should run once. Forms, tables, dialogs and dismissible elements may register duplicate event listeners if the complete initializer is called repeatedly.
+
+## Progressive enhancement
+
+The frontend utilities preserve useful baseline behavior wherever possible.
+
+### Forms
+
+The `novalidate` attribute is added only when Loom73 form validation initializes.
+
+Without JavaScript, the browser continues to provide its native constraint validation.
+
+### Tables
+
+Without JavaScript, all rows remain visible in their original order. Search, sorting and pagination are enhancements applied to an existing semantic table.
+
+### InView
+
+The initial hidden state is scoped through `.loom73-ready`. Content therefore remains visible when JavaScript does not run.
+
+The supplied CSS also disables the reveal animation when the visitor requests reduced motion.
+
+### Responsive navigation
+
+The navigation remains present in the document without JavaScript. The mobile toggle behavior is applied after frontend initialization.
+
+### Tooltips and dialogs
+
+Tooltip text must not be the only place where essential information is available.
+
+Critical actions should not depend exclusively on a dialog that cannot be opened without JavaScript.
+
+## CSS layers
+
+The layer order is declared explicitly:
+
+```css
+@layer reset, layout, components, ui, utilities, specific, stitch;
+```
+
+The source files are compiled in the same order:
+
+```text
+001-layers.css
+    layer order
+
+002-reset.css
+    browser normalization and document defaults
+
+003-layout.css
+    grids, flex layouts and structural composition
+
+004-components.css
+    reusable visual components
+
+005-ui.css
+    styles associated with JavaScript UI utilities
+
+006-utilities.css
+    small-purpose helpers, feedback and color utilities
+
+007-specific.css
+    application and page-specific presentation
+
+008-stitch.css
+    Stitch icon system
+```
+
+The current baseline includes both structural rules and visual choices. A stronger separation between core behavior, themes and application styles remains planned work rather than part of the current frontend contract.
+
+## Building the frontend
+
+Install the Node development dependencies from the project root:
+
+```console
+npm install
+```
+
+Compile CSS and JavaScript:
+
+```console
+npm run build
+```
+
+Optimize and copy image, SVG, favicon and font assets:
+
+```console
+npm run build:assets
+```
+
+Run the complete deployment build:
+
+```console
+npm run build:deploy
+```
+
+Build once and watch the frontend source during development:
+
+```console
+npm run watch
+```
+
+The deployment build:
+
+1. concatenates the CSS layers;
+2. minifies the resulting stylesheet;
+3. minifies the JavaScript modules;
+4. converts supported raster images to WebP;
+5. optimizes SVG files while preserving their `viewBox`;
+6. copies favicons and fonts without modification.
+
+## Application boundaries
+
+The supplied frontend handles browser interaction. It does not replace application rules.
+
+In particular:
+
+- frontend validation must be repeated by the server;
+- tables operate on rows already present in the document;
+- dialogs do not authorize the action they contain;
+- hiding an element does not change access permissions;
+- interface state is not a substitute for persistent application state.
+
+Application forks may remove any frontend utility they do not need or replace it with a project-specific implementation.

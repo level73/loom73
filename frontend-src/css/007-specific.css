@@ -23,9 +23,6 @@
         padding: 1.5rem;
         place-items: center;
         text-align: center;
-        opacity: 0;
-        transform: translateY(1.25rem) scale(0.3);
-
         span.icon-name {
             display: block;
             color: var(--color-secondary);
@@ -35,19 +32,6 @@
             margin-block-start: 1rem;
         }
 
-    }
-    .is-visible > * {
-        animation: popin 0.5s cubic-bezier(0.3, 1.5, 0.7, 1) forwards;
-        animation-delay: calc( var(--i)  * 40ms);
-    }
-    @media (prefers-reduced-motion:reduce) {
-        .icon-container {
-            opacity: 1;
-            transform: none;
-        }
-        .is-visible > * {
-            animation: none;
-        }
     }
 
     body .coding-window {
@@ -204,14 +188,43 @@
         }
     }
 
+    .utilities-grid {
+        width: 100%;
+        display: grid;
+        grid:
+            "data-tables in-view-wrapper" auto
+            "forms in-view-wrapper" auto
+            "dialogs tooltips" auto
+            "dismissables responsive-navs" auto
+            / 1fr 1fr;
+        gap: var(--spacing);
+        .data-tables { grid-area: data-tables; }
+        .in-view-wrapper { grid-area: in-view-wrapper; }
+        .forms { grid-area: forms; }
+        .dialogs { grid-area: dialogs; }
+        .tooltips { grid-area: tooltips; }
+        .dismissables { grid-area: dismissables; }
+        .responsive-navs { grid-area: responsive-navs; }
+        @media screen and (width <= 48rem){
+            grid:
+                    "data-tables" auto
+                    "forms" auto
+                    "in-view-wrapper" auto
+                    "dialogs" auto
+                    "tooltips" auto
+                    "dismissables" auto
+                    "responsive-navs" auto
+            / 1fr 1fr;
+        }
+    }
+
+
+
     .card.utility {
         background-color: var(--color-surface);
         padding: var(--padding);
         border: 1px solid var(--color-border);
-        display: grid;
-        gap: var(--spacing);
-        grid-template-rows: 1fr auto;
-        grid-template-columns: auto 18rem;
+
         h4 {
             border-bottom: 1px solid var(--color-border);
             grid-column: span 2;
@@ -245,7 +258,7 @@
             @media screen and (width <= 48rem){
                 width: 100%;
                 justify-content: center;
-                & + .icon {
+                & + .stitch {
                     transform: rotate(90deg);
                 }
             }
@@ -253,9 +266,11 @@
     }
     .list {
         padding: var(--padding);
-        margin: var(--spacing);
         &.large {
             font-size: var(--fontsize-1);
+            @media (width <= 48rem){
+                font-size: var(--fontsize-0);
+            }
         }
         li {
             padding-block: calc(var(--spacing) / 2);
@@ -319,5 +334,8 @@
         border-radius: 50%;
         border: 2px solid var(--color-accent);
     }
+
+    /** Setting up a bit of responsiveness for tables **/
+    body.components-tables #main-content .grid:not(.breakout) > div { min-width: 0; }
 }
 

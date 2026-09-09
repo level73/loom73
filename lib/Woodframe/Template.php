@@ -28,15 +28,46 @@ class Template
     /** Display Template **/
     public function render(): void
     {
-
         extract($this->variables);
 
         if(!isset($title)):
             $title = $_SERVER['APPNAME'];
         endif;
 
-        // Get Views Directory
+
+        /** Check existence of the View file */
+        $viewsDirectory = ROOT_DIR
+            . DIRECTORY_SEPARATOR
+            . 'application'
+            . DIRECTORY_SEPARATOR
+            . 'views';
+
         $dirname = strtolower($this->_controller);
+
+        $viewPath = $viewsDirectory
+            . DIRECTORY_SEPARATOR
+            . $dirname
+            . DIRECTORY_SEPARATOR
+            . $this->_method
+            . '.php';
+
+        if (!file_exists($viewPath)):
+            http_response_code(500);
+
+            $missingView = $viewPath;
+
+            $title = 'Something went wrong';
+            $meta_description = 'The requested page cannot be displayed.';
+            $bodyClass = 'error error-500';
+
+            $dirname = 'errors';
+
+            $viewPath = $viewsDirectory
+                . DIRECTORY_SEPARATOR
+                . 'errors'
+                . DIRECTORY_SEPARATOR
+                . '500.php';
+        endif;
 
         // Check for excluded routes
         if( !in_array(  $this->_method, $this->exclude  ) &&
@@ -66,16 +97,7 @@ class Template
             endif;
 
             /** Include desired center template **/
-            try {
-                if (!file_exists(ROOT_DIR . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $dirname . DIRECTORY_SEPARATOR . $this->_method . '.php')):
-                    throw new Errata("<strong>Template piece not found: <em>" . DIRECTORY_SEPARATOR . $dirname . DIRECTORY_SEPARATOR . $this->_method . "</em></strong>", 500);
-                else:
-                    include(ROOT_DIR . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $dirname . DIRECTORY_SEPARATOR . $this->_method . '.php');
-                endif;
-            }
-            catch (Errata $e){
-                echo $e->errorMessage();
-            }
+            include $viewPath;
 
             /** Include footer **/
             if (file_exists(ROOT_DIR . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $dirname . DIRECTORY_SEPARATOR . 'footer.php')):

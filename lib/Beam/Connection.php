@@ -74,4 +74,27 @@ class Connection
     {
         self::$pdo = null;
     }
+
+    /**
+     * This method can be used to check
+     * if the DB is active mocking a model
+     * @return bool
+     */
+    public static function ping(): bool
+    {
+        try {
+            $stmt = self::pdo()->prepare('SELECT 1');
+
+            if ($stmt === false):
+                return false;
+            endif;
+
+            $success = $stmt->execute();
+            $stmt->closeCursor();
+
+            return $success;
+        } catch (RuntimeException) {
+            return false;
+        }
+    }
 }

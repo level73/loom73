@@ -2,6 +2,7 @@
 use Loom73\Woodframe\Errata;
 use Loom73\Woodframe\Debugger;
 use Loom73\Woodframe\Config;
+use Loom73\Woodframe\Template;
 
 /** Basic Error Reporting Config */
 function errorReporting(): void
@@ -95,6 +96,17 @@ function Loom73_autoloader(string $className): void
 
 spl_autoload_register('Loom73_autoloader');
 
+/** Render Error Pages */
+function renderNotFound(): void
+{
+    http_response_code(404);
+    $Template = new Template( 'errors', '404');
+    $Template->set('title', 'Page not found');
+    $Template->set('meta_description', 'The requested page could not be found.');
+    $Template->set('bodyClass', 'error error-404');
+    $Template->render();
+}
+
 /** Start the Application */
 function Loom73(): void {
     // Set error reporting levels
@@ -144,11 +156,31 @@ function Loom73(): void {
     $controller = 'Loom73\Weave\Controllers\\' . $baseClassName . 'Ctrl';
     $model = 'Loom73\Weave\Models\\' . $baseClassName;
 
-    // avoid dispatching for Javascript, CSS and Resources
+    // avoid dispatching for JavaScript, CSS and Resources
     if(!in_array($route, $fragments_to_exclude)):
         // Create Instance
         // refer to lib/Ctrl.class.php to see how the controller handles the business logic
-        if(class_exists($controller)):
+        // Check if Controller and Method exist, otherwise render 404 page
+        if (
+            !class_exists($controller) ||
+            !method_exists($controller, $method)
+        ):
+            renderNotFound();
+
+            return;
+        endif;
+
+        $dispatch = new $controller(
+            $model,
+            $route,
+            $method
+        );
+
+        call_user_func_array(
+            [$dispatch, $method],
+            $queryString
+        );
+        /*if(class_exists($controller)):
             try
             {
                 $dispatch = new $controller($model, $route, $method);
@@ -162,6 +194,6 @@ function Loom73(): void {
             catch (Errata $e) {
                 $e->errorMessage();
             }
-        endif;
+        endif;*/
     endif;
 }

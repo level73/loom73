@@ -1,4 +1,4 @@
-<main>
+<main id="main-content">
     <section class="grid">
         <div>
             <h1>Loom73 Tables <span class="accent">Example</span></h1>
@@ -6,16 +6,11 @@
             <p>All data presented on this page is fictional and seeded randomly.</p>
             <form role="search" class="table-search">
                 <label for="authors-search" class="sr-only">Search authors</label>
-
-                <input
-                    type="search"
-                    id="authors-search"
-                    data-table-search="#authors-table"
-                    placeholder="Search authors">
-
+                <input type="search" id="authors-search" data-table-search="#authors-table" placeholder="Search authors">
                 <span class="stitch stitch--search" aria-hidden="true"></span>
             </form>
-            <table id="authors-table" data-table data-table-page-size="10">
+            <div class="table-scroll" role="region" aria-label="Example table" tabindex="0">
+                <table id="authors-table" data-table data-table-page-size="10">
                 <thead>
                 <tr>
                     <th>
@@ -598,6 +593,7 @@
                 </tr>
                 </tbody>
             </table>
+            </div>
             <nav
                 data-table-pagination="#authors-table"
                 aria-label="Authors table pagination">
@@ -608,7 +604,7 @@
         <div>
             <h2>References</h2>
             <hr />
-            <a class="button hollow">Read the docs <i class="icon arrow"></i></a>
+            <a class="button hollow">Read the docs <i class="stitch stitch--arrow"></i></a>
         </div>
     </section>
 </main>

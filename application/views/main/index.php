@@ -1,4 +1,4 @@
-<main>
+<main id="main-content">
     <section class="grid grid-2-col">
         <div class="">
             <h1>Loom<span class="accent">73</span></h1>
@@ -17,7 +17,7 @@
         </div>
         <div class="">
             <figure>
-                <img src="/assets/loom73.svg" alt="Loom73 Logo">
+                <img width="512" height="512" src="/assets/loom73.svg" alt="Loom73 Logo">
                 <figcaption>Loom73: Weaving your relationship with technology.</figcaption>
             </figure>
         </div>
@@ -121,7 +121,7 @@
         </div>
         <div>
             <figure>
-                <img src="/assets/raster/medieval-loom.webp" alt="A medieval incision portraying a loom with two people working on the weaving" width="100%">
+                <img width="600" height="797" loading="lazy" src="/assets/raster/medieval-loom.webp" alt="A medieval incision portraying a loom with two people working on the weaving" class="image">
                 <figcaption>The Loom, weaving and creating since a very long time ago.</figcaption>
             </figure>
         </div>
@@ -190,7 +190,7 @@
     <section class="grid bordered">
         <div class="grid-2-col grid with-gap">
             <figure>
-                <img src="/assets/raster/Max_Liebermann-The_Weaver-1882.webp" class="image" alt="Picture of Max Liebermann's painting 'The Weaver' from 1882">
+                <img width="1184" height="861" src="/assets/raster/Max_Liebermann-The_Weaver-1882.webp" loading="lazy" class="image" alt="Picture of Max Liebermann's painting 'The Weaver' from 1882">
                 <figcaption>Max Liebermann - The Weaver (1882)</figcaption>
 
             </figure>
@@ -199,7 +199,7 @@
                 <h2 class="balance">Start with the decisions<br />that should not need<br />to be made again.</h2>
                 <hr />
                 <p>Loom73 collects the recurring decisions that should <strong><em>not</em></strong> need<br />to be reconsidered at the beginning of every project.</p>
-                <a class="button" href="#">View on Github <span class="icon arrow"></span></a> <a class="button hollow" href="#">Read the docs <span class="icon arrow"></span></a>
+                <a class="button" href="#">View on Github <span class="stitch stitch--arrow"></span></a> <a class="button hollow" href="#">Read the docs <span class="stitch stitch--arrow"></span></a>
             </div>
         </div>
     </section>

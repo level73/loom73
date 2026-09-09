@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?php echo $title . ' - ' . $_SERVER['APPNAME']; ?></title>
+    <meta name="description" content="<?php echo $meta_description; ?>">
     <?php if(isset($leaflet)): hasLeaflet('head'); endif; ?>
 
     <!-- Favicon -->
@@ -22,3 +23,6 @@
 </head>
 
 <body class="<?php echo $bodyClass; ?>">
+<a class="skip-link" href="#main-content">
+    Skip to main content
+</a>

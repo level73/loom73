@@ -1,4 +1,4 @@
-<main>
+<main id="main-content">
     <section class="grid grid-1_2-col">
 
             <div>
@@ -13,7 +13,7 @@
             </div>
             <div>
                 <figure>
-                    <img src="/assets/raster/stitch.webp" class="image" alt="A human mae hand stitching a database icon on a piece of cloth.">
+                    <img  width="1672" height="941" src="/assets/raster/stitch.webp" class="image" alt="A human hand stitching a database icon on a piece of cloth.">
                     <figcaption>Stitching</figcaption>
                 </figure>
             </div>
@@ -199,12 +199,22 @@
                     <button type="button" class="button hollow"><span class="stitch stitch--download"></span> Download</button>
                 </div>
                 <div class="card">
-                    <button type="button" class="button hollow"><span class="stitch stitch--bin" aria-label="Delete"></span></button>
-                    <span class="label">aria-label="Delete"</span>
+                    <button type="button" class="button hollow" aria-label="Delete"><span class="stitch stitch--bin" aria-hidden="true"></span></button>
+
+<code>
+    &lt;button type="button" class="button hollow" aria-label="Delete"&gt;
+        &lt;span class="stitch stitch--bin" aria-hidden="true"&gt;&lt;/span&gt;
+    &lt;/button&gt;
+</code>
+
                 </div>
                 <div class="card">
-                    <button type="button" class="button hollow"><span class="stitch stitch--search" aria-label="Search"></span></button>
-                    <span class="label">aria-label="Search"</span>
+                    <button type="button" class="button hollow" aria-label="Search"><span class="stitch stitch--search" aria-hidden="true"></span></button>
+<code>
+    &lt;button type="button" class="button hollow" aria-label="Search"&gt;
+        &lt;span class="stitch stitch--search" aria-hidden="true"&gt;&lt;/span&gt;
+    &lt;/button&gt;
+</code>
                 </div>
             </div>
         </div>
@@ -243,7 +253,7 @@
         <div>
             <h2>References</h2>
             <hr />
-            <a class="button hollow">Read the docs <i class="icon arrow"></i></a>
+            <a class="button hollow">Read the docs <i class="stitch stitch--arrow"></i></a>
         </div>
     </section>
 </main>

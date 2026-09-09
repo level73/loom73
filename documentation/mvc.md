@@ -1,168 +1,189 @@
+
 # Loom73 MVC
 
-Loom73 follows a small, explicit MVC architecture.
+Loom73 uses a small, explicit MVC architecture.
 
-It is not meant to be a full-stack framework, and it does not try to hide the request flow behind excessive machinery.
+It does not hide the request flow behind a route registry, service container or automatic controller wiring.
 
-The goal is simple:
-
-```text id="62pte0"
-URL → Controller → Method → Model/Service when needed → View/Redirect/Response
+```text
+URL
+  → Controller
+  → Method
+  → Model or service when needed
+  → View, redirect, JSON or binary response
 ```
 
-Loom73 MVC is based on convention, not magic.
+## Application bootstrap
 
----
+All public HTTP requests enter through:
+
+```text
+public_html/public/index.php
+```
+
+The bootstrap:
+
+1. defines application paths;
+2. loads Composer dependencies and Loom73 configuration;
+3. loads `config/.env`;
+4. starts the named PHP session;
+5. configures the timezone and HTML content type;
+6. registers the Loom73 autoloader;
+7. loads module configuration;
+8. dispatches the request.
+
+The web server document root must point to:
+
+```text
+public_html/public
+```
+
+Application code, configuration, storage and vendor files must remain outside the public web root.
 
 ## Routing
 
-Routing is intentionally straightforward.
+The rewritten request path is read from the `url` query parameter and split into fragments.
 
-A request path is interpreted as follows:
-
-```text id="oymaxf"
-first URL fragment   → controller
-second URL fragment  → method
-remaining fragments  → method parameters
+```text
+first fragment       controller
+second fragment      method
+remaining fragments  method arguments
 ```
 
-Example:
+For example:
 
-```text id="jb6yft"
-example.com/the-fancy-pants/more-pants/12/edit
+```text
+/user/profile
 ```
 
-routes to:
+dispatches to:
 
-```php id="lu6953"
-TheFancyPantsCtrl::more_pants(12, 'edit')
+```php
+Loom73\Weave\Controllers\UserCtrl::profile()
 ```
 
-Controller and method names do not need to respect PHP casing or underscore conventions in the URL.
+and:
 
-The router normalizes incoming route fragments through the `toMachine()` function.
-
-The route:
-
-```text id="ha6de6"
-the-fancy-pants
+```text
+/asset/view/550e8400-e29b-41d4-a716-446655440000
 ```
 
-becomes:
+dispatches to:
 
-```php id="5plqwb"
-TheFancyPantsCtrl
+```php
+Loom73\Weave\Controllers\AssetCtrl::view(
+    '550e8400-e29b-41d4-a716-446655440000'
+);
 ```
 
-The route:
+Hyphenated controller fragments become PascalCase class names:
 
-```text id="pc17wp"
-more-pants
+```text
+technical-requirements
+    → TechnicalRequirementsCtrl
 ```
 
-becomes:
+Hyphenated method fragments become underscore-separated method names:
 
-```php id="nl0s36"
-more_pants()
+```text
+profile-update
+    → profile_update()
 ```
 
-This allows URLs to remain readable while PHP code keeps its normal class and method naming conventions.
+The default controller and method come from:
 
----
-
-## Default route
-
-The default controller is:
-
-```php id="4yb5d0"
-MainCtrl
+```env
+DEFAULT_CONTROLLER='main'
+DEFAULT_METHOD='index'
 ```
 
-The default method is:
+The base URL therefore normally resolves to:
 
-```php id="7a7aap"
-index()
-```
-
-So the base URL routes to:
-
-```php id="g3ygxq"
+```php
 MainCtrl::index()
 ```
 
----
+## Missing routes and views
+
+If the controller or method does not exist, Loom73 returns:
+
+```text
+HTTP 404
+```
+
+and renders the public error view:
+
+```text
+application/views/errors/404.php
+```
+
+If a dispatched controller method has no corresponding view, `Template` returns:
+
+```text
+HTTP 500
+```
+
+and renders:
+
+```text
+application/views/errors/500.php
+```
+
+Internal path information is shown only when:
+
+```env
+SYSTEM_STATUS='development'
+```
+
+Production error pages remain generic.
 
 ## Controllers
 
-Controllers live in the application layer.
+Application controllers live in:
 
-A typical controller is located in:
-
-```text id="j05eob"
-/application/controllers/
+```text
+application/controllers/
 ```
 
-Controllers may use the namespace:
+and use:
 
-```php id="bejtaz"
+```php
 Loom73\Weave\Controllers
 ```
 
-because controllers belong to the orchestration layer of the application.
+Controllers extend:
 
-A controller is responsible for coordinating the request:
-
-```text id="98cj4c"
-read request data
-apply guards when needed
-call models or services
-set view data
-redirect after mutations
-return binary/custom responses when necessary
-```
-
-The base controller is:
-
-```php id="k7d8ap"
+```php
 Loom73\Woodframe\Ctrl
 ```
 
-It provides shared controller behavior such as:
+A controller coordinates the request. It may:
 
-```text id="w7ad82"
-view data assignment
-template coordination
-redirect helpers
-authentication context bootstrapping
-guard helpers
-render control
+```text
+inspect request data
+apply authentication or ability guards
+call models and services
+set template variables
+record meaningful actions
+redirect after a mutation
+disable normal rendering for JSON or binary responses
 ```
 
-A controller should remain readable. It should express the application flow clearly without becoming a dumping ground for domain logic.
+A controller should make the application flow easy to follow.
 
----
+## Dependencies
 
-## Controller/model relationship
+Controllers should instantiate the models and services they actually use.
 
-Controllers do **not** need to have a model by default.
-
-Earlier Loom73 prototypes allowed automatic model instantiation, but the current direction is more explicit:
-
-```text id="l6vfga"
-Controllers instantiate the models or services they actually use.
-```
-
-This avoids false coupling and keeps each controller honest about its dependencies.
-
-Good:
-
-```php id="rsext6"
+```php
 use Loom73\Beam\User;
+use Loom73\Woodframe\Ctrl;
 use Loom73\Yarn\Asset;
 
 class UserCtrl extends Ctrl
 {
     protected User $User;
+    protected Asset $Asset;
 
     public function __construct(
         string $model,
@@ -172,558 +193,401 @@ class UserCtrl extends Ctrl
         parent::__construct($model, $controller, $method);
 
         $this->User = new User();
+        $this->Asset = new Asset();
     }
 }
 ```
 
-Avoid assuming that every controller must have:
+`Ctrl` retains an optional `_model` property for compatibility and generic helpers. New controller code should prefer explicitly named dependencies.
 
-```php id="zghwl6"
-$this->_model
-```
-
-Some controllers coordinate views, static pages, auth flows, asset delivery or CLI-adjacent operations and may not need a domain model at all.
-
-The principle is:
-
-```text id="lqm8ky"
+```text
 Instantiate what you use.
-Do not create dependencies just because the pattern expects them.
+Keep dependencies visible.
 ```
 
----
+## Controller property names
 
-## Controller property naming
+Models, services and reusable components use PascalCase properties:
 
-Loom73 follows a practical naming convention inside controllers.
-
-Dependency/model/service properties use PascalCase:
-
-```php id="r272ks"
+```php
 $this->User
 $this->Asset
-$this->Auth
 $this->Session
+$this->Auth
 ```
 
-Runtime data or records use lowercase:
+Records, query results and other runtime data use camelCase:
 
-```php id="ht3j1q"
-$this->user
+```php
+$user
+$asset
 $profile
 $result
-$avatar
 ```
 
-This makes controller code easier to scan.
+This is a Loom73 convention rather than a general PHP requirement.
+
+## GET and POST
+
+Loom73 follows a predictable request convention:
+
+```text
+GET   prepares and displays
+POST  changes state and redirects
+```
+
+A GET action may retrieve data and render a page or form.
+
+A POST action should normally:
+
+1. verify the request method and CSRF token;
+2. read and validate input;
+3. perform the mutation;
+4. add a flash message;
+5. redirect.
 
 Example:
 
-```php id="f2xai2"
-$profile = $this->user?->first();
+```php
+public function save(): void
+{
+    if (!$this->isPost(notEmpty: true)):
+        return;
+    endif;
 
-$avatar = $this->Asset->latestForOwnerSlot(
-    ownerType: 'user',
-    ownerId: (string) $profile->id,
-    ownerSlot: 'avatar'
+    $result = $this->User->create([
+        // Validated values.
+    ]);
+
+    $this->evaluateResponse($result);
+}
+```
+
+`isPost()` validates CSRF by default:
+
+```php
+$this->isPost();
+$this->isPost(notEmpty: true);
+$this->isPost(notEmpty: true, csrf: false);
+```
+
+`isGet()` checks GET requests:
+
+```php
+$this->isGet();
+$this->isGet(notEmpty: true);
+```
+
+`httpCheck()` remains available for compatibility. New code should prefer `isPost()` and `isGet()`.
+
+## Reading POST values
+
+`post()` returns a trimmed value without applying a filter:
+
+```php
+$password = $this->post('password');
+```
+
+`posted()` preserves Loom73's historical default filtering:
+
+```php
+$username = $this->posted('username');
+$email = $this->posted(
+    'email',
+    FILTER_SANITIZE_EMAIL
+);
+$password = $this->posted(
+    'password',
+    false
 );
 ```
 
----
+Input normalization and output escaping solve different problems.
 
-## Request method convention
+```text
+Input:
+    normalize and validate according to the field
 
-Loom73 uses a simple request convention:
-
-```text id="rhzn1f"
-GET  → show pages, forms, lists and details
-POST → perform actions and mutations
+Output:
+    escape according to the destination context
 ```
 
-A GET method may read from the database and prepare view data.
+Views must still escape values for HTML, attributes, URLs, JSON or other output contexts as appropriate.
 
-A POST method should usually:
+## CSRF
 
-```text id="vkg3sp"
-validate input
-perform the action
-set feedback/flash message
-redirect
+Loom73 stores the CSRF token in the application session.
+
+Views can print a hidden field with:
+
+```php
+<?php csrf(); ?>
 ```
 
-This avoids duplicate GET/POST controller methods and keeps mutation flows predictable.
+POST actions normally validate it through `isPost()`.
 
-Examples:
+After a completed mutation or authentication attempt, the controller may destroy the current token so a new one is generated for the next form.
 
-```text id="dc8gvq"
-/user/create          GET  → show creation form
-/user/edit/{id}       GET  → show edit form
-/user/save            POST → create or update user
+## Authentication and guards
 
-/user/profile         GET  → show profile
-/user/profile-update  POST → update profile and avatar
+The base controller initializes the authentication context.
 
-/user/login           GET  → show login form
-/user/access          POST → authenticate
+Available state includes:
 
-/user/recover         GET  → show recovery form
-/user/recover-send    POST → send recovery email
-
-/user/reset/{hash}    GET  → show reset form
-/user/reset-save      POST → update password
+```php
+$this->Auth
+$this->isAuthenticated
+$this->user
 ```
 
-The principle:
+This does not protect every route automatically.
 
-```text id="53gevz"
-GET prepares.
-POST changes.
-POST redirects.
-```
+Controllers apply guards explicitly:
 
----
-
-## Authentication context and guards
-
-`Ctrl` may bootstrap the authentication context so that controllers can access the current user when available.
-
-This does **not** mean every route is private.
-
-Public routes remain public unless a controller method explicitly calls a guard.
-
-Typical guards:
-
-```php id="45yhgg"
+```php
 $this->requireAuth();
-$this->requireAbility('manage_users');
 $this->requireAdmin();
+$this->requireEditor();
+$this->requireAbility('manage_users');
 ```
 
-Example:
-
-```php id="gqayrc"
-public function profile(): void
-{
-    $this->requireAuth();
-
-    // profile logic
-}
-```
-
-A login page, recovery page or public landing page simply does not call `requireAuth()`.
-
-The rule is:
-
-```text id="2qg117"
-Auth context may be global.
-Access control must remain explicit.
-```
-
----
-
-## Passing data to views
-
-The base controller provides a simple mechanism for assigning data to the view.
-
-Typical usage:
-
-```php id="hj1o8k"
-$this->set('title', 'Edit profile');
-$this->set('user', $this->user);
-$this->set('avatar', $avatar);
-```
-
-The view then receives these variables through the template layer.
-
-The base controller coordinates this process; individual controllers should not need to manually assemble templates in ordinary cases.
-
----
-
-## Views
-
-Views live in:
-
-```text id="3gehqb"
-/application/views/
-```
-
-Each controller should have a matching view directory named after the controller without the `Ctrl` suffix, in lowercase.
-
-Example:
-
-```text id="aat2e3"
-MainCtrl
-```
-
-uses:
-
-```text id="cdqz6r"
-/application/views/main/
-```
-
-A method normally maps to a view file with the same name.
-
-Example:
-
-```php id="cgn70p"
-MainCtrl::index()
-```
-
-uses:
-
-```text id="s5g682"
-/application/views/main/index.php
-```
-
-Another example:
-
-```php id="w1ecqu"
-UserCtrl::profile()
-```
-
-uses:
-
-```text id="5w21mk"
-/application/views/user/profile.php
-```
-
-Method names normalized from dashed URLs retain their PHP underscore form.
-
-So:
-
-```text id="gxya8y"
-/user/profile-update
-```
-
-routes to:
-
-```php id="u4opvu"
-UserCtrl::profile_update()
-```
-
-and may use:
-
-```text id="vvbxq7"
-/application/views/user/profile_update.php
-```
-
-when a view is needed.
-
----
-
-## Template assembly
-
-The template layer is handled by:
-
-```php id="4wxqnj"
-Loom73\Woodframe\Template
-```
-
-The template class assembles the final page output from the selected view and the surrounding layout/template parts.
-
-In ordinary application work, this class should rarely need to be touched.
-
-Controllers prepare data.
-
-Views render local markup.
-
-The template assembles the response.
-
----
-
-## Disabling automatic rendering
-
-Some routes do not return an HTML view.
-
-Examples:
-
-```text id="ylqfbj"
-asset delivery
-file download
-JSON response
-manual redirect
-binary output
-```
-
-In these cases, automatic template rendering must be disabled.
-
-Example:
-
-```php id="8g36ne"
-public function view(string $uuid): void
-{
-    $this->disableRender();
-
-    // asset delivery logic
-}
-```
-
-This is especially important for binary responses. If the template appends HTML after an image, the browser may receive a corrupted image even if the response has the correct `Content-Type`.
-
-The rule is:
-
-```text id="az30uf"
-If the controller sends the full response itself, disable rendering.
-```
-
----
+This keeps route access visible in the action that requires it.
 
 ## Models
 
-Models that need database access should extend:
+Application data-access classes live in:
 
-```php id="7scu6m"
+```text
+application/models/
+```
+
+They extend:
+
+```php
 Loom73\Beam\Model
 ```
 
-A model defines its persistence target through protected properties:
+A model defines at least its table and normally its primary key:
 
-```php id="qa5dbv"
-protected string $table;
-protected string $pkey;
-protected bool $dates;
-```
-
-Example:
-
-```php id="7xzq3x"
-use Loom73\Beam\Model;
+```php
+namespace Loom73\Beam;
 
 class User extends Model
 {
     protected string $table = 'auth_user';
     protected string $pkey = 'idauth_user';
     protected bool $dates = true;
+    protected bool $softDeletes = true;
 }
 ```
 
-These properties describe:
+Use the common Model methods for ordinary persistence. Write explicit SQL in the concrete model when it expresses the domain more clearly.
 
-```text id="an52vl"
-$table  → database table name
-$pkey   → primary key column
-$dates  → whether the table has created_at / modified_at fields
+```php
+public function apiByUsername(string $username): QueryResult
+{
+    $sql = '
+        SELECT username, role
+        FROM auth_user
+        WHERE username = :username
+        LIMIT 1
+    ';
+
+    return $this->query($sql, [
+        'username' => $username,
+    ]);
+}
 ```
 
-A model may then use the base CRUD helpers provided by `Beam\Model`.
+SQL belongs in models or dedicated data-access services, not in views.
 
-However, models are not limited to generic CRUD.
+## QueryResult handling
 
-Concrete models should write explicit SQL when that is clearer.
+Model operations return `QueryResult`.
 
-Use explicit SQL for:
-
-```text id="19yxo1"
-joins
-reports
-aggregations
-complex filters
-domain-specific queries
-performance-sensitive reads
-```
-
-The principle is:
-
-```text id="fc9qmd"
-Beam reduces repetition.
-It does not hide SQL.
-```
-
----
-
-## Query results
-
-Database operations return:
-
-```php id="60vhqr"
-Loom73\Beam\QueryResult
-```
-
-`QueryResult` makes the outcome of a query explicit.
-
-It can represent:
-
-```text id="ff7u3v"
-success with rows
-success without rows
-failed query
-insert result
-database error
-```
-
-Typical usage:
-
-```php id="qywfhn"
+```php
 $result = $this->User->getById($id);
 
-if ($result->fails() || $result->isEmpty()) {
-    $this->redirect('/user/list');
-}
+if ($result->fails()):
+    // The database operation failed.
+endif;
+
+if ($result->isEmpty()):
+    // The operation succeeded but returned no record.
+endif;
 
 $user = $result->first();
 ```
 
-This avoids spreading raw PDO handling through controllers.
+`evaluateResponse()` provides a common mutation flow for ordinary CRUD actions. Controllers may handle a result directly when the use case requires different behavior.
 
----
+## Views and templates
 
-## Application flow example
+Views live in:
 
-A typical GET method:
-
-```php id="k9wcix"
-public function profile(): void
-{
-    $this->requireAuth();
-
-    $this->set('title', 'Edit profile');
-    $this->set('user', $this->user);
-
-    $profile = $this->user?->first();
-
-    if (!$profile) {
-        return;
-    }
-
-    $avatar = $this->Asset->latestForOwnerSlot(
-        ownerType: 'user',
-        ownerId: (string) $profile->id,
-        ownerSlot: 'avatar'
-    );
-
-    $this->set('avatar', $avatar);
-}
+```text
+application/views/{controller}/{method}.php
 ```
 
-A typical POST method:
+For example:
 
-```php id="bkpwzc"
-public function profile_update(): void
-{
-    $this->requireAuth();
-
-    // validate input
-    // update profile
-    // handle avatar upload if present
-    // set feedback
-
-    $this->redirect('/user/profile');
-}
+```text
+/user/profile
+    → application/views/user/profile.php
 ```
 
-A binary route:
+Controllers assign variables with:
 
-```php id="5rkwvc"
-public function view(string $uuid): void
-{
-    $this->disableRender();
-
-    // validate asset
-    // check visibility
-    // deliver file
-}
+```php
+$this->set('title', 'Profile');
+$this->set('profile', $profile);
 ```
 
----
+The template extracts those variables before composing the response.
 
-## MVC boundaries
+A standard HTML response may include:
 
-### Controller
-
-A controller should coordinate the request.
-
-It may:
-
-```text id="8f5obp"
-read request data
-call models/services
-apply guards
-set view variables
-redirect
-disable rendering for custom responses
+```text
+application/views/head.php
+controller-specific or global header
+controller-specific submenu
+the requested view
+controller-specific or global footer
+application/views/foot.php
 ```
 
-It should not contain heavy persistence logic or reusable infrastructure code.
+A view may:
 
----
-
-### Model
-
-A model should handle persistence for a domain object or database-backed concept.
-
-It may:
-
-```text id="u3x3ox"
-use Beam CRUD helpers
-write explicit SQL
-return QueryResult
-encapsulate domain-specific data access
-```
-
-It should not know about HTML templates or request routing.
-
----
-
-### View
-
-A view should render markup.
-
-It may:
-
-```text id="z4bymn"
+```text
+render semantic markup
 read assigned variables
 escape output
-display forms
-display records
-include small presentational logic
+include partials and presentational components
+perform small display-only decisions
 ```
 
-It should not perform database operations or business decisions.
+A view should not:
 
----
-
-### Template
-
-The template assembles the final response.
-
-It should remain generic and rarely need project-specific changes.
-
----
-
-## Summary
-
-```text id="mch3ec"
-URL fragment 1
-  selects the controller
-
-URL fragment 2
-  selects the method
-
-Remaining fragments
-  become method parameters
-
-Controllers
-  orchestrate requests
-
-Models
-  handle persistence when needed
-
-Views
-  render application markup
-
-Template
-  assembles the final response
-
-GET
-  prepares and displays
-
-POST
-  changes state and redirects
+```text
+query the database
+make authorization decisions
+mutate application state
+perform redirects
 ```
 
-The Loom73 MVC rule:
+## Automatic rendering
 
-```text id="wd4hw7"
+Normal controller actions do not call `render()` directly.
+
+`Ctrl` renders the configured template from its destructor when:
+
+```php
+$this->shouldRender === true
+```
+
+This keeps ordinary page actions concise.
+
+For responses that must bypass the HTML template, call:
+
+```php
+$this->disableRender();
+```
+
+This is used for responses such as:
+
+```text
+JSON
+uploaded assets
+downloads
+exports
+redirects
+```
+
+Redirect helpers disable rendering automatically and terminate execution.
+
+## Flash messages and redirects
+
+Mutation actions can redirect with a typed message:
+
+```php
+$this->redirectWithSuccess('/user/profile', [
+    'message' => MSG_PROFILE_UPDATE_SUCCESS,
+    'data' => null,
+    'error' => null,
+]);
+```
+
+Available helpers include:
+
+```php
+redirectWithSuccess()
+redirectWithWarning()
+redirectWithError()
+redirectWithInfo()
+```
+
+Flash messages survive the redirect and are consumed when rendered.
+
+Diagnostic error details should only be exposed while development debugging is enabled.
+
+## Ledger
+
+Controllers can record meaningful actions through:
+
+```php
+$this->recordAction(
+    action: 'user.update',
+    ownerType: 'user',
+    ownerId: (string) $userId,
+    summary: 'User profile updated'
+);
+```
+
+Anonymous actions use:
+
+```php
+$this->recordAnonymousAction(...);
+```
+
+Ledger failures are logged but should not reverse a successful application operation.
+
+## Alternative control syntax
+
+Loom73 templates prefer PHP's alternative control syntax where it improves the readability of mixed PHP and HTML:
+
+```php
+<?php if ($is_authenticated): ?>
+    <a href="/user/profile">Profile</a>
+<?php else: ?>
+    <a href="/user/login">Login</a>
+<?php endif; ?>
+```
+
+Ordinary braces remain appropriate inside classes and for PHP-only logic.
+
+## Request summary
+
+```text
+Request
+  ↓
+public/index.php bootstrap
+  ↓
+route fragments
+  ↓
+controller and method
+  ↓
+guards and input handling
+  ↓
+model or service
+  ↓
+QueryResult or domain result
+  ↓
+view, redirect, JSON or binary response
+```
+
+The MVC rule is:
+
+```text
 Keep routing simple.
 Keep controllers explicit.
 Keep models honest.

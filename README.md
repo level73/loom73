@@ -208,7 +208,7 @@ npm run build:deploy
 Create the environment file from the provided example:
 
 ```bash
-cp config/.env.example config/.env
+cp config/example.env config/.env
 ```
 
 Then configure the database, application URL, mail delivery, and other instance-specific settings.

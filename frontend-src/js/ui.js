@@ -693,5 +693,4 @@ export const Loom73UI = {
     getRootMargin(element) {
         return element.dataset.inviewRootMargin || this.options.inViewRootMargin;
     }
-
 };

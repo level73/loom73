@@ -108,16 +108,5 @@
     .color-info {      color: var(--color-utility-info); }
     .color-success {   color: var(--color-utility-success); }
 
-    /** Handy Animations **/
-    /** Bouncy Pop In **/
-    @keyframes popin {
-        from {
-            opacity: 0;
-            transform: scale(0.3) translateY(1.25rem);
-        }
-        to {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-        }
-    }
+
 }

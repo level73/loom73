@@ -43,16 +43,17 @@ export const Loom73Forms = {
     initForm(form) {
         form.setAttribute('novalidate', '');
         form.addEventListener('submit', event => {
-            event.preventDefault();
-
             const isValid = this.validateForm(form);
+            form.dispatchEvent(
+                new CustomEvent(
+                    isValid ? 'loom73:form-valid' : 'loom73:form-invalid',
+                    { bubbles: true }
+                )
+            );
+            if (isValid) return;
 
-            if (!isValid) {
-                this.focusFirstInvalidField(form);
-                return;
-            }
-
-            form.submit();
+            event.preventDefault();
+            this.focusFirstInvalidField(form);
         });
 
         form.addEventListener('input', event => {
@@ -216,5 +217,4 @@ export const Loom73Forms = {
 
         return true;
     }
-
 };
