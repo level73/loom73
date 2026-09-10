@@ -4,7 +4,7 @@ Loom73 is a small, forkable PHP application blueprint built around explicit arch
 
 This documentation explains how Loom73 works, how to configure and operate an instance, and how to adapt the blueprint without obscuring the resulting application.
 
-If you are discovering Loom73 for the first time, begin with the [project README](../README.md). It provides the project overview, principles, technical requirements and initial setup procedure.
+If you are discovering Loom73 for the first time, begin with the [project README](https://github.com/level73/loom73#readme). It provides the project overview, principles, technical requirements and initial setup procedure.
 
 ## How this documentation is organized
 
@@ -42,7 +42,7 @@ Loom73 is intended to be read as well as used. The documentation therefore expla
 
 Use these documents for the current installation path:
 
-- [Project README](../README.md) — overview, principles, requirements and quick start.
+- [project README](https://github.com/level73/loom73#readme) — overview, principles, requirements and quick start.
 - [Deployment guide](deployment.md) — server structure, GitHub Actions, runtime state and deployment procedure.
 - [Shuttle](shuttle.md) — installation, inspection and maintenance from the command line.
 - [Roadmap](roadmap.md) — current milestone, planned work and deliberately excluded features.
@@ -82,7 +82,7 @@ Loom73 components solve recurring application problems while keeping their behav
 
 The structural foundation of the application: configuration, controllers, templates, shared utilities, registries and operational logging.
 
-A dedicated Woodframe reference is in preparation.
+See the [Woodframe reference](backend/woodframe.md).
 
 ### Beam
 
@@ -90,13 +90,13 @@ PDO connection handling, the base `Model`, explicit SQL execution and normalized
 
 Beam reduces repetition without hiding SQL. Common CRUD operations are available as conveniences; domain-specific queries remain explicit inside concrete models.
 
-A dedicated Beam reference is in preparation.
+See the [Beam reference](backend/beam.md).
 
 ### Heddle
 
 Authentication, sessions, roles, abilities and authorization.
 
-A dedicated Heddle reference is in preparation.
+See the [Heddle reference](backend/heddle.md).
 
 ### Yarn
 
@@ -104,7 +104,7 @@ Validation, storage, ownership, visibility, replacement and controlled delivery 
 
 Yarn stores runtime files outside the public web root and leaves access decisions to explicit application policies.
 
-A dedicated Yarn reference is in preparation.
+See the [Yarn reference](backend/yarn.md).
 
 ### Ledger
 
@@ -112,7 +112,7 @@ Auditing of meaningful user actions, with configurable retention.
 
 Ledger records what a user did. Operational failures and diagnostic information belong to the Logger.
 
-A dedicated Ledger reference is in preparation.
+See the [Ledger reference](backend/ledger.md).
 
 ### Shuttle
 
@@ -160,16 +160,9 @@ The current API layer is deliberately small and read-only.
 
 Resources are exposed explicitly through application controllers and API-specific queries. Models and database columns are never serialized automatically.
 
-The API documentation will cover:
-
-- exposing a resource;
-- response and error formats;
-- HTTP status handling;
-- public and session-protected endpoints;
-- field selection and sensitive-data boundaries;
-- the current limits of the read-only API.
-
 Token authentication and write operations are outside the current release contract.
+
+See the [API reference](backend/api.md).
 
 ## Operations
 

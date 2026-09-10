@@ -1,0 +1,71 @@
+site_name: Loom73 Documentation
+site_description: Documentation for the Loom73 PHP application blueprint
+site_url: https://level73.github.io/loom73/
+
+repo_name: level73/loom73
+repo_url: https://github.com/level73/loom73
+edit_uri: edit/main/documentation/
+
+docs_dir: documentation
+site_dir: site
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.action.edit
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+
+nav:
+  - Home: index.md
+
+  - Getting started:
+      - Deployment: deployment.md
+      - Shuttle CLI: shuttle.md
+
+  - Architecture:
+      - MVC and request flow: mvc.md
+      - Namespaces: namespaces.md
+      - Labels and feedback: labels.md
+
+  - Backend:
+      - Overview: backend/index.md
+      - Woodframe: backend/woodframe.md
+      - Beam: backend/beam.md
+      - Heddle: backend/heddle.md
+      - Yarn: backend/yarn.md
+      - Ledger: backend/ledger.md
+      - Weave: backend/weave.md
+      - API: backend/api.md
+
+  - Frontend:
+      - Overview: frontend.md
+      - Forms: frontend/forms.md
+      - Tables: frontend/tables.md
+      - UI utilities: frontend/ui.md
+      - Stitch icons: frontend/stitch.md
+
+  - Roadmap: roadmap.md
