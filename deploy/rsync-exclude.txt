@@ -11,6 +11,8 @@ frontend-src/
 config/.env
 .env
 
+public_html/public/robots.txt
+
 storage/
 
 frontend-src/concat.css
