@@ -152,7 +152,7 @@ class User extends Model
         SELECT
             u.username,
             r.role AS role,
-            u.created_at AS last_access
+            u.modified_at AS modified_at
         FROM auth_user AS u
         LEFT JOIN auth_role AS r
             ON r.idauth_role = u.role

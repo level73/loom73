@@ -57,7 +57,7 @@ class LedgerCleanup
         /*
          * Retention disabled.
          */
-        if ((int) $retention === 0):
+        if (!$purge && (int) $retention === 0):
             echo "Ledger retention is disabled. No cleanup required." . PHP_EOL;
             return;
         endif;

@@ -107,6 +107,68 @@ function renderNotFound(): void
     $Template->render();
 }
 
+/** Check if route is valid according to Loom73 convention */
+function isRoutableAction(
+    string $controller,
+    string $method,
+    array $parameters = []
+): bool {
+    if (!class_exists($controller)):
+        return false;
+    endif;
+
+    try {
+        $reflection = new \ReflectionMethod(
+            $controller,
+            $method
+        );
+    } catch (\ReflectionException) {
+        return false;
+    }
+
+if (!$reflection->isPublic()):
+    return false;
+endif;
+
+if ($reflection->isStatic()):
+    return false;
+endif;
+
+if (str_starts_with($method, '__')):
+    return false;
+endif;
+
+/*
+ * Exclude methods inherited from Ctrl or another parent.
+ * Only actions declared by the concrete controller are routable.
+ */
+if (
+    $reflection->getDeclaringClass()->getName()
+    !== $controller
+):
+    return false;
+endif;
+
+$parameterCount = count($parameters);
+
+if (
+    $parameterCount
+    < $reflection->getNumberOfRequiredParameters()
+):
+    return false;
+endif;
+
+if (
+    !$reflection->isVariadic()
+    && $parameterCount
+    > $reflection->getNumberOfParameters()
+):
+    return false;
+endif;
+
+return true;
+}
+
 /** Start the Application */
 function Loom73(): void {
     // Set error reporting levels
@@ -162,8 +224,11 @@ function Loom73(): void {
         // refer to lib/Ctrl.class.php to see how the controller handles the business logic
         // Check if Controller and Method exist, otherwise render 404 page
         if (
-            !class_exists($controller) ||
-            !method_exists($controller, $method)
+            !isRoutableAction(
+                controller: $controller,
+                method: $method,
+                parameters: $queryString
+            )
         ):
             renderNotFound();
 

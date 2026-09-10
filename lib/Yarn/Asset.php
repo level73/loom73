@@ -131,7 +131,7 @@ class Asset extends Model
     }
 
     public function getByOwner(
-        int $ownerType,
+        string $ownerType,
         string $ownerId,
         ?string $ownerSlot = null
     ): QueryResult {
@@ -139,7 +139,7 @@ class Asset extends Model
             'owner_type' => [
                 'operator' => '=',
                 'value' => $ownerType,
-                'type' => PDO::PARAM_INT,
+                'type' => PDO::PARAM_STR,
             ],
 
             'owner_id' => [

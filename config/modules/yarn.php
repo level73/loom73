@@ -131,9 +131,6 @@ return [
     | hash:
     |   uploads/ab/cd
     |
-    | flat:
-    |   uploads
-    |
     | For the first Loom73 implementation, "date" is the recommended default.
     |
     */
