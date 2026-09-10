@@ -25,7 +25,7 @@ Successful response:
 {
   "data": [
     {
-      "username": "alan",
+      "username": "loom73_admin",
       "role": "admin"
     }
   ]
@@ -35,7 +35,7 @@ Successful response:
 ### One user
 
 ```http
-GET /api/users/alan
+GET /api/users/loom73_admin
 ```
 
 Successful response:
@@ -43,9 +43,9 @@ Successful response:
 ```json
 {
   "data": {
-    "username": "alan",
+    "username": "loom73_admin",
     "role": "admin",
-    "last_access": "2026-09-10 12:00:00"
+    "modified_at": "2026-09-10 12:00:00"
   }
 }
 ```

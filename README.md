@@ -342,7 +342,7 @@ The README remains the entry point. Detailed implementation guidance belongs in 
 
 ## Project status
 
-Loom73 6.0 is under active development and is not yet presented as a finished public release.
+Loom73 6.0 is under active development and is presented as a release candidate.
 
 The current milestone focuses on documentation, the project landing page, repository readiness, and consolidation of the reference implementation.
 

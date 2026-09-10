@@ -46,7 +46,8 @@ Use these documents for the current installation path:
 - [Deployment guide](deployment.md) — server structure, GitHub Actions, runtime state and deployment procedure.
 - [Shuttle](shuttle.md) — installation, inspection and maintenance from the command line.
 - [Roadmap](roadmap.md) — current milestone, planned work and deliberately excluded features.
-
+- [Backend](backend/index.md)
+- [Frontend Utilities](frontend.md)
 Dedicated guides for requirements, configuration and the first application run will be extracted from the README and deployment guide as the documentation is consolidated.
 
 ## Architecture

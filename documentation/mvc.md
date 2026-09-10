@@ -102,6 +102,7 @@ The base URL therefore normally resolves to:
 ```php
 MainCtrl::index()
 ```
+Only the public methods declared in the controllers can be dispatched. 
 
 ## Missing routes and views
 
