@@ -1,5 +1,10 @@
 # Loom73
 
+[![Deploy](https://img.shields.io/github/actions/workflow/status/level73/loom73/deploy-test.yml?branch=main&event=push&label=deploy)](https://github.com/level73/loom73/actions/workflows/deploy-test.yml)
+[![Docs](https://img.shields.io/github/actions/workflow/status/level73/loom73/deploy-docs.yml?branch=main&label=docs)](https://github.com/level73/loom73/actions/workflows/deploy-docs.yml)
+[![Release](https://img.shields.io/github/v/release/level73/loom73?display_name=tag)](https://github.com/level73/loom73/releases/latest)
+![PHP](https://img.shields.io/badge/PHP-8.3%2B-777BB4?logo=php&logoColor=white)
+
 **A clear foundation for building PHP applications.**
 
 Loom73 is a lightweight, forkable application blueprint built from recurring architectural decisions, reusable components, and practical web-development experience.
