@@ -23,7 +23,7 @@
                 </ul>
             </li>
             <li class="nav-item"><a href="/main/technical-requirements">Tech</a></li>
-            <li class="nav-item"><a href="https://github.com/level73/loom73/blob/main/documentation/index.md" target="_blank">Docs</a></li>
+            <li class="nav-item"><a href="https://level73.github.io/loom73/" target="_blank">Docs</a></li>
             <li class="nav-item"><a href="https://github.com/level73/loom73" target="_blank">Github</a></li>
         </ul>
     </nav>

@@ -25,8 +25,8 @@
         <div>
             <h3>Resources</h3>
             <ul>
-                <li><a href="https://github.com/level73/loom73/blob/main/documentation/index.md#start-here" target="_blank" class="footer-nav-item">Getting started</a></li>
-                <li><a href="https://github.com/level73/loom73/blob/main/documentation/index.md" target="_blank"  class="footer-nav-item">Documentation</a></li>
+                <li><a href="https://level73.github.io/loom73/deployment/" target="_blank" class="footer-nav-item">Getting started</a></li>
+                <li><a href="https://level73.github.io/loom73/" target="_blank"  class="footer-nav-item">Documentation</a></li>
                 <li><a href="https://github.com/level73/loom73" target="_blank" class="footer-nav-item">GitHub</a></li>
             </ul>
         </div>

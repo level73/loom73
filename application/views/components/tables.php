@@ -604,7 +604,7 @@
         <div>
             <h2>References</h2>
             <hr />
-            <a class="button hollow" href="https://github.com/level73/loom73/blob/main/documentation/frontend/tables.md" target="_blank">Read the docs <i class="stitch stitch--arrow"></i></a>
+            <a class="button hollow" href="https://level73.github.io/loom73/frontend/tables/" target="_blank">Read the docs <i class="stitch stitch--arrow"></i></a>
         </div>
     </section>
 </main>

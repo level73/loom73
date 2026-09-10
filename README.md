@@ -327,7 +327,7 @@ vendor/             Composer dependencies
 
 The documentation is being consolidated into a structured `documentation/` directory as part of the current public-foundation milestone.
 
-It will cover:
+It covers:
 
 - requirements, installation, and configuration;
 - architecture and conventions;
@@ -340,11 +340,13 @@ It will cover:
 
 The README remains the entry point. Detailed implementation guidance belongs in the documentation rather than being duplicated here.
 
+[Read the documentation](https://level73.github.io/loom73/)
+
 ## Project status
 
-Loom73 6.0 is under active development and is presented as a release candidate.
+Loom73 6.0 establishes the first public foundation of the project.
 
-The current milestone focuses on documentation, the project landing page, repository readiness, and consolidation of the reference implementation.
+The completed milestone focuses on documentation, the project landing page, repository readiness, and consolidation of the reference implementation.
 
 Future additions are evaluated against three questions:
 
