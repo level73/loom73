@@ -9,17 +9,17 @@ const MSG_QUERY_SUCCESS = 'Query on the database was successful.';
 const MSG_DUPLICATE_ENTRY = 'Duplicate entry found.';
 
 /** User access control labels */
-const MSG_ACCESS_USER_NOT_FOUND = 'User does not exist.';
+const MSG_ACCESS_USER_NOT_FOUND = 'Invalid username or password.';
 const MSG_ACCESS_SUCCESS = 'Access granted.';
-const MSG_ACCESS_WRONG_PASSWORD = 'Wrong password.';
-const MSG_ACCESS_INACTIVE = 'Your account is pending activation.';
+const MSG_ACCESS_WRONG_PASSWORD = 'Invalid username or password.';
+const MSG_ACCESS_INACTIVE = 'Invalid username or password.';
 const MSG_ACCESS_RECOVERY = 'Password Recovery';
 const MSG_CANNOT_SET_RECOVERY_CODE = 'We couldn\'t set the recovery code. Please contact your system administrator.';
 const MSG_RECOVERY_EMAIL_SENT = 'If your account exists, an email with instructions has been sent to your inbox. Please click on the link in the email to reset your password.';
 const MSG_EMAIL_FAILED_SEND = 'An error occurred while sending the email.';
 const MSG_RECOVERY_CODE_INVALID = 'The recovery code is invalid.';
 const MSG_RECOVERY_CODE_MISSING = 'The recovery code is missing.';
-const MSG_USER_RECOVERY_FAIL = 'Impossibile impostare il reset password.';
+const MSG_USER_RECOVERY_FAIL = 'Password reset failed.';
 const MSG_USER_RECOVERY_SUCCESS = 'Password reset successfully.';
 const MSG_RECOVERY_CODE_EXPIRED= 'Reset code expired.';
 const MSG_NOTHING_TO_UPDATE = 'No data sent, no update occurrred.';

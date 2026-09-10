@@ -92,7 +92,7 @@
                         <div class="toolbar">
                             <a href="/user/edit/<?php echo $user->id; ?>" class="button">
                                 <span class="sr-only">Edit user <?php echo $user->username; ?></span>
-                                <i class="icon pencil" aria-hidden="true"></i>
+                                <i class="stitch stitch--pencil" aria-hidden="true"></i>
                             </a>
 
                             <button
@@ -100,7 +100,7 @@
                                     data-dialog-open="user-delete-<?php echo $user->id; ?>"
                                     class="button">
                                 <span class="sr-only">Delete User <?php echo $user->username; ?></span>
-                                <i class="icon bin" aria-hidden="true"></i>
+                                <i class="stitch stitch--bin" aria-hidden="true"></i>
                             </button>
 
                             <dialog id="user-delete-<?php echo $user->id; ?>" closedby="any">

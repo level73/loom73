@@ -10,20 +10,9 @@ Loom73 evaluates additions against three questions:
 
 ## 6.0 — Public Foundation
 
-**Status: current milestone**
+**Status: complete**
 
 The functional foundation and public frontend are substantially complete. The remaining work is consolidation and release preparation.
-
-### Remaining
-
-```text
-complete and reorganize repository documentation
-document every current backend component
-document frontend utilities and Stitch
-align README and documentation links
-finalize repository metadata and license presentation
-prepare the first public 6.0 release
-```
 
 ### Completed foundation
 
@@ -37,6 +26,12 @@ tooltip and responsive navigation
 deployment workflow
 runtime health inspection
 repository pre-publication review
+complete and reorganize repository documentation
+document every current backend component
+document frontend utilities and Stitch
+align README and documentation links
+finalize repository metadata and license presentation
+prepare the first public 6.0 release
 ```
 
 Version 6.0 should not gain another large subsystem.
