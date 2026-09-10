@@ -12,7 +12,7 @@ Loom73 evaluates additions against three questions:
 
 **Status: complete**
 
-The functional foundation and public frontend are substantially complete. The remaining work is consolidation and release preparation.
+Loom73 6.0 establishes the first public foundation of the project.
 
 ### Completed foundation
 
