@@ -57,7 +57,9 @@
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
 
-  # Block bots - remove in production if you want the application to be indexed
-  Header set X-Robots-Tag "noindex, nofollow, noarchive"
+  # Block indexing unless explicitly enabled for this instance
+  <If "! -f '%{DOCUMENT_ROOT}/../../storage/.loom73-indexing-enabled'">
+    Header always set X-Robots-Tag "noindex, nofollow, noarchive"
+  </If>
 </IfModule>
 
