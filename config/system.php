@@ -1,6 +1,6 @@
 <?php
 const LOOM73 = [
-    'version' => '6.0.1',
+    'version' => '6.0.2',
     'directories' => [
         'lib' => '.class',
         'commands' => '',
