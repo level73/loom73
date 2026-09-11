@@ -3,12 +3,14 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { optimize } from 'svgo';
 import sharp from 'sharp';
+import { transform } from 'lightningcss';
 
 /** Define SRC Paths **/
 const frontendRoot = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(frontendRoot, '..');
 const sourceAssetsRoot = path.join(frontendRoot, 'assets');
 const publicRoot = path.join(projectRoot, 'public_html', 'public');
+const sourceCssRoot = path.join(frontendRoot, 'css');
 
 /** Static asset dirs: add here in you want to copy other assets to public dir **/
 const staticAssetDirectories = [
@@ -39,7 +41,8 @@ async function copyStaticAssets(outputRoot = publicRoot) {
     const label = copiedAssets === 1 ? 'asset' : 'assets';
 
     console.log(
-        `[build] ${copiedAssets} static ${label} copied.`
+        `[build] ${copiedAssets} static ${label} copied.\n` +
+        `-------------------------------------------------`
     );
 }
 
@@ -107,9 +110,10 @@ async function optimizeSvgAssets(outputRoot = publicRoot) {
     const label = svgAssets.length === 1 ? 'asset' : 'assets';
 
     console.log(
-        `[build] ${svgAssets.length} SVG ${label} optimized. ` +
+        `[build] ${svgAssets.length} SVG ${label} optimized. \n` +
         `${savedBytes.toLocaleString('en-US')} bytes saved ` +
-        `(${savedPercentage.toFixed(1)}%).`
+        `(${savedPercentage.toFixed(1)}%).\n` +
+        `-------------------------------------------------`
     );
 }
 
@@ -131,7 +135,7 @@ const readyRasterExtensions = new Set([
 async function processRasterAssets(outputRoot = publicRoot) {
     const quality = rasterOptimizationOptions.webp.quality;
 
-    if (!Number.isInteger(quality) || quality < 1 ||quality > 100) {
+    if (!Number.isInteger(quality) || quality < 1 || quality > 100) {
         throw new Error(
             'WebP quality must be an integer between 1 and 100.'
         );
@@ -211,19 +215,179 @@ async function processRasterAssets(outputRoot = publicRoot) {
     const savedPercentage = sourceBytes === 0 ? 0 : (savedBytes / sourceBytes) * 100;
     console.log(
         `[build] ${optimizedAssets} raster assets optimized ` +
-        `at WebP quality ${quality}. ` +
+        `at WebP quality ${quality}. \n` +
         `${savedBytes.toLocaleString('en-US')} bytes saved ` +
-        `(${savedPercentage.toFixed(1)}%). ` +
-        `${copiedAssets} existing WebP copied.`
+        `(${savedPercentage.toFixed(1)}%). \n` +
+        `${copiedAssets} existing WebP copied.\n` +
+        `-------------------------------------------------`
     );
 }
 
+/** CSS Concat and Minify **/
+/** CSS Build Options **/
+const cssSourceFiles = [
+    '001-layers.css',
+    '002-reset.css',
+    '003-layout.css',
+    '004-components.css',
+    '005-ui.css',
+    '006-utilities.css',
+    '007-specific.css',
+    '008-stitch.css',
+];
+
+const cssBuildOptions = {
+    minify: true,
+};
+function annotateCssError(error, sources) {
+    if (
+        typeof error !== 'object' ||
+        error === null ||
+        !Number.isInteger(error.loc?.line)
+    ) {
+        return;
+    }
+
+    let startLine = 1;
+
+    for (const source of sources) {
+        const lineBreaks = (
+            source.content.match(/\r\n|\r|\n/g) ?? []
+        ).length;
+
+        const endLine = startLine + lineBreaks;
+
+        if (
+            error.loc.line >= startLine &&
+            error.loc.line <= endLine
+        ) {
+            error.fileName = source.filePath;
+            error.loc = {
+                ...error.loc,
+                line: error.loc.line - startLine + 1,
+            };
+            error.source = source.content;
+
+            return;
+        }
+
+        /*
+         * Account for the newline inserted by join('\n').
+         */
+        startLine = endLine + 1;
+    }
+}
+async function buildCss(outputRoot = publicRoot) {
+    const sources = await Promise.all(
+        cssSourceFiles.map(async (file) => {
+            const filePath = path.join(sourceCssRoot, file);
+
+            return {
+                filePath,
+                content: await readFile(filePath, 'utf8'),
+            };
+        })
+    );
+
+    /*
+     * The separator prevents the end of one source file from touching
+     * the beginning of the next one.
+     */
+    const sourceCss = sources.map((source) => source.content).join('\n');
+    const destination = path.join(
+        outputRoot,
+        'css',
+        'main.min.css'
+    );
+
+    let result;
+
+    try {
+        result = transform({
+            filename: destination,
+            code: Buffer.from(sourceCss, 'utf8'),
+            ...cssBuildOptions,
+        });
+    } catch (error) {
+        annotateCssError(error, sources);
+        throw error;
+    }
+
+    await mkdir(path.dirname(destination), {
+        recursive: true,
+    });
+
+    await writeFile(destination, result.code);
+
+    const sourceBytes = Buffer.byteLength(sourceCss, 'utf8');
+    const outputBytes = result.code.length;
+    const savedBytes = sourceBytes - outputBytes;
+    const savedPercentage = sourceBytes === 0 ? 0 : (savedBytes / sourceBytes) * 100;
+
+    const label = cssSourceFiles.length === 1
+        ? 'file'
+        : 'files';
+
+    console.log(
+        `[build] ${cssSourceFiles.length} CSS ${label} built. \n` +
+        `${savedBytes.toLocaleString('en-US')} bytes saved ` +
+        `(${savedPercentage.toFixed(1)}%).\n` +
+        `-------------------------------------------------`
+    );
+}
 /** Register Tasks **/
 const tasks = new Map([
-    [ 'assets:static', copyStaticAssets,],
-    ['assets:svg', optimizeSvgAssets],
-    ['assets:raster', processRasterAssets],
+    [ 'assets:static', copyStaticAssets ],
+    [ 'assets:svg', optimizeSvgAssets ],
+    [ 'assets:raster', processRasterAssets ],
+    [ 'css', buildCss ],
 ]);
+
+/** Build error message formatter **/
+function formatBuildError(error) {
+    if (!(error instanceof Error)) {
+        return `[build] ${String(error)}`;
+    }
+
+    const output = [
+        `[build] ${error.message}`,
+    ];
+
+    const fileName = error.fileName;
+    const line = error.loc?.line;
+    const column = error.loc?.column;
+
+    if (fileName && Number.isInteger(line)) {
+        const location = Number.isInteger(column)
+            ? `${fileName}:${line}:${column + 1}`
+            : `${fileName}:${line}`;
+
+        output.push(`[build] ${location}`);
+    }
+
+    if (
+        typeof error.source === 'string' &&
+        Number.isInteger(line)
+    ) {
+        const sourceLine = error.source
+            .split(/\r\n|\r|\n/)[line - 1];
+
+        if (sourceLine !== undefined) {
+            const lineLabel = String(line);
+
+            output.push(`${lineLabel} | ${sourceLine}`);
+
+            if (Number.isInteger(column)) {
+                output.push(
+                    `${' '.repeat(lineLabel.length)} | ` +
+                    `${' '.repeat(column)}^`
+                );
+            }
+        }
+    }
+
+    return output.join('\n');
+}
 
 async function main() {
     const taskName = process.argv[2];
@@ -240,11 +404,7 @@ async function main() {
     try {
         await task();
     } catch (error) {
-        const message = error instanceof Error
-            ? error.message
-            : String(error);
-
-        console.error(`[build] ${message}`);
+        console.error(formatBuildError(error));
         process.exitCode = 1;
     }
 }
