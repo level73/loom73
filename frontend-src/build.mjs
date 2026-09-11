@@ -3,7 +3,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { optimize } from 'svgo';
 import sharp from 'sharp';
-import { transform } from 'lightningcss';
+import { transform as transformCss} from 'lightningcss';
+import { transform as transformJavaScript } from 'esbuild';
 
 /** Define SRC Paths **/
 const frontendRoot = path.dirname(fileURLToPath(import.meta.url));
@@ -11,6 +12,31 @@ const projectRoot = path.resolve(frontendRoot, '..');
 const sourceAssetsRoot = path.join(frontendRoot, 'assets');
 const publicRoot = path.join(projectRoot, 'public_html', 'public');
 const sourceCssRoot = path.join(frontendRoot, 'css');
+const sourceJavaScriptRoot = path.join(frontendRoot, 'js');
+
+/** Manifest path **/
+const projectManifestPath = path.join(projectRoot, 'package.json');
+
+/** Project version **/
+async function getProjectVersion() {
+    const manifestSource = await readFile(
+        projectManifestPath,
+        'utf8'
+    );
+
+    const manifest = JSON.parse(manifestSource);
+
+    if (
+        typeof manifest.version !== 'string' ||
+        manifest.version.trim() === ''
+    ) {
+        throw new Error(
+            `Missing or invalid version in ${projectManifestPath}.`
+        );
+    }
+
+    return manifest.version;
+}
 
 /** Static asset dirs: add here in you want to copy other assets to public dir **/
 const staticAssetDirectories = [
@@ -303,7 +329,7 @@ async function buildCss(outputRoot = publicRoot) {
     let result;
 
     try {
-        result = transform({
+        result = transformCss({
             filename: destination,
             code: Buffer.from(sourceCss, 'utf8'),
             ...cssBuildOptions,
@@ -335,18 +361,139 @@ async function buildCss(outputRoot = publicRoot) {
         `-------------------------------------------------`
     );
 }
+
+/** JavaScript Build Options **/
+const javascriptEntries = [
+    {
+        source: 'index.js',
+        destination: 'index.min.js',
+    },
+    {
+        source: 'forms.js',
+        destination: 'forms.min.js',
+    },
+    {
+        source: 'table.js',
+        destination: 'table.min.js',
+    },
+    {
+        source: 'ui.js',
+        destination: 'ui.min.js',
+    },
+];
+const javascriptBuildOptions = {
+    charset: 'utf8',
+    format: 'esm',
+    legalComments: 'none',
+    minify: true,
+    sourcemap: false,
+    target: 'esnext',
+};
+async function buildJavaScript(outputRoot = publicRoot) {
+    /** Get Project Version **/
+    const projectVersion = await getProjectVersion();
+
+    const outputJavaScriptRoot = path.join(
+        outputRoot,
+        'js'
+    );
+
+    await mkdir(outputJavaScriptRoot, {
+        recursive: true,
+    });
+
+    let sourceBytes = 0;
+    let outputBytes = 0;
+
+    for (const entry of javascriptEntries) {
+        const source = path.join(
+            sourceJavaScriptRoot,
+            entry.source
+        );
+
+        const destination = path.join(
+            outputJavaScriptRoot,
+            entry.destination
+        );
+
+        const sourceJavaScript = await readFile(
+            source,
+            'utf8'
+        );
+
+        const result = await transformJavaScript(
+            sourceJavaScript,
+            {
+                ...javascriptBuildOptions,
+                define: {
+                    __LOOM73_VERSION__: JSON.stringify(projectVersion),
+                },
+                sourcefile: source,
+            }
+        );
+
+        await writeFile(destination, result.code, 'utf8');
+
+        sourceBytes += Buffer.byteLength(
+            sourceJavaScript,
+            'utf8'
+        );
+
+        outputBytes += Buffer.byteLength(
+            result.code,
+            'utf8'
+        );
+    }
+
+    const savedBytes = sourceBytes - outputBytes;
+    const savedPercentage = sourceBytes === 0
+        ? 0
+        : (savedBytes / sourceBytes) * 100;
+
+    const label = javascriptEntries.length === 1
+        ? 'file'
+        : 'files';
+
+    console.log(
+        `[build] Loom73 ${projectVersion}: ${javascriptEntries.length} JavaScript ${label} built. \n` +
+        `${savedBytes.toLocaleString('en-US')} bytes saved ` +
+        `(${savedPercentage.toFixed(1)}%).\n` +
+        `-------------------------------------------------`
+    );
+}
+
 /** Register Tasks **/
 const tasks = new Map([
     [ 'assets:static', copyStaticAssets ],
     [ 'assets:svg', optimizeSvgAssets ],
     [ 'assets:raster', processRasterAssets ],
     [ 'css', buildCss ],
+    [ 'js', buildJavaScript ],
 ]);
 
 /** Build error message formatter **/
 function formatBuildError(error) {
     if (!(error instanceof Error)) {
         return `[build] ${String(error)}`;
+    }
+
+    const diagnostic = Array.isArray(error.errors)
+        ? error.errors[0]
+        : null;
+
+    if (diagnostic?.location) {
+        const location = diagnostic.location;
+        const lineLabel = String(location.line);
+
+        const output = [
+            `[build] ${diagnostic.text}`,
+            `[build] ${location.file}:${location.line}:${location.column + 1}`,
+            `${lineLabel} | ${location.lineText}`,
+            `${' '.repeat(lineLabel.length)} | ` +
+            `${' '.repeat(location.column)}^`,
+        ];
+
+        return output.join('\n');
     }
 
     const output = [

@@ -9,7 +9,10 @@ import {Loom73Tables} from "./table.min.js";
 import { Loom73UI } from './ui.min.js';
 
 const Loom73 = {
-    version: '6.0.0',
+    /*
+     * Replaced by build.mjs using package.json.
+     */
+    version: __LOOM73_VERSION__,
 
     init() {
         Loom73Forms.init();
