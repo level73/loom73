@@ -220,7 +220,7 @@
         }
     }
     @scope (div.table-pagination){
-        text-align: center;
+        :scope { text-align: center; }
         button {
             padding-block: calc(var(--padding) / 2);
             padding-inline: calc(var(--padding) / 2);
@@ -247,7 +247,7 @@
 
     /** Forms **/
     @scope (form) {
-        accent-color: var(--color-accent);
+        :scope { accent-color: var(--color-accent); }
         &.small {
             max-width: max(40%, 20rem);
         }
@@ -372,52 +372,54 @@
 
     /** Dialogs **/
     @scope(dialog){
-        margin: auto;
-        padding: var(--padding);
-        text-transform: initial;
-        min-width: 35vw;
-        max-width: 90vw;
-        &::backdrop {
-            background-image: var(--backdrop);
-            background-size: 0.5rem 0.5rem;
-            background-repeat: repeat;
-        }
+        :scope {
+            margin: auto;
+            padding: var(--padding);
+            text-transform: initial;
+            min-width: 35vw;
+            max-width: 90vw;
+            &::backdrop {
+                background-image: var(--backdrop);
+                background-size: 0.5rem 0.5rem;
+                background-repeat: repeat;
+            }
 
-        .buttons {
-            display: grid;
-            gap: var(--spacing);
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            margin-block-start: var(--spacing);
-        }
-        button.modal-button, button.modal-button[type="submit"] {
-            font-size: var(--fontsize-0);
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-            &.close{
-                background: transparent;
-                border: 1px solid var(--color-accent);
-                color: var(--color-accent);
+            .buttons {
+                display: grid;
+                gap: var(--spacing);
+                grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+                margin-block-start: var(--spacing);
+            }
+            button.modal-button, button.modal-button[type="submit"] {
+                font-size: var(--fontsize-0);
+                padding: 0.5rem 1rem;
+                cursor: pointer;
+                &.close{
+                    background: transparent;
+                    border: 1px solid var(--color-accent);
+                    color: var(--color-accent);
+                    &:hover, &:focus, &:active {
+                        background-color: var(--color-accent);
+                        color: contrast-color(var(--color-accent));
+                    }
+                }
+
+
+            }
+            button.modal-button[type="submit"]{
+                background-color: var(--color-utility-danger);
+                color: contrast-color(var(--color-utility-danger));
                 &:hover, &:focus, &:active {
-                    background-color: var(--color-accent);
-                    color: contrast-color(var(--color-accent));
+                    background-color: oklch(from var(--color-utility-danger) 0.5 c h);
+                    color: contrast-color(oklch(from var(--color-utility-danger) 0.5 c h));
                 }
             }
-
-
-        }
-        button.modal-button[type="submit"]{
-            background-color: var(--color-utility-danger);
-            color: contrast-color(var(--color-utility-danger));
-            &:hover, &:focus, &:active {
-                background-color: oklch(from var(--color-utility-danger) 0.5 c h);
-                color: contrast-color(oklch(from var(--color-utility-danger) 0.5 c h));
+            button[data-dialog-close] {
+                border: none;
+                background: none;
+                display: flex;
+                justify-self: end;
             }
-        }
-        button[data-dialog-close] {
-            border: none;
-            background: none;
-            display: flex;
-            justify-self: end;
         }
     }
 
