@@ -38,7 +38,9 @@ Version 6.0 should not gain another large subsystem.
 
 ## 6.1 — Frontend Modernization
 
-Replace the current Grunt pipeline with a focused build script while preserving the framework-free browser runtime.
+**Status: in progress**
+
+Modernize the frontend toolchain while preserving the framework-free browser runtime.
 
 Target toolset:
 
@@ -48,35 +50,55 @@ Lightning CSS
 esbuild
 SVGO
 Sharp
-node:fs
+Node standard library
 ```
 
-### First phase: build parity
+### Build foundation
+
+**Status: complete**
+
+The Node.js build runner now provides:
 
 ```text
-CSS concatenation and minification
-JavaScript bundling and minification
+ordered CSS concatenation and minification
+JavaScript module minification
+package-version injection
 SVG optimization
-WebP conversion
+configurable WebP conversion
 font and static-asset copying
+aggregate build and optimization tasks
 development watch mode
-deployment build
+source-aware error reporting
+colored success and failure output
+per-task and aggregate timing
 ```
 
-Grunt and its plugins should be removed only after the new build produces equivalent output.
-
-### Second phase: build improvements
+The legacy Grunt pipeline and its plugins were removed after validating:
 
 ```text
-explicit CSS entry point
-explicit ES module graph
+npm clean installation
+one-off frontend build
+deployment build
+development watch mode
+new and modified asset handling
+generated public asset paths
+frontend behavior
+```
+
+### Remaining build improvements
+
+The following improvements are candidates for the remainder of 6.1. They are not build-parity blockers:
+
+```text
+CSS entry file instead of a runner-owned source list
+source imports that do not reference compiled .min.js files
 development source maps
 declared browser targets
-fail-fast builds
-build summary
 esbuild metafile
 optional bundle-size guardrails
 ```
+
+The JavaScript module graph and possible bundling strategy should be evaluated together, so source imports, public filenames and browser requests remain coherent.
 
 ### Theme layer
 
@@ -240,6 +262,78 @@ npm clean install
 frontend build
 deployment validation
 ```
+## 6.5 — Public Discovery
+
+Make search-engine exposure an explicit choice of each installed instance.
+
+### Indexing control
+
+Indexing is disabled by default through two complementary mechanisms:
+
+```text
+robots.txt
+    controls crawler access
+
+X-Robots-Tag
+    controls indexing through the HTTP response
+```
+The versioned `.htaccess` checks for this instance-owned marker: 
+```text
+storage/.loom73-indexing-enabled
+```
+
+Possible shuttle operations: 
+```text
+php shuttle indexing.info
+php shuttle indexing.enable
+php shuttle indexing.disable
+```
+The commands should coordinate both `robots.txt` and the `.loom73-indexing-enabled` marker.
+
+```text
+indexing.info
+    report the marker state
+    inspect the global robots policy
+    warn when the two mechanisms disagree
+
+indexing.enable
+    configure robots.txt to allow crawling
+    create the indexing marker
+
+indexing.disable
+    remove the indexing marker
+    configure robots.txt with Disallow: /
+```
+Implementation should:
+
+- default to indexing disabled
+- preserve unrelated robots.txt directives where possible
+- write robots.txt atomically
+- report unwritable files clearly
+- leave the instance in the safer non-indexable state after partial failure
+
+### Sitemap Generation
+Add a small, explicit sitemap generator for public application resources.
+
+The generator should support:
+
+- explicit static routes
+- application-provided URL sources
+- instance URL from configuration
+- optional last-modified dates
+- URL normalization and deduplication
+- valid XML generation
+- atomic file replacement
+
+Possible Shuttle operations:
+
+```text
+php shuttle sitemap.generate
+php shuttle sitemap.info
+```
+
+The generator must not discover controller methods automatically, infer public access from route names or include protected resources.
+
 
 ## Later — Operational Interfaces
 
