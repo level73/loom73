@@ -6,6 +6,8 @@ import sharp from 'sharp';
 import { transform as transformCss} from 'lightningcss';
 import { transform as transformJavaScript } from 'esbuild';
 import { watch as watchFileSystem } from 'node:fs';
+import { performance } from 'node:perf_hooks';
+import { styleText } from 'node:util';
 
 /** Define SRC Paths **/
 const frontendRoot = path.dirname(fileURLToPath(import.meta.url));
@@ -17,6 +19,43 @@ const sourceJavaScriptRoot = path.join(frontendRoot, 'js');
 
 /** Manifest path **/
 const projectManifestPath = path.join(projectRoot, 'package.json');
+
+/** Console Output **/
+function formatDuration(startedAt) {
+    return (
+        (performance.now() - startedAt) / 1000
+    ).toFixed(2);
+}
+function logSuccess(message, startedAt) {
+    const output =
+        `✓ ${message} ` +
+        `Task took ${formatDuration(startedAt)} seconds.`;
+
+    console.log(
+        styleText(
+            ['bold', 'green'],
+            output,
+            {
+                stream: process.stdout,
+            }
+        )
+    );
+}
+function logFailure(message, startedAt = null) {
+    const duration = Number.isFinite(startedAt)
+        ? `\nTask failed after ${formatDuration(startedAt)} seconds.`
+        : '';
+
+    console.error(
+        styleText(
+            ['bold', 'red'],
+            `✗ ${message}${duration}`,
+            {
+                stream: process.stderr,
+            }
+        )
+    );
+}
 
 /** Project version **/
 async function getProjectVersion() {
@@ -45,6 +84,7 @@ const staticAssetDirectories = [
     'fonts',
 ];
 async function copyStaticAssets(outputRoot = publicRoot) {
+    const startedAt = performance.now();
     const outputAssetsRoot = path.join(outputRoot, 'assets');
     let copiedAssets = 0;
     await mkdir(outputAssetsRoot, { recursive: true });
@@ -67,12 +107,11 @@ async function copyStaticAssets(outputRoot = publicRoot) {
 
     const label = copiedAssets === 1 ? 'asset' : 'assets';
 
-    console.log(
-        `[build] ${copiedAssets} static ${label} copied.\n` +
-        `-------------------------------------------------`
+    logSuccess(
+        `[assets:static] ${copiedAssets} static ${label} copied.`,
+        startedAt
     );
 }
-
 
 /** SVG Optimization Options **/
 const svgOptimizationOptions = {
@@ -86,6 +125,7 @@ const svgOptimizationOptions = {
     ],
 };
 async function optimizeSvgAssets(outputRoot = publicRoot) {
+    const startedAt = performance.now();
     const entries = await readdir(sourceAssetsRoot, {
         recursive: true,
         withFileTypes: true,
@@ -136,11 +176,11 @@ async function optimizeSvgAssets(outputRoot = publicRoot) {
 
     const label = svgAssets.length === 1 ? 'asset' : 'assets';
 
-    console.log(
-        `[build] ${svgAssets.length} SVG ${label} optimized. \n` +
+    logSuccess(
+        `[assets:svg] ${svgAssets.length} SVG ${label} optimized.  ` +
         `${savedBytes.toLocaleString('en-US')} bytes saved ` +
-        `(${savedPercentage.toFixed(1)}%).\n` +
-        `-------------------------------------------------`
+        `(${savedPercentage.toFixed(1)}%).`,
+        startedAt
     );
 }
 
@@ -160,6 +200,8 @@ const readyRasterExtensions = new Set([
     '.webp',
 ]);
 async function processRasterAssets(outputRoot = publicRoot) {
+    const startedAt = performance.now();
+
     const quality = rasterOptimizationOptions.webp.quality;
 
     if (!Number.isInteger(quality) || quality < 1 || quality > 100) {
@@ -240,13 +282,13 @@ async function processRasterAssets(outputRoot = publicRoot) {
 
     const savedBytes = sourceBytes - optimizedBytes;
     const savedPercentage = sourceBytes === 0 ? 0 : (savedBytes / sourceBytes) * 100;
-    console.log(
-        `[build] ${optimizedAssets} raster assets optimized ` +
-        `at WebP quality ${quality}. \n` +
+    logSuccess(
+        `[assets:raster] ${optimizedAssets} raster assets optimized ` +
+        `at WebP quality ${quality}. ` +
         `${savedBytes.toLocaleString('en-US')} bytes saved ` +
-        `(${savedPercentage.toFixed(1)}%). \n` +
-        `${copiedAssets} existing WebP copied.\n` +
-        `-------------------------------------------------`
+        `(${savedPercentage.toFixed(1)}%). ` +
+        `${copiedAssets} existing WebP copied.`,
+        startedAt
     );
 }
 
@@ -305,6 +347,7 @@ function annotateCssError(error, sources) {
     }
 }
 async function buildCss(outputRoot = publicRoot) {
+    const startedAt = performance.now();
     const sources = await Promise.all(
         cssSourceFiles.map(async (file) => {
             const filePath = path.join(sourceCssRoot, file);
@@ -355,11 +398,11 @@ async function buildCss(outputRoot = publicRoot) {
         ? 'file'
         : 'files';
 
-    console.log(
-        `[build] ${cssSourceFiles.length} CSS ${label} built. \n` +
+    logSuccess(
+        `[css] ${cssSourceFiles.length} CSS ${label} built. ` +
         `${savedBytes.toLocaleString('en-US')} bytes saved ` +
-        `(${savedPercentage.toFixed(1)}%).\n` +
-        `-------------------------------------------------`
+        `(${savedPercentage.toFixed(1)}%).`,
+        startedAt
     );
 }
 
@@ -391,9 +434,8 @@ const javascriptBuildOptions = {
     target: 'esnext',
 };
 async function buildJavaScript(outputRoot = publicRoot) {
-    /** Get Project Version **/
+    const startedAt = performance.now();
     const projectVersion = await getProjectVersion();
-
     const outputJavaScriptRoot = path.join(
         outputRoot,
         'js'
@@ -455,15 +497,16 @@ async function buildJavaScript(outputRoot = publicRoot) {
         ? 'file'
         : 'files';
 
-    console.log(
-        `[build] Loom73 ${projectVersion}: ${javascriptEntries.length} JavaScript ${label} built. \n` +
+    logSuccess(
+        `[js] ${javascriptEntries.length} JavaScript ${label} built. ` +
         `${savedBytes.toLocaleString('en-US')} bytes saved ` +
-        `(${savedPercentage.toFixed(1)}%).\n` +
-        `-------------------------------------------------`
+        `(${savedPercentage.toFixed(1)}%).`,
+        startedAt
     );
 }
 /** Aggregated Tasks **/
 async function optimizeAssets(outputRoot = publicRoot, showVersion = true ) {
+    const startedAt = performance.now();
     if (showVersion) {
         const projectVersion = await getProjectVersion();
         console.log(`Loom73 v. ${projectVersion}`);
@@ -475,10 +518,14 @@ async function optimizeAssets(outputRoot = publicRoot, showVersion = true ) {
     await optimizeSvgAssets(outputRoot);
     await processRasterAssets(outputRoot);
 
-    console.log('[optimize] Optimization completed.');
+    logSuccess(
+        '[optimize] Asset optimization completed.',
+        startedAt
+    );
 }
 
 async function buildProject(outputRoot = publicRoot) {
+    const startedAt = performance.now();
     const projectVersion = await getProjectVersion();
 
     console.log(`Loom73 v. ${projectVersion}`);
@@ -488,7 +535,10 @@ async function buildProject(outputRoot = publicRoot) {
     await buildJavaScript(outputRoot);
     await optimizeAssets(outputRoot, false);
 
-    console.log('[build] Build completed.');
+    logSuccess(
+        '[build] Build completed.',
+        startedAt
+    );
 }
 
 /** Watcher **/
@@ -508,10 +558,17 @@ function scheduleWatchTask(taskName, task) {
     const timeout = setTimeout(() => {
         scheduledWatchTasks.delete(taskName);
 
-        watchTaskQueue = watchTaskQueue
-            .then(async () => {
+        watchTaskQueue = watchTaskQueue.then(async () => {
+                const startedAt = performance.now();
                 console.log(`[watch] Running ${taskName}.`);
-                await task();
+                try {
+                    await task();
+                } catch (error) {
+                    logFailure(
+                        formatBuildError(error),
+                        startedAt
+                    );
+                }
             })
             .catch((error) => {
                 console.error(formatBuildError(error));
@@ -713,20 +770,24 @@ async function main() {
     const task = tasks.get(taskName);
 
     if (!task) {
-        console.error(
+        logFailure(
             `[build] Available tasks: ${[...tasks.keys()].join(', ')}`
         );
         process.exitCode = 1;
         return;
     }
 
+    const startedAt = performance.now();
+
     try {
         await task();
     } catch (error) {
-        console.error(formatBuildError(error));
+        logFailure(
+            formatBuildError(error),
+            startedAt
+        );
+
         process.exitCode = 1;
     }
 }
-
-
 await main();
