@@ -15,9 +15,6 @@ Thumbs.db
 # Runtime storage
 /storage/
 
-# Build intermediates
-/frontend-src/concat.css
-
 # Logs
 *.log
 /npm-debug.log*

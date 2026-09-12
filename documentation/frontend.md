@@ -24,7 +24,7 @@ frontend-src/
 ├── css/
 ├── js/
 ├── assets/
-└── Gruntfile.js
+└── build.mjs
 ```
 
 Compiled browser assets are written to:
@@ -149,7 +149,7 @@ Install the Node development dependencies from the project root:
 npm install
 ```
 
-Compile CSS and JavaScript:
+Run the complete frontend build once:
 
 ```console
 npm run build
@@ -161,7 +161,7 @@ Optimize and copy image, SVG, favicon and font assets:
 npm run build:assets
 ```
 
-Run the complete deployment build:
+Run the complete build user during deployment:
 
 ```console
 npm run build:deploy

@@ -173,7 +173,7 @@ Loom73Tables
 Loom73UI
 ```
 
-The current build is driven by Grunt. A planned modernization milestone will replace it with focused tools while preserving the same framework-free runtime:
+The frontend build is driven by `frontend-src/build.mjs`. It uses focused development dependencies while preserving a framework-free browser runtime:
 
 ```text
 Lightning CSS

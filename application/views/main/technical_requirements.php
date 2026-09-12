@@ -45,8 +45,8 @@
         <div>
             <h2>Build tooling (Development only)</h2>
             <hr />
-            <p>Node.js, npm and Grunt are used during development and deployment for asset optimization.</p>
-            <p>Including SVG, CSS and JS minification, as well as WEBP conversion for raster images.</p>
+            <p>Node.js and npm are used during development and deployment to run the asset pipeline.</p>
+            <p>Lightning CSS, esbuild, SVGO and Sharp handle CSS and JavaScript minification, SVG optimization and WebP conversion.</p>
 
             <div class="flow-diagram">
                 <div class="flow-diagram-element">

@@ -14,14 +14,6 @@
   },
   "devDependencies": {
     "esbuild": "0.28.2",
-    "grunt": "^1.6.1",
-    "grunt-contrib-concat": "^2.1.0",
-    "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-uglify": "^5.2.2",
-    "grunt-contrib-watch": "^1.1.0",
-    "grunt-css": "^0.5.4",
-    "grunt-cwebp": "^3.0.0",
-    "grunt-svgmin": "^7.0.0",
     "lightningcss": "1.33.0",
     "sharp": "0.35.4",
     "svgo": "3.3.3"
