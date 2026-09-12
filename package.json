@@ -7,10 +7,10 @@
   "type": "commonjs",
   "main": "public_html/public/index.php",
   "scripts": {
-    "build": "cd frontend-src && grunt build",
-    "build:assets": "cd frontend-src && grunt optimize",
-    "build:deploy": "cd frontend-src && grunt deploy",
-    "watch": "cd frontend-src && grunt dev"
+    "build": "node frontend-src/build.mjs build",
+    "build:assets": "node frontend-src/build.mjs optimize",
+    "build:deploy": "node frontend-src/build.mjs build",
+    "watch": "node frontend-src/build.mjs watch"
   },
   "devDependencies": {
     "esbuild": "0.28.2",

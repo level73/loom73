@@ -5,6 +5,7 @@ import { optimize } from 'svgo';
 import sharp from 'sharp';
 import { transform as transformCss} from 'lightningcss';
 import { transform as transformJavaScript } from 'esbuild';
+import { watch as watchFileSystem } from 'node:fs';
 
 /** Define SRC Paths **/
 const frontendRoot = path.dirname(fileURLToPath(import.meta.url));
@@ -461,9 +462,180 @@ async function buildJavaScript(outputRoot = publicRoot) {
         `-------------------------------------------------`
     );
 }
+/** Aggregated Tasks **/
+async function optimizeAssets(outputRoot = publicRoot, showVersion = true ) {
+    if (showVersion) {
+        const projectVersion = await getProjectVersion();
+        console.log(`Loom73 v. ${projectVersion}`);
+    }
+
+    console.log('[optimize] Asset optimization started.');
+
+    await copyStaticAssets(outputRoot);
+    await optimizeSvgAssets(outputRoot);
+    await processRasterAssets(outputRoot);
+
+    console.log('[optimize] Optimization completed.');
+}
+
+async function buildProject(outputRoot = publicRoot) {
+    const projectVersion = await getProjectVersion();
+
+    console.log(`Loom73 v. ${projectVersion}`);
+    console.log('[build] Build started.');
+
+    await buildCss(outputRoot);
+    await buildJavaScript(outputRoot);
+    await optimizeAssets(outputRoot, false);
+
+    console.log('[build] Build completed.');
+}
+
+/** Watcher **/
+/** Watch Options **/
+const watchDebounceMilliseconds = 150;
+const scheduledWatchTasks = new Map();
+
+let watchTaskQueue = Promise.resolve();
+
+function scheduleWatchTask(taskName, task) {
+    const scheduledTask = scheduledWatchTasks.get(taskName);
+
+    if (scheduledTask) {
+        clearTimeout(scheduledTask);
+    }
+
+    const timeout = setTimeout(() => {
+        scheduledWatchTasks.delete(taskName);
+
+        watchTaskQueue = watchTaskQueue
+            .then(async () => {
+                console.log(`[watch] Running ${taskName}.`);
+                await task();
+            })
+            .catch((error) => {
+                console.error(formatBuildError(error));
+            });
+    }, watchDebounceMilliseconds);
+
+    scheduledWatchTasks.set(taskName, timeout);
+}
+function scheduleAssetTask(fileName) {
+    if (!fileName) {
+        scheduleWatchTask('optimize', optimizeAssets);
+        return;
+    }
+
+    const relativePath = String(fileName);
+    const [topLevelDirectory] = relativePath.split(/[\\/]/);
+    const extension = path.extname(relativePath).toLowerCase();
+
+    if (staticAssetDirectories.includes(topLevelDirectory)) {
+        scheduleWatchTask(
+            'assets:static',
+            copyStaticAssets
+        );
+        return;
+    }
+
+    if (extension === '.svg') {
+        scheduleWatchTask(
+            'assets:svg',
+            optimizeSvgAssets
+        );
+        return;
+    }
+
+    if (
+        convertibleRasterExtensions.has(extension) ||
+        readyRasterExtensions.has(extension)
+    ) {
+        scheduleWatchTask(
+            'assets:raster',
+            processRasterAssets
+        );
+    }
+}
+async function watchSources() {
+    await buildProject();
+
+    const watchers = [
+        watchFileSystem(
+            sourceCssRoot,
+            {
+                recursive: true,
+            },
+            () => {
+                scheduleWatchTask('css', buildCss);
+            }
+        ),
+
+        watchFileSystem(
+            sourceJavaScriptRoot,
+            {
+                recursive: true,
+            },
+            () => {
+                scheduleWatchTask(
+                    'js',
+                    buildJavaScript
+                );
+            }
+        ),
+
+        watchFileSystem(
+            sourceAssetsRoot,
+            {
+                recursive: true,
+            },
+            (eventType, fileName) => {
+                scheduleAssetTask(fileName);
+            }
+        ),
+    ];
+
+    console.log(
+        '[watch] Watching CSS, JavaScript and assets. ' +
+        'Press Ctrl+C to stop.'
+    );
+
+    await new Promise((resolve, reject) => {
+        const closeWatchers = () => {
+            for (const watcher of watchers) {
+                watcher.close();
+            }
+
+            for (const timeout of scheduledWatchTasks.values()) {
+                clearTimeout(timeout);
+            }
+
+            scheduledWatchTasks.clear();
+        };
+
+        const stopWatching = () => {
+            closeWatchers();
+            console.log('\n[watch] Stopped.');
+            resolve();
+        };
+
+        for (const watcher of watchers) {
+            watcher.once('error', (error) => {
+                closeWatchers();
+                reject(error);
+            });
+        }
+
+        process.once('SIGINT', stopWatching);
+        process.once('SIGTERM', stopWatching);
+    });
+}
 
 /** Register Tasks **/
 const tasks = new Map([
+    [ 'build', buildProject ],
+    [ 'optimize', optimizeAssets ],
+    [ 'watch', watchSources ],
+
     [ 'assets:static', copyStaticAssets ],
     [ 'assets:svg', optimizeSvgAssets ],
     [ 'assets:raster', processRasterAssets ],
