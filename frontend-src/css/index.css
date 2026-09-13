@@ -1,5 +1,6 @@
 @import "./001-layers.css";
-@import "./002-reset.css";
+@import "./core/reset.css";
+@import "./themes/plain.css";
 @import "./core/layout.css";
 @import "./004-components.css";
 @import "./core/ui.css";
