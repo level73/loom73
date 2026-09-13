@@ -1,13 +1,15 @@
 import { cp, mkdir, readdir, readFile, writeFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { optimize } from 'svgo';
-import sharp from 'sharp';
-import { transform as transformCss} from 'lightningcss';
-import { transform as transformJavaScript } from 'esbuild';
+import { styleText } from 'node:util';
 import { watch as watchFileSystem } from 'node:fs';
 import { performance } from 'node:perf_hooks';
-import { styleText } from 'node:util';
+import { optimize } from 'svgo';
+import sharp from 'sharp';
+import { bundleAsync } from 'lightningcss';
+import { transform as transformJavaScript } from 'esbuild';
+
+
 
 /** Define SRC Paths **/
 const frontendRoot = path.dirname(fileURLToPath(import.meta.url));
@@ -292,78 +294,27 @@ async function processRasterAssets(outputRoot = publicRoot) {
     );
 }
 
-/** CSS Concat and Minify **/
-/** CSS Build Options **/
-const cssSourceFiles = [
-    '001-layers.css',
-    '002-reset.css',
-    '003-layout.css',
-    '004-components.css',
-    '005-ui.css',
-    '006-utilities.css',
-    '007-specific.css',
-    '008-stitch.css',
-];
+
+/** CSS Bundle and Minify **/
+const cssEntryPath = path.join(
+    sourceCssRoot,
+    'index.css'
+);
 
 const cssBuildOptions = {
     minify: true,
 };
-function annotateCssError(error, sources) {
-    if (
-        typeof error !== 'object' ||
-        error === null ||
-        !Number.isInteger(error.loc?.line)
-    ) {
-        return;
-    }
 
-    let startLine = 1;
-
-    for (const source of sources) {
-        const lineBreaks = (
-            source.content.match(/\r\n|\r|\n/g) ?? []
-        ).length;
-
-        const endLine = startLine + lineBreaks;
-
-        if (
-            error.loc.line >= startLine &&
-            error.loc.line <= endLine
-        ) {
-            error.fileName = source.filePath;
-            error.loc = {
-                ...error.loc,
-                line: error.loc.line - startLine + 1,
-            };
-            error.source = source.content;
-
-            return;
-        }
-
-        /*
-         * Account for the newline inserted by join('\n').
-         */
-        startLine = endLine + 1;
-    }
-}
 async function buildCss(outputRoot = publicRoot) {
     const startedAt = performance.now();
-    const sources = await Promise.all(
-        cssSourceFiles.map(async (file) => {
-            const filePath = path.join(sourceCssRoot, file);
-
-            return {
-                filePath,
-                content: await readFile(filePath, 'utf8'),
-            };
-        })
-    );
 
     /*
-     * The separator prevents the end of one source file from touching
-     * the beginning of the next one.
+     * Store every source read by Lightning CSS. This provides
+     * automatic file counts, byte totals and source-aware errors
+     * without duplicating the import graph inside build.mjs.
      */
-    const sourceCss = sources.map((source) => source.content).join('\n');
+    const sources = new Map();
+
     const destination = path.join(
         outputRoot,
         'css',
@@ -373,13 +324,46 @@ async function buildCss(outputRoot = publicRoot) {
     let result;
 
     try {
-        result = transformCss({
-            filename: destination,
-            code: Buffer.from(sourceCss, 'utf8'),
+        result = await bundleAsync({
+            filename: cssEntryPath,
             ...cssBuildOptions,
+
+            resolver: {
+                async read(filePath) {
+                    const source = await readFile(
+                        filePath,
+                        'utf8'
+                    );
+
+                    sources.set(
+                        path.resolve(filePath),
+                        source
+                    );
+
+                    return source;
+                },
+            },
         });
     } catch (error) {
-        annotateCssError(error, sources);
+        /*
+         * bundleAsync already reports the real imported filename
+         * and line. Restore its source text so formatBuildError()
+         * can also print the offending line and caret.
+         */
+        if (
+            typeof error === 'object' &&
+            error !== null &&
+            typeof error.fileName === 'string'
+        ) {
+            const source = sources.get(
+                path.resolve(error.fileName)
+            );
+
+            if (source !== undefined) {
+                error.source = source;
+            }
+        }
+
         throw error;
     }
 
@@ -389,17 +373,30 @@ async function buildCss(outputRoot = publicRoot) {
 
     await writeFile(destination, result.code);
 
-    const sourceBytes = Buffer.byteLength(sourceCss, 'utf8');
+    const sourceBytes = [...sources.values()]
+        .reduce(
+            (total, source) => {
+                return total + Buffer.byteLength(
+                    source,
+                    'utf8'
+                );
+            },
+            0
+        );
+
     const outputBytes = result.code.length;
     const savedBytes = sourceBytes - outputBytes;
-    const savedPercentage = sourceBytes === 0 ? 0 : (savedBytes / sourceBytes) * 100;
+    const savedPercentage = sourceBytes === 0
+        ? 0
+        : (savedBytes / sourceBytes) * 100;
 
-    const label = cssSourceFiles.length === 1
+    const cssFileCount = sources.size;
+    const label = cssFileCount === 1
         ? 'file'
         : 'files';
 
     logSuccess(
-        `[css] ${cssSourceFiles.length} CSS ${label} built. ` +
+        `[css] ${cssFileCount} CSS ${label} bundled and minified. ` +
         `${savedBytes.toLocaleString('en-US')} bytes saved ` +
         `(${savedPercentage.toFixed(1)}%).`,
         startedAt
