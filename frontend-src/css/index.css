@@ -1,8 +1,8 @@
 @import "./001-layers.css";
 @import "./002-reset.css";
-@import "./003-layout.css";
+@import "./core/layout.css";
 @import "./004-components.css";
-@import "./005-ui.css";
-@import "./006-utilities.css";
+@import "./core/ui.css";
+@import "./core/utilities.css";
 @import "./007-specific.css";
-@import "./008-stitch.css";
+@import "./core/stitch.css";
