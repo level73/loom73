@@ -1,6 +1,79 @@
-@layer specific {
+@layer application {
 
-     figure {
+    header#main-header {
+        width: 100%;
+        padding-inline: calc(var(--spacing) + 5%);
+        padding-block: 0.5rem;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--color-border);
+        a.navbar-brand {
+            display:flex;
+            flex-direction: row;
+            text-decoration: none;
+            color: var(--color-accent);
+            align-items: center;
+            justify-content: center;
+            img {
+                aspect-ratio: 1 / 1;
+                margin-inline-end: 1rem;
+            }
+            &:hover {
+                text-decoration: underline;
+                color: var(--color-accent-hover);
+            }
+        }
+
+        .username {
+            display: inline-block;
+            font-weight: 600;
+            color: var(--color-accent);
+
+        }
+        #toolbar {
+            display: inline-grid;
+            grid-auto-flow: column;
+            grid-template-columns: repeat(auto-fill, 1fr);
+
+            .button, .button+.button {
+                background-color: transparent;
+                color: var(--color-accent);
+                border: none;
+                padding: 0 1rem;
+                margin-inline-start: 0;
+                margin-block-end: 0;
+            }
+        }
+    }
+
+    p.claim {
+        font-size: calc(var(--fontsize-5) * 1.6);
+        line-height: 110%;
+        letter-spacing: -0.2rem;
+        margin-block: 3rem;
+        max-width: 13ch;
+        .hilite {
+            color: var(--color-accent);
+        }
+        & ~ p.claim {
+            font-size: var(--fontsize-1);
+            line-height: 140%;
+            letter-spacing: 0;
+            margin-block: 3rem;
+            max-width: 42ch;
+            text-wrap: balance;
+        }
+    }
+
+    p.intro {
+        font-size: var(--fontsize-2);
+        margin-block: var(--spacing);
+        max-width: 18ch;
+    }
+
+    figure {
         text-align: center;
         margin-block: 2rem;
         img {
@@ -337,5 +410,62 @@
 
     /** Setting up a bit of responsiveness for tables **/
     body.components-tables #main-content .grid:not(.breakout) > div { min-width: 0; }
+
+
+    footer {
+        border-top: 1px solid var(--color-border);
+        background-color: var(--color-surface);
+        padding: var(--padding) 5%;
+
+        h3 {
+            font-family: var(--monospace-font-family);
+            font-size: var(--fontsize-1);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: -0.1rem;
+            display: inline-block;
+
+        }
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            li {
+                padding-block: 0.5rem;
+                .footer-nav-item {
+                    color: var(--color-text);
+                    text-decoration: var(--color-text) dotted;
+
+                }
+            }
+        }
+        p {font-size: var(--fontsize--1);}
+    }
+
+    .code-example {
+        display: grid;
+        margin-block: var(--spacing);
+        padding: var(--padding);
+        border: 1px solid var(--color-border);
+        text-align: center;
+        justify-content: center;
+        justify-items: center;
+        align-items: center;
+        h4 {
+            margin-block-end: var(--spacing);
+            text-transform: uppercase;
+            font-family: var(--monospace-font-family);
+        }
+        pre {
+            display: block;
+            margin-block: var(--spacing);
+        }
+        .helper {
+            font-size: var(--fontsize--1);
+            color: var(--color-secondary);
+            font-family: var(--body-italic-font-family);
+            max-width: 80%;
+        }
+    }
 }
 
