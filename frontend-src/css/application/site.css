@@ -88,6 +88,27 @@
         }
     }
 
+    main > section {
+        border-inline: 1px solid var(--color-border);
+    }
+
+    main > section.breakout {
+        background-color: var(--color-surface);
+        border-inline: 0;
+        border-block: 1px solid var(--color-border);
+        & > .inner-border {
+            border-inline: 1px solid var(--color-border);
+        }
+    }
+
+    main > section.bordered {
+        border-block-start: 1px solid var(--color-border);
+    }
+
+    /** Custom Grids **/
+    .technical-snapshot {
+        --grid-min: 12rem;
+    }
     .card.icon-container {
 
         outline: 1px solid var(--color-border);
@@ -134,7 +155,7 @@
         }
     }
     .callout{
-        margin-block: calc(var(--spacing) * 2);
+        margin-block-start: calc(var(--spacing) * 2);
         text-align: left;
         font-size: var(--fontsize-3);
         text-wrap: balance;

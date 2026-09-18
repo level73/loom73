@@ -1,6 +1,6 @@
 <footer>
 
-    <div class="grid grid-4-col with-gap">
+    <div class="grid grid-4 with-gap">
         <div>
             <img src="/assets/loom73.svg" width="16" height="16" alt="Loom73 Logo - Back to homepage">
             <h3>Loom<span class="accent">73</span></h3>

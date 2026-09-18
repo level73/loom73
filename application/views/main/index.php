@@ -1,5 +1,5 @@
 <main id="main-content">
-    <section class="grid grid-2-col">
+    <section class="grid grid-2">
         <div class="">
             <h1>Loom<span class="accent">73</span></h1>
             <p class="claim">
@@ -16,80 +16,81 @@
             <a class="button" href="/main/architecture">Learn More <span class="stitch stitch--arrow"></span></a>
             <a class="button hollow" href="https://level73.github.io/loom73/">Read the docs <span class="stitch stitch--arrow"></span></a>
         </div>
-        <div class="">
+        <div class="center-block">
             <figure>
                 <img width="512" height="512" src="/assets/loom73.svg" alt="Loom73 Logo">
                 <figcaption>Loom73: Weaving your relationship with technology.</figcaption>
             </figure>
         </div>
     </section>
-    <section class="grid grid-2-col breakout">
-        <div>
-            <h2>Why Loom73?</h2>
-            <hr>
-            <p>Every application starts by rebuilding many of the same foundations.<br />
-            Loom73 starts from a practical question.
-            </p>
+    <section class="breakout">
+        <div class="grid grid-2 inner-border">
+            <div>
+                <h2>Why Loom73?</h2>
+                <hr>
+                <p>Every application starts by rebuilding many of the same foundations.<br />
+                Loom73 starts from a practical question.
+                </p>
 
-            <p class="callout">
-                “What if the recurring parts were already solved without forcing the rest of the application into a framework?”
-            </p>
-        </div>
-        <div>
-            <div class="grid grid-components">
-                <div>
-                    <div class="stitch stitch--routes x3 color-accent"></div>
-                    <span class="label">Routing</span>
-                </div>
-                <div>
-                    <div class="stitch stitch--padlock x3 color-accent"></div>
-                    <span class="label">Auth</span>
-                </div>
-                <div>
-                    <div class="stitch stitch--database x3 color-accent"></div>
-                    <span class="label">Database</span>
-                </div>
-                <div>
-                    <div class="stitch stitch--image x3 color-accent"></div>
-                    <span class="label">Assets</span>
-                </div>
-                <div>
-                    <div class="stitch stitch--cli x3 color-accent"></div>
-                    <span class="label">CLI</span>
-                </div>
-                <div>
-                    <div class="stitch stitch--cog x3 color-accent"></div>
-                    <span class="label">Sessions</span>
-                </div>
-                <div>
-                    <div class="stitch stitch--layers x3 color-accent"></div>
-                    <span class="label">Access Control</span>
-                </div>
-                <div>
-                    <div class="stitch stitch--document x3 color-accent"></div>
-                    <span class="label">Logging</span>
-                </div>
-                <div>
-                    <div class="stitch stitch--path x3 color-accent"></div>
-                    <span class="label">Audit trail</span>
-                </div>
-                <div>
-                    <div class="stitch stitch--api x3 color-accent"></div>
-                    <span class="label">API</span>
+                <p class="callout">
+                    “What if the recurring parts were already solved without forcing the rest of the application into a framework?”
+                </p>
+            </div>
+            <div class="center-block">
+                <div class="grid grid-components">
+                    <div>
+                        <div class="stitch stitch--routes x3 color-accent"></div>
+                        <span class="label">Routing</span>
+                    </div>
+                    <div>
+                        <div class="stitch stitch--padlock x3 color-accent"></div>
+                        <span class="label">Auth</span>
+                    </div>
+                    <div>
+                        <div class="stitch stitch--database x3 color-accent"></div>
+                        <span class="label">Database</span>
+                    </div>
+                    <div>
+                        <div class="stitch stitch--image x3 color-accent"></div>
+                        <span class="label">Assets</span>
+                    </div>
+                    <div>
+                        <div class="stitch stitch--cli x3 color-accent"></div>
+                        <span class="label">CLI</span>
+                    </div>
+                    <div>
+                        <div class="stitch stitch--cog x3 color-accent"></div>
+                        <span class="label">Sessions</span>
+                    </div>
+                    <div>
+                        <div class="stitch stitch--layers x3 color-accent"></div>
+                        <span class="label">Access Control</span>
+                    </div>
+                    <div>
+                        <div class="stitch stitch--document x3 color-accent"></div>
+                        <span class="label">Logging</span>
+                    </div>
+                    <div>
+                        <div class="stitch stitch--path x3 color-accent"></div>
+                        <span class="label">Audit trail</span>
+                    </div>
+                    <div>
+                        <div class="stitch stitch--api x3 color-accent"></div>
+                        <span class="label">API</span>
+                    </div>
                 </div>
             </div>
         </div>
-
     </section>
 
-    <section class="grid grid-2_3-col" id="architecture">
+    <section class="grid grid-2-1 with-gap" id="architecture">
         <div>
             <span class="badge">Architecture</span>
             <h2>A solid structure <br />grants <span class="accent">freedom</span><br/>to build</h2>
             <hr>
             <p>Loom73 is organized around a small number of clearly defined responsibilities.</p>
             <p><strong>Convention, not cage</strong></p>
-            <div class="grid grid-4-col with-gap">
+            <div class="grid grid-4 with-gap">
                 <div class="card architecture-card">
                     <h3>Woodframe</h3>
                     <p>Blueprint structure, configuration, shared utilities and registries.</p>
@@ -127,7 +128,7 @@
             </figure>
         </div>
     </section>
-    <section class="grid grid-25" id="principles">
+    <section class="grid grid-4" id="principles">
         <div class="card principle">
             <i class="stitch stitch--path x2 color-accent"></i>
 
@@ -164,7 +165,7 @@
         <h3>Technical Snapshot</h3>
         <hr>
         </header>
-        <div class="grid grid-20 with-gap">
+        <div class="grid grid-fit with-gap technical-snapshot">
             <div class="card ts">
                 <span class="ts-label badge">PHP 8.3+</span>
                 <p>Built with modern PHP and native extensions.</p>
@@ -189,7 +190,7 @@
     </section>
 
     <section class="grid bordered">
-        <div class="grid-2-col grid with-gap">
+        <div class=" grid grid-2 with-gap">
             <figure>
                 <img width="1184" height="861" src="/assets/raster/Max_Liebermann-The_Weaver-1882.webp" loading="lazy" class="image" alt="Picture of Max Liebermann's painting 'The Weaver' from 1882">
                 <figcaption>Max Liebermann - The Weaver (1882)</figcaption>
