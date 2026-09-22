@@ -1,5 +1,5 @@
 <main id="main-content">
-    <section class="grid grid-1_2-col">
+    <section class="grid grid-1-2">
         <div>
             <h1>Technical</h1>
             <hr />
@@ -12,36 +12,38 @@
             <figcaption>The various parts that compose a loom.</figcaption>
         </figure>
     </section>
-    <section class="grid grid-3-col with-gap breakout">
-        <div class="">
-            <h2>Runtime requirements</h2>
-            <hr />
-            <ul class="list large">
-                <li>PHP 8.3 or newer</li>
-                <li>PDO, PDO MySQL, Fileinfo, OpenSSL</li>
-                <li>MySQL or MariaDB</li>
-                <li>Webserver (Apache compatible)</li>
-            </ul>
-        </div>
-        <div class="">
-            <h2>PHP dependencies</h2>
-            <hr />
-            <ul class="list large">
-                <li>vlucas/phpdotenv</li>
-                <li>PHPMailer</li>
-            </ul>
-        </div>
-        <div>
-            <h2>No frontend frameworks</h2>
-            <hr />
-            <ul class="list large">
-                <li>No React, Vue, Angular, jQuery, Bootstrap, Tailwind...</li>
-                <li>Modern CSS</li>
-                <li>Vanilla JS</li>
-            </ul>
+    <section class="breakout">
+        <div class="grid grid-3 with-gap inner-border">
+            <div>
+                <h2>Runtime requirements</h2>
+                <hr />
+                <ul class="list large">
+                    <li>PHP 8.3 or newer</li>
+                    <li>PDO, PDO MySQL, Fileinfo, OpenSSL</li>
+                    <li>MySQL or MariaDB</li>
+                    <li>Webserver (Apache compatible)</li>
+                </ul>
+            </div>
+            <div>
+                <h2>PHP dependencies</h2>
+                <hr />
+                <ul class="list large">
+                    <li>vlucas/phpdotenv</li>
+                    <li>PHPMailer</li>
+                </ul>
+            </div>
+            <div>
+                <h2>No frontend frameworks</h2>
+                <hr />
+                <ul class="list large">
+                    <li>No React, Vue, Angular, jQuery, Bootstrap, Tailwind...</li>
+                    <li>Modern CSS</li>
+                    <li>Vanilla JS</li>
+                </ul>
+            </div>
         </div>
     </section>
-    <section class="grid grid-2-col">
+    <section class="grid grid-2 with-gap">
         <div>
             <h2>Build tooling (Development only)</h2>
             <hr />

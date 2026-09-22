@@ -1,5 +1,5 @@
 <main id="main-content">
-    <section class="grid grid-1_2-col">
+    <section class="grid grid-1-2">
 
         <div>
             <h1>Shuttle</h1>
@@ -21,38 +21,40 @@
             </figure>
         </div>
     </section>
-    <section class="grid breakout grid-25">
-        <div class="grid grid-1_2-col with-gap">
-            <span class="stitch stitch--cli x6 color-accent" aria-hidden="true"></span>
-            <div>
-                <h4>Health & Info</h4>
-                <p>Check Loom73 instance health, such as PHP versions, database connections, runtime directory permissions and more.</p>
+    <section class="breakout">
+        <div class="grid grid-4 inner-border with-gap">
+            <div class="grid grid-1-2 with-gap">
+                <span class="stitch stitch--cli x6 color-accent" aria-hidden="true"></span>
+                <div>
+                    <h4>Health & Info</h4>
+                    <p>Check Loom73 instance health, such as PHP versions, database connections, runtime directory permissions and more.</p>
+                </div>
             </div>
-        </div>
-        <div class="grid grid-1_2-col with-gap">
-            <span class="stitch stitch--download x6 color-accent" aria-hidden="true"></span>
-            <div>
-                <h4>Clean install</h4>
-                <p>Install the schema, basic seeds and the runtime directories.</p>
+            <div class="grid grid-1-2 with-gap">
+                <span class="stitch stitch--download x6 color-accent" aria-hidden="true"></span>
+                <div>
+                    <h4>Clean install</h4>
+                    <p>Install the schema, basic seeds and the runtime directories.</p>
+                </div>
             </div>
-        </div>
-        <div class="grid grid-1_2-col with-gap">
-            <span class="stitch stitch--user x6 color-accent" aria-hidden="true"></span>
-            <div>
-                <h4>Admin bootstrap</h4>
-                <p>Create the first administrative user.</p>
+            <div class="grid grid-1-2 with-gap">
+                <span class="stitch stitch--user x6 color-accent" aria-hidden="true"></span>
+                <div>
+                    <h4>Admin bootstrap</h4>
+                    <p>Create the first administrative user.</p>
+                </div>
             </div>
-        </div>
-        <div class="grid grid-1_2-col with-gap">
-            <span class="stitch stitch--puzzle x6 color-accent" aria-hidden="true"></span>
-            <div>
-                <h4>Extensible by convention</h4>
-                <p>Add new commands with one file, one class, one constructor-driven operation.</p>
+            <div class="grid grid-1-2 with-gap">
+                <span class="stitch stitch--puzzle x6 color-accent" aria-hidden="true"></span>
+                <div>
+                    <h4>Extensible by convention</h4>
+                    <p>Add new commands with one file, one class, one constructor-driven operation.</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <section class="grid grid-2-1-1-col with-gap">
+    <section class="grid grid-3 with-gap">
         <div>
             <h2>Core commands</h2>
             <hr>

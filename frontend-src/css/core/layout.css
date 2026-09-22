@@ -59,9 +59,6 @@
     .grid-4 {
         --grid-template: repeat(4, minmax(0, 1fr));
     }
-    .grid-5 {
-        --grid-template: repeat(5, minmax(0, 1fr));
-    }
 
     /** Asymmetrical grids **/
     .grid-1-2 {
@@ -93,7 +90,6 @@
         .grid-2,
         .grid-3,
         .grid-4,
-        .grid-5,
         .grid-1-2,
         .grid-2-1,
         .grid-1-3,

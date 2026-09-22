@@ -109,7 +109,10 @@
     .color-success {   color: var(--color-utility-success); }
 
     /** Positioning Utilities **/
-    .center-block{
+    .center-block { /** This acts on all axis **/
         place-self: center;
+    }
+    .center-vertical { /** This only acts on the Y axis **/
+        align-self: center;
     }
 }

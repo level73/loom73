@@ -36,8 +36,8 @@
                     “What if the recurring parts were already solved without forcing the rest of the application into a framework?”
                 </p>
             </div>
-            <div class="center-block">
-                <div class="grid grid-components">
+            <div class="center-vertical">
+                <div class="grid grid-fit grid-components">
                     <div>
                         <div class="stitch stitch--routes x3 color-accent"></div>
                         <span class="label">Routing</span>
