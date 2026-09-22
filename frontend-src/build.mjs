@@ -7,7 +7,7 @@ import { performance } from 'node:perf_hooks';
 import { optimize } from 'svgo';
 import sharp from 'sharp';
 import { bundleAsync } from 'lightningcss';
-import { transform as transformJavaScript } from 'esbuild';
+import { build as bundleJavaScript } from 'esbuild';
 
 
 
@@ -404,98 +404,89 @@ async function buildCss(outputRoot = publicRoot) {
 }
 
 /** JavaScript Build Options **/
-const javascriptEntries = [
-    {
-        source: 'index.js',
-        destination: 'index.min.js',
-    },
-    {
-        source: 'forms.js',
-        destination: 'forms.min.js',
-    },
-    {
-        source: 'table.js',
-        destination: 'table.min.js',
-    },
-    {
-        source: 'ui.js',
-        destination: 'ui.min.js',
-    },
-];
+const javascriptEntryPath = path.join(
+    sourceJavaScriptRoot,
+    'index.js'
+);
 const javascriptBuildOptions = {
+    bundle: true,
     charset: 'utf8',
     format: 'esm',
     legalComments: 'none',
     minify: true,
     sourcemap: false,
     target: 'esnext',
+    metafile: true,
+    write: false,
 };
 async function buildJavaScript(outputRoot = publicRoot) {
     const startedAt = performance.now();
     const projectVersion = await getProjectVersion();
+
     const outputJavaScriptRoot = path.join(
         outputRoot,
         'js'
+    );
+
+    const destination = path.join(
+        outputJavaScriptRoot,
+        'index.min.js'
     );
 
     await mkdir(outputJavaScriptRoot, {
         recursive: true,
     });
 
-    let sourceBytes = 0;
-    let outputBytes = 0;
+    const result = await bundleJavaScript({
+        ...javascriptBuildOptions,
+        entryPoints: [
+            javascriptEntryPath,
+        ],
+        outfile: destination,
+        define: {
+            __LOOM73_VERSION__: JSON.stringify(projectVersion),
+        },
+    });
 
-    for (const entry of javascriptEntries) {
-        const source = path.join(
-            sourceJavaScriptRoot,
-            entry.source
-        );
+    const outputFile = result.outputFiles.find(
+        file => path.extname(file.path) === '.js'
+    );
 
-        const destination = path.join(
-            outputJavaScriptRoot,
-            entry.destination
-        );
-
-        const sourceJavaScript = await readFile(
-            source,
-            'utf8'
-        );
-
-        const result = await transformJavaScript(
-            sourceJavaScript,
-            {
-                ...javascriptBuildOptions,
-                define: {
-                    __LOOM73_VERSION__: JSON.stringify(projectVersion),
-                },
-                sourcefile: source,
-            }
-        );
-
-        await writeFile(destination, result.code, 'utf8');
-
-        sourceBytes += Buffer.byteLength(
-            sourceJavaScript,
-            'utf8'
-        );
-
-        outputBytes += Buffer.byteLength(
-            result.code,
-            'utf8'
+    if (!outputFile) {
+        throw new Error(
+            'JavaScript bundle output was not generated.'
         );
     }
 
+    await writeFile(
+        destination,
+        outputFile.contents
+    );
+
+    const sourceBytes = Object.values(
+        result.metafile.inputs
+    ).reduce(
+        (total, input) => total + input.bytes,
+        0
+    );
+
+    const outputBytes = outputFile.contents.byteLength;
     const savedBytes = sourceBytes - outputBytes;
+
     const savedPercentage = sourceBytes === 0
         ? 0
         : (savedBytes / sourceBytes) * 100;
 
-    const label = javascriptEntries.length === 1
-        ? 'file'
-        : 'files';
+    const moduleCount = Object.keys(
+        result.metafile.inputs
+    ).length;
+
+    const label = moduleCount === 1
+        ? 'module'
+        : 'modules';
 
     logSuccess(
-        `[js] ${javascriptEntries.length} JavaScript ${label} built. ` +
+        `[js] ${moduleCount} JavaScript ${label} bundled and minified. ` +
         `${savedBytes.toLocaleString('en-US')} bytes saved ` +
         `(${savedPercentage.toFixed(1)}%).`,
         startedAt

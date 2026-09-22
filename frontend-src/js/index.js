@@ -4,14 +4,13 @@
  *  Prepare init all modules
  *  wait for DOMContentLoaded, then run everything.
  */
-import { Loom73Forms } from './forms.min.js';
-import {Loom73Tables} from "./table.min.js";
-import { Loom73UI } from './ui.min.js';
+import { Loom73Forms } from './forms.js';
+import {Loom73Tables} from "./table.js";
+import { Loom73UI } from './ui.js';
 
 const Loom73 = {
-    /*
-     * Replaced by build.mjs using package.json.
-     */
+
+    /* This placeholder is replaced by build.mjs using package.json. */
     version: __LOOM73_VERSION__,
 
     init() {
