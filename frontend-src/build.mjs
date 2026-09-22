@@ -18,6 +18,7 @@ const sourceAssetsRoot = path.join(frontendRoot, 'assets');
 const publicRoot = path.join(projectRoot, 'public_html', 'public');
 const sourceCssRoot = path.join(frontendRoot, 'css');
 const sourceJavaScriptRoot = path.join(frontendRoot, 'js');
+const sourceThemeRoot = path.join(sourceCssRoot,'themes');
 
 /** Manifest path **/
 const projectManifestPath = path.join(projectRoot, 'package.json');
@@ -305,62 +306,45 @@ const cssBuildOptions = {
     minify: true,
 };
 
-async function buildCss(outputRoot = publicRoot) {
-    const startedAt = performance.now();
-
-    /*
-     * Store every source read by Lightning CSS. This provides
-     * automatic file counts, byte totals and source-aware errors
-     * without duplicating the import graph inside build.mjs.
-     */
+/** Bundle CSS Files **/
+async function bundleCssEntry(source, destination) {
     const sources = new Map();
-
-    const destination = path.join(
-        outputRoot,
-        'css',
-        'main.min.css'
-    );
 
     let result;
 
     try {
         result = await bundleAsync({
-            filename: cssEntryPath,
+            filename: source,
             ...cssBuildOptions,
 
             resolver: {
                 async read(filePath) {
-                    const source = await readFile(
+                    const content = await readFile(
                         filePath,
                         'utf8'
                     );
 
                     sources.set(
                         path.resolve(filePath),
-                        source
+                        content
                     );
 
-                    return source;
+                    return content;
                 },
             },
         });
     } catch (error) {
-        /*
-         * bundleAsync already reports the real imported filename
-         * and line. Restore its source text so formatBuildError()
-         * can also print the offending line and caret.
-         */
         if (
             typeof error === 'object' &&
             error !== null &&
             typeof error.fileName === 'string'
         ) {
-            const source = sources.get(
+            const content = sources.get(
                 path.resolve(error.fileName)
             );
 
-            if (source !== undefined) {
-                error.source = source;
+            if (content !== undefined) {
+                error.source = content;
             }
         }
 
@@ -373,30 +357,107 @@ async function buildCss(outputRoot = publicRoot) {
 
     await writeFile(destination, result.code);
 
-    const sourceBytes = [...sources.values()]
-        .reduce(
-            (total, source) => {
+    return {
+        sourceFiles: sources.size,
+
+        sourceBytes: [...sources.values()].reduce(
+            (total, content) => {
                 return total + Buffer.byteLength(
-                    source,
+                    content,
                     'utf8'
                 );
             },
             0
+        ),
+
+        outputBytes: result.code.byteLength,
+    };
+}
+
+
+async function buildCss(outputRoot = publicRoot) {
+    const startedAt = performance.now();
+
+    const themeFiles = (
+        await readdir(sourceThemeRoot, {
+            withFileTypes: true,
+        })
+    )
+        .filter(entry => {
+            return (
+                entry.isFile() &&
+                path.extname(entry.name) === '.css'
+            );
+        })
+        .sort((entryA, entryB) => {
+            return entryA.name.localeCompare(entryB.name);
+        });
+
+    if (!themeFiles.some(entry => entry.name === 'plain.css')) {
+        throw new Error(
+            'Missing required Plain theme: frontend-src/css/themes/plain.css'
+        );
+    }
+
+    const bundles = [
+        {
+            source: cssEntryPath,
+            destination: path.join(
+                outputRoot,
+                'css',
+                'main.min.css'
+            ),
+        },
+
+        ...themeFiles.map(entry => {
+            const themeName = path.basename(
+                entry.name,
+                '.css'
+            );
+
+            if (!/^[a-z0-9][a-z0-9-]*$/.test(themeName)) {
+                throw new Error(
+                    `Invalid theme filename: ${entry.name}`
+                );
+            }
+
+            return {
+                source: path.join(
+                    sourceThemeRoot,
+                    entry.name
+                ),
+                destination: path.join(
+                    outputRoot,
+                    'css',
+                    `theme-${themeName}.min.css`
+                ),
+            };
+        }),
+    ];
+
+    let sourceFiles = 0;
+    let sourceBytes = 0;
+    let outputBytes = 0;
+
+    for (const bundle of bundles) {
+        const result = await bundleCssEntry(
+            bundle.source,
+            bundle.destination
         );
 
-    const outputBytes = result.code.length;
+        sourceFiles += result.sourceFiles;
+        sourceBytes += result.sourceBytes;
+        outputBytes += result.outputBytes;
+    }
+
     const savedBytes = sourceBytes - outputBytes;
     const savedPercentage = sourceBytes === 0
         ? 0
         : (savedBytes / sourceBytes) * 100;
 
-    const cssFileCount = sources.size;
-    const label = cssFileCount === 1
-        ? 'file'
-        : 'files';
-
     logSuccess(
-        `[css] ${cssFileCount} CSS ${label} bundled and minified. ` +
+        `[css] ${bundles.length} CSS bundles built from ` +
+        `${sourceFiles} source files. ` +
         `${savedBytes.toLocaleString('en-US')} bytes saved ` +
         `(${savedPercentage.toFixed(1)}%).`,
         startedAt

@@ -1,3 +1,21 @@
+<?php
+/** Theme Selector/Loader **/
+$theme = strtolower(
+        trim((string) ($_SERVER['LOOM73_THEME'] ?? 'plain'))
+);
+
+if (!preg_match('/\A[a-z0-9][a-z0-9-]*\z/', $theme)):
+    $theme = 'plain';
+endif;
+
+$themeFile = 'theme-' . $theme . '.min.css';
+
+$themePath = APP_DIR . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . $themeFile;
+
+if (!is_file($themePath)):
+    $themeFile = 'theme-plain.min.css';
+endif;
+?>
 <!DOCTYPE html>
 <html lang="<?php echo $_SERVER['LOCALE']; ?>">
 
@@ -20,6 +38,8 @@
     <link rel="preload" href="/assets/fonts/IBM-Plex-Sans_latin_100_700_italic.woff2" as="font" type="font/woff2" crossorigin>
     <!-- Main Stylesheet -->
     <link rel="stylesheet" href="/css/main.min.css">
+    <!-- Theme Stylesheet -->
+    <link rel="stylesheet" href="/css/<?php echo htmlspecialchars($themeFile,ENT_QUOTES, 'UTF-8'); ?>">
 </head>
 
 <body class="<?php echo $bodyClass; ?>">
