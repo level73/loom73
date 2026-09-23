@@ -183,7 +183,7 @@ Sharp
 Node standard library
 ```
 
-A lightweight theme layer is also planned to separate Loom73's functional UI primitives from the visual identity of each application.
+The frontend separates reusable functional styles, selectable themes and application-specific presentation. Loom73 ships with the Plain theme, selected through `LOOM73_THEME` and compiled as a standalone stylesheet.
 
 ## Quick start
 

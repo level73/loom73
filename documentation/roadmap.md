@@ -40,34 +40,27 @@ Version 6.0 should not gain another large subsystem.
 
 **Status: in progress**
 
-Modernize the frontend toolchain while preserving the framework-free browser runtime.
-
-Target toolset:
-
-```text
-build.mjs
-Lightning CSS
-esbuild
-SVGO
-Sharp
-Node standard library
-```
+Modernize the frontend architecture and toolchain while preserving the framework-free browser runtime.
 
 ### Build foundation
 
 **Status: complete**
 
-The Node.js build runner now provides:
+The Node.js build runner provides:
 
 ```text
-ordered CSS concatenation and minification
-JavaScript module minification
+CSS import bundling and minification
+automatic theme entry discovery and compilation
+JavaScript module bundling and minification
 package-version injection
 SVG optimization
 configurable WebP conversion
 font and static-asset copying
 aggregate build and optimization tasks
 development watch mode
+development-only source maps
+shared browser targets for CSS and JavaScript
+esbuild metadata used for build metrics
 source-aware error reporting
 colored success and failure output
 per-task and aggregate timing
@@ -85,45 +78,59 @@ generated public asset paths
 frontend behavior
 ```
 
-### Remaining build improvements
+### Frontend source contract
 
-The following improvements are candidates for the remainder of 6.1. They are not build-parity blockers:
+**Status: complete**
+
+The frontend now uses explicit source entry points:
 
 ```text
-CSS entry file instead of a runner-owned source list
-source imports that do not reference compiled .min.js files
-development source maps
-declared browser targets
-esbuild metafile
-optional bundle-size guardrails
+frontend-src/css/index.css
+frontend-src/js/index.js
 ```
 
-The JavaScript module graph and possible bundling strategy should be evaluated together, so source imports, public filenames and browser requests remain coherent.
+CSS dependencies are expressed through imports rather than a source list owned by the build runner.
 
-### Theme layer
+JavaScript modules import their source files directly and are bundled into a single browser entry point.
 
-The same milestone introduces the first theme boundary:
+Production builds generate deployable assets without source maps. Development watch mode generates linked source maps for CSS and JavaScript.
+
+Browser targets are configured once in `frontend-src/build.mjs` and passed to both Lightning CSS and esbuild.
+
+### Layout contract
+
+**Status: complete**
+
+The core layout layer provides reusable page sections, bounded content, breakout sections and adaptable grid patterns.
+
+The contract favors a small set of configurable layout primitives over a large collection of fixed grid combinations. Application-specific spacing, borders and presentation remain outside the reusable layout layer.
+
+### Theme boundary
+
+**Status: complete**
+
+The frontend is divided into:
 
 ```text
 Loom73 core
-    behavior and functional UI contracts
+    reusable structure, behavior and functional UI contracts
 
-plain theme
-    colors, typography and component appearance
+themes
+    colors, typography and component presentation
 
 application
     domain-specific visual decisions
 ```
 
-Planned configuration:
+Loom73 ships with the Plain theme:
 
 ```env
 LOOM73_THEME='plain'
 ```
 
-The first implementation should provide one theme identifier resolved by convention.
+Theme entry files are discovered by convention and compiled to standalone public stylesheets. Invalid or unavailable theme identifiers fall back to Plain.
 
-It should not introduce:
+The theme contract deliberately excludes:
 
 ```text
 theme inheritance
@@ -132,6 +139,22 @@ template overrides
 database theme selection
 plugin lifecycle
 ```
+
+### Remaining release work
+
+Before releasing 6.1:
+
+```text
+run a clean npm installation
+validate production and development builds
+validate watch behavior and source-map cleanup
+run browser and responsive smoke tests
+run the deployment build
+update the project version
+prepare the 6.1 release notes
+```
+
+Optional bundle-size guardrails remain a possible later improvement and are not a 6.1 release requirement.
 
 ## 6.2 — Gauge
 
