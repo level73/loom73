@@ -26,5 +26,9 @@ Thumbs.db
 /tmp/
 /temp/
 
+# Frontend Development source maps
+/public_html/public/css/*.map
+/public_html/public/js/*.map
+
 # Generated documentation site
 /site/

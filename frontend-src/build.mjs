@@ -1,4 +1,4 @@
-import { cp, mkdir, readdir, readFile, writeFile, stat } from 'node:fs/promises';
+import { cp, mkdir, readdir, readFile, rm, writeFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { styleText } from 'node:util';
@@ -9,7 +9,15 @@ import sharp from 'sharp';
 import { browserslistToTargets, bundleAsync } from 'lightningcss';
 import { build as bundleJavaScript } from 'esbuild';
 
-
+/** Build Modes **/
+const frontendBuildModes = {
+    development: {
+        sourceMaps: true,
+    },
+    production: {
+        sourceMaps: false,
+    },
+};
 
 /** Define SRC Paths **/
 const frontendRoot = path.dirname(fileURLToPath(import.meta.url));
@@ -30,6 +38,7 @@ const browserTargets = [
     'firefox 146',
     'safari 18',
 ];
+
 const javascriptTargets = browserTargets.map(
     (target) => target.replace(' ', '')
 );
@@ -320,16 +329,15 @@ const cssBuildOptions = {
 };
 
 /** Bundle CSS Files **/
-async function bundleCssEntry(source, destination) {
+async function bundleCssEntry(source, destination, buildOptions = frontendBuildModes.production) {
     const sources = new Map();
-
     let result;
-
     try {
         result = await bundleAsync({
             filename: source,
+            projectRoot,
+            sourceMap: buildOptions.sourceMaps,
             ...cssBuildOptions,
-
             resolver: {
                 async read(filePath) {
                     const content = await readFile(
@@ -368,7 +376,38 @@ async function bundleCssEntry(source, destination) {
         recursive: true,
     });
 
-    await writeFile(destination, result.code);
+
+    /** Source Maps **/
+    const sourceMapDestination = `${destination}.map`;
+    let outputCode = result.code;
+
+    if (buildOptions.sourceMaps) {
+        if (!result.map) {
+            throw new Error(
+                `CSS source map was not generated for ${source}.`
+            );
+        }
+
+        const sourceMapReference =
+            `\n/*# sourceMappingURL=` +
+            `${path.basename(sourceMapDestination)} */\n`;
+
+        outputCode = Buffer.concat([
+            result.code,
+            Buffer.from(sourceMapReference),
+        ]);
+
+        await writeFile(
+            sourceMapDestination,
+            result.map
+        );
+    } else {
+        await rm(sourceMapDestination, {
+            force: true,
+        });
+    }
+
+    await writeFile(destination, outputCode);
 
     return {
         sourceFiles: sources.size,
@@ -383,12 +422,12 @@ async function bundleCssEntry(source, destination) {
             0
         ),
 
-        outputBytes: result.code.byteLength,
+        outputBytes: outputCode.byteLength,
     };
 }
 
 
-async function buildCss(outputRoot = publicRoot) {
+async function buildCss(outputRoot = publicRoot, buildOptions = frontendBuildModes.production) {
     const startedAt = performance.now();
 
     const themeFiles = (
@@ -455,7 +494,8 @@ async function buildCss(outputRoot = publicRoot) {
     for (const bundle of bundles) {
         const result = await bundleCssEntry(
             bundle.source,
-            bundle.destination
+            bundle.destination,
+            buildOptions
         );
 
         sourceFiles += result.sourceFiles;
@@ -488,12 +528,11 @@ const javascriptBuildOptions = {
     format: 'esm',
     legalComments: 'none',
     minify: true,
-    sourcemap: false,
     target: javascriptTargets,
     metafile: true,
     write: false,
 };
-async function buildJavaScript(outputRoot = publicRoot) {
+async function buildJavaScript(outputRoot = publicRoot, buildOptions = frontendBuildModes.production) {
     const startedAt = performance.now();
     const projectVersion = await getProjectVersion();
 
@@ -513,6 +552,7 @@ async function buildJavaScript(outputRoot = publicRoot) {
 
     const result = await bundleJavaScript({
         ...javascriptBuildOptions,
+        sourcemap: buildOptions.sourceMaps ? 'linked' : false,
         entryPoints: [
             javascriptEntryPath,
         ],
@@ -532,10 +572,18 @@ async function buildJavaScript(outputRoot = publicRoot) {
         );
     }
 
-    await writeFile(
-        destination,
-        outputFile.contents
-    );
+    for (const generatedFile of result.outputFiles) {
+        await writeFile(
+            generatedFile.path,
+            generatedFile.contents
+        );
+    }
+
+    if (!buildOptions.sourceMaps) {
+        await rm(`${destination}.map`, {
+            force: true,
+        });
+    }
 
     const sourceBytes = Object.values(
         result.metafile.inputs
@@ -586,15 +634,15 @@ async function optimizeAssets(outputRoot = publicRoot, showVersion = true ) {
     );
 }
 
-async function buildProject(outputRoot = publicRoot) {
+async function buildProject(outputRoot = publicRoot, buildOptions = frontendBuildModes.production) {
     const startedAt = performance.now();
     const projectVersion = await getProjectVersion();
 
     console.log(`Loom73 v. ${projectVersion}`);
     console.log('[build] Build started.');
 
-    await buildCss(outputRoot);
-    await buildJavaScript(outputRoot);
+    await buildCss(outputRoot, buildOptions);
+    await buildJavaScript(outputRoot, buildOptions);
     await optimizeAssets(outputRoot, false);
 
     logSuccess(
@@ -605,7 +653,7 @@ async function buildProject(outputRoot = publicRoot) {
 
 /** Watcher **/
 /** Watch Options **/
-const watchDebounceMilliseconds = 150;
+const watchDebounceMilliseconds = 500;
 const scheduledWatchTasks = new Map();
 
 let watchTaskQueue = Promise.resolve();
@@ -676,7 +724,18 @@ function scheduleAssetTask(fileName) {
     }
 }
 async function watchSources() {
-    await buildProject();
+    const buildOptions = frontendBuildModes.development;
+
+    const rebuildCss = () => {
+        return buildCss(publicRoot, buildOptions);
+    };
+
+    const rebuildJavaScript = () => {
+        return buildJavaScript(publicRoot, buildOptions);
+    };
+
+
+    await buildProject(publicRoot, buildOptions);
 
     const watchers = [
         watchFileSystem(
@@ -685,7 +744,7 @@ async function watchSources() {
                 recursive: true,
             },
             () => {
-                scheduleWatchTask('css', buildCss);
+                scheduleWatchTask('css', rebuildCss);
             }
         ),
 
@@ -695,10 +754,7 @@ async function watchSources() {
                 recursive: true,
             },
             () => {
-                scheduleWatchTask(
-                    'js',
-                    buildJavaScript
-                );
+                scheduleWatchTask('js', rebuildJavaScript);
             }
         ),
 
