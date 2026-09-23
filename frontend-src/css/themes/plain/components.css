@@ -17,7 +17,7 @@
         text-decoration: none;
         border: 1px solid var(--color-accent);
         background-color: var(--color-accent);
-        color: contrast-color(var(--color-accent));
+        color: var(--color-on-accent);
         font-size: var(--fontsize-0);
     }
     .button.hollow {
@@ -52,13 +52,13 @@
         letter-spacing: 0.1rem;
 
         &.badge-status {
-            &.status-active { background-color: var(--color-utility-success); color: contrast-color(var(--color-utility-success) ); }
-            &.status-inactive { background-color: var(--color-secondary); color: contrast-color(var(--color-secondary) ); }
+            &.status-active { background-color: var(--color-utility-success); color: var(--color-on-success); }
+            &.status-inactive { background-color: var(--color-secondary); color: var(--color-on-secondary); }
         }
         &.badge-role {
-            &.role-admin { background-color: var(--color-utility-info); color: contrast-color(var(--color-utility-info) ); }
-            &.role-editor { background-color: var(--color-utility-info); color: contrast-color(var(--color-utility-info) ); }
-            &.role-user { background-color: var(--color-utility-info); color: contrast-color(var(--color-utility-info) ); }
+            &.role-admin { background-color: var(--color-utility-info); color: var(--color-on-info); }
+            &.role-editor { background-color: var(--color-utility-info); color: var(--color-on-info); }
+            &.role-user { background-color: var(--color-utility-info); color: var(--color-on-info); }
         }
     }
 
@@ -108,23 +108,27 @@
                 font-weight: 600;
                 --bg-color: inherit;
                 background-color: var(--bg-color);
-                color: contrast-color(var(--bg-color));
+                color: var(--color-on-surface);
             }
             &.status-inactive {
                 --bg-color: var(--color-utility-warning);
-
+                color: var(--color-on-warning);
             }
             &.status-active {
-                --bg-color: color-mix(var(--color-utility-success) 95%, black 5%);
+                --bg-color: color-mix(in oklch, var(--color-utility-success) 95%, black 5%);
+                color: var(--color-on-success);
             }
             &.role-admin {
-                --bg-color: color-mix(var(--color-utility-info) 95%, black 5%);
+                --bg-color: color-mix(in oklch, var(--color-utility-info) 95%, black 5%);
+                color: var(--color-on-info);
             }
             &.role-editor {
-                --bg-color: color-mix(oklch( from var(--color-utility-info) l c h / 0.75) 95%, black 5%);
+                --bg-color: color-mix(in oklch, oklch( from var(--color-utility-info) l c h / 0.75) 95%, black 5%);
+                color: var(--color-on-info);
             }
             &.role-user {
-                --bg-color: color-mix(oklch( from var(--color-utility-info) l c h / 0.50) 95%, black 5%);
+                --bg-color: color-mix(in oklch, oklch(from var(--color-utility-info) l c h / 0.50) 95%, black 5%);
+                color: var(--color-on-info);
             }
         }
 

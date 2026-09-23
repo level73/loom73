@@ -6,7 +6,7 @@ import { watch as watchFileSystem } from 'node:fs';
 import { performance } from 'node:perf_hooks';
 import { optimize } from 'svgo';
 import sharp from 'sharp';
-import { bundleAsync } from 'lightningcss';
+import { browserslistToTargets, bundleAsync } from 'lightningcss';
 import { build as bundleJavaScript } from 'esbuild';
 
 
@@ -22,6 +22,18 @@ const sourceThemeRoot = path.join(sourceCssRoot,'themes');
 
 /** Manifest path **/
 const projectManifestPath = path.join(projectRoot, 'package.json');
+
+/** Target Browsers **/
+const browserTargets = [
+    'chrome 122',
+    'edge 122',
+    'firefox 146',
+    'safari 18',
+];
+const javascriptTargets = browserTargets.map(
+    (target) => target.replace(' ', '')
+);
+const cssTargets = browserslistToTargets(browserTargets);
 
 /** Console Output **/
 function formatDuration(startedAt) {
@@ -304,6 +316,7 @@ const cssEntryPath = path.join(
 
 const cssBuildOptions = {
     minify: true,
+    targets: cssTargets,
 };
 
 /** Bundle CSS Files **/
@@ -476,7 +489,7 @@ const javascriptBuildOptions = {
     legalComments: 'none',
     minify: true,
     sourcemap: false,
-    target: 'esnext',
+    target: javascriptTargets,
     metafile: true,
     write: false,
 };

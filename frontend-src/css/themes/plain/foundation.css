@@ -14,11 +14,18 @@
         --color-accent-brightest: oklch(0.903 0.096 167.313);/** #57D2A3 **/
         --color-accent-hover: oklch(from var(--color-accent) 70% c h);
 
-        /** Utility colors - used for alerts, messages, toasts and so forth. To be used in conjuction with contrast-color() for accessibility **/
+        /** Utility colors paired with explicit foreground colors for accessible contrast **/
         --color-utility-danger:  oklch(0.486 0.188 30.089);     /** #B11608 **/
         --color-utility-warning: oklch(0.636 0.101 49.627);     /** #FFB68E **/
         --color-utility-success: oklch(0.475 0.143 146.455);    /** #007023 **/
         --color-utility-info:    oklch(0.524 0.224 260.83);     /** #005CE8 **/
+        --color-on-accent: white;
+        --color-on-danger: white;
+        --color-on-warning: var(--color-text);
+        --color-on-info: white;
+        --color-on-secondary: white;
+        --color-on-success: white;
+        --color-on-surface: var(--color-text);
 
         /** Fontsize Clamps For Responsive Type **/
         --fontsize--2:  clamp(0.64rem, calc(0.7167rem + -0.099vw), 0.6944rem);
