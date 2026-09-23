@@ -50,8 +50,6 @@
         font-family: var(--monospace-font-family);
         text-transform: uppercase;
         letter-spacing: 0.1rem;
-        display: inline-block;
-        margin: var(--padding); /** this is funny **/
 
         &.badge-status {
             &.status-active { background-color: var(--color-utility-success); color: contrast-color(var(--color-utility-success) ); }
@@ -89,7 +87,6 @@
             }
         }
         tr {
-            padding: 0.5rem;
             border: 1px solid var(--color-border);
         }
         tbody {
@@ -128,9 +125,6 @@
             }
             &.role-user {
                 --bg-color: color-mix(oklch( from var(--color-utility-info) l c h / 0.50) 95%, black 5%);
-            }
-            & > .button {
-                margin-block-end: 0;
             }
         }
 
