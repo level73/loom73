@@ -1,0 +1,155 @@
+@layer theme {
+
+    .popover-menu {
+        border: none;
+        background-color: var(--color-background);
+        box-shadow: var(--box-shadow);
+        ul .menu-item a {
+            color: var(--color-accent);
+            text-decoration: none;
+            &:hover, &:focus{
+                text-decoration: underline;
+            }
+        }
+    }
+
+    .button {
+        text-decoration: none;
+        border: 1px solid var(--color-accent);
+        background-color: var(--color-accent);
+        color: contrast-color(var(--color-accent));
+        font-size: var(--fontsize-0);
+    }
+    .button.hollow {
+        color: var(--color-accent);
+        border: 1px solid var(--color-accent);
+        background-color: transparent;
+        transition: all 0.2s linear;
+        &:hover {
+            cursor: pointer;
+            background-color: var(--color-accent);
+            color: var(--color-background);
+        }
+    }
+
+    hr {
+        background-color: var(--color-accent);
+        border: none;
+        max-width: 10%;
+        height: 4px;
+    }
+
+    .card h2 {
+        font-size: var(--fontsize-1);
+    }
+
+    .badge {
+        background-color: var(--color-secondary-dark);
+        color: var(--color-accent-brightest);
+        font-size: var(--fontsize--1);
+        font-family: var(--monospace-font-family);
+        text-transform: uppercase;
+        letter-spacing: 0.1rem;
+        display: inline-block;
+        margin: var(--padding); /** this is funny **/
+
+        &.badge-status {
+            &.status-active { background-color: var(--color-utility-success); color: contrast-color(var(--color-utility-success) ); }
+            &.status-inactive { background-color: var(--color-secondary); color: contrast-color(var(--color-secondary) ); }
+        }
+        &.badge-role {
+            &.role-admin { background-color: var(--color-utility-info); color: contrast-color(var(--color-utility-info) ); }
+            &.role-editor { background-color: var(--color-utility-info); color: contrast-color(var(--color-utility-info) ); }
+            &.role-user { background-color: var(--color-utility-info); color: contrast-color(var(--color-utility-info) ); }
+        }
+    }
+
+    ul.checklist {
+        font-size: var(--fontsize-1);
+        li::marker {
+            content: url(../assets/checklist-checkmark.png);
+        }
+        &.small {
+            font-size: var(--fontsize-0);
+        }
+    }
+
+    table {
+        border: 1px solid var(--color-border);
+        caption {
+            font-size: var(--fontsize-3);
+            font-weight: 600;
+            text-align: start;
+        }
+        thead {
+            th {
+                text-align: left;
+                font-size: var(--fontsize--1);
+                text-transform: uppercase;
+            }
+        }
+        tr {
+            padding: 0.5rem;
+            border: 1px solid var(--color-border);
+        }
+        tbody {
+            tr:nth-child(odd) {
+                background-color: var(--color-surface);
+                &:hover {
+                    background-color: var(--color-accent-brightest);
+                }
+            }
+            tr:hover {
+                background-color: var(--color-accent-brightest);
+            }
+
+        }
+        td {
+            &.full-cell {
+                text-transform: uppercase;
+                font-size: var(--fontsize--1);
+                font-weight: 600;
+                --bg-color: inherit;
+                background-color: var(--bg-color);
+                color: contrast-color(var(--bg-color));
+            }
+            &.status-inactive {
+                --bg-color: var(--color-utility-warning);
+
+            }
+            &.status-active {
+                --bg-color: color-mix(var(--color-utility-success) 95%, black 5%);
+            }
+            &.role-admin {
+                --bg-color: color-mix(var(--color-utility-info) 95%, black 5%);
+            }
+            &.role-editor {
+                --bg-color: color-mix(oklch( from var(--color-utility-info) l c h / 0.75) 95%, black 5%);
+            }
+            &.role-user {
+                --bg-color: color-mix(oklch( from var(--color-utility-info) l c h / 0.50) 95%, black 5%);
+            }
+            & > .button {
+                margin-block-end: 0;
+            }
+        }
+
+        .toolbar {
+            .button {
+                border: 1px solid var(--color-accent);
+                transition: all 0.3s ease-in-out;
+                &:hover, &:focus{
+                    background-color: var(--color-accent-hover);
+                    border: 1px solid var(--color-accent-hover);
+                }
+            }
+        }
+    }
+
+    code {
+        font-size: var(--fontsize--2);
+        font-family: var(--monospace-font-family);
+        border: 1px solid var(--color-border);
+        text-align: left;
+    }
+}
