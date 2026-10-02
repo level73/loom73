@@ -266,6 +266,28 @@ empty instance
   → runtime directories
   → loom73.info
 ```
+### Frontend confidence
+
+Add focused browser automation around the public frontend contracts:
+
+```text
+Playwright functional smoke tests
+responsive viewport checks
+navigation and component interactions
+selected visual regression snapshots
+@axe-core/playwright accessibility scans
+```
+
+Accessibility scans should cover both the initial document and meaningful interactive states, including:
+
+```text
+expanded responsive navigation
+open dialogs
+visible tooltips
+form validation feedback
+sorted and paginated tables
+revealed InView content
+```
 
 The target CI matrix is:
 
@@ -283,6 +305,8 @@ PHP lint
 focused tests
 npm clean install
 frontend build
+frontend functional smoke tests
+automated accessibility checks
 deployment validation
 ```
 ## 6.5 — Public Discovery

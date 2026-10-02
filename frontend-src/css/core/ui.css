@@ -1,6 +1,5 @@
 @layer ui {
 
-
     /** InView Intersection Observer CSS **/
     .loom73-ready [data-inview] > * {
         opacity: 0;
@@ -37,6 +36,7 @@
         display: none;
     }
     .navbar {
+        --submenu-top-offset: 2.125rem;
         display: flex;
         align-items: start;
         gap: var(--spacing, 1.5rem);
@@ -53,19 +53,29 @@
             padding-inline: calc(var(--spacing) / 2);
         }
     }
+    .navbar .navbar-menu > li.nav-item {
+        position: relative;
+    }
     /** Sub nav dropdown **/
     ul.sub-nav {
         display: none;
         flex-direction: column;
         position: absolute;
-        top: 36px; /** #TODO this needs to be tweaked, should be a custom prop **/
+        top: 100%;
         padding: calc(var(--padding) / 2);
+        width: calc((var(--padding) / 2)  + 100%);
         li {
             padding: calc(var(--padding) / 4);
+            display: inline-block;
+            width: fit-content;
+            a {
+                width: fit-content;
+            }
         }
     }
-    li.nav-item:hover>ul.sub-nav, li.nav-item:focus-within>ul.sub-nav {
-        display: block;
+    li.nav-item:hover>ul.sub-nav,
+    li.nav-item:focus-within>ul.sub-nav {
+        display: flex;
     }
 
     @media (width < 48rem) {
@@ -87,7 +97,10 @@
         .loom73-ready .navbar-menu {
             display: grid;
             list-style: none;
-            li { padding: calc(var(--spacing) / 4); flex-direction: column; }
+            li {
+                padding: calc(var(--spacing) / 4);
+                flex-direction: column;
+            }
         }
 
         .loom73-ready .navbar-menu ul.sub-nav {

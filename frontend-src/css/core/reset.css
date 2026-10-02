@@ -8,7 +8,6 @@
     }
     html {
         scroll-behavior: smooth;
-
     }
     body {
         height: 100%;
@@ -61,7 +60,8 @@
         line-height: 150%;
         padding-block-end: calc(var(--padding) / 2);
     }
-    /** #TODO add lists to the rest **/
+
+    /** #TODO add lists to the reset **/
     ol, ul, dl { }
     li {
         font-family: var(--body-font-family);
