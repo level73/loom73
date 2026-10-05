@@ -1,5 +1,25 @@
 @layer theme {
 
+    :root {
+        /** Theme related custom properties **/
+        --header-height: 3rem;
+    }
+    header#main-header {
+        position: fixed;
+        top: 0;
+        height: var(--header-height);
+        z-index: 1;
+        background-color: var(--color-background);
+    }
+    .skip-link:focus {
+        transform: translateY(var(--header-height));
+    }
+    main#main-content {
+        margin-block-start: var(--header-height);
+    }
+
+
+
     .popover-menu {
         border: none;
         background-color: var(--color-background);

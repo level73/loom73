@@ -8,8 +8,8 @@
         </p>
         </div>
         <div>
-            <figure>
-                <img src="/assets/raster/components.webp" width="1672" height="941" class="image" alt="Ink drawing of heddle, shed and warp mechanism in 19th century looms.">
+            <figure class="hero-image">
+                <img src="/assets/raster/components.webp" width="1672" height="941" class="image hero" alt="Ink drawing of heddle, shed and warp mechanism in 19th century looms.">
                 <figcaption>The Heddle/Shuttle/Warp mechanism of 19<sup>th</sup> century looms.</figcaption>
             </figure>
         </div>

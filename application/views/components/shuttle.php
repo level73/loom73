@@ -15,8 +15,8 @@
             </ul>
         </div>
         <div>
-            <figure>
-                <img width="1672" height="941" src="/assets/raster/shuttle.webp" class="image" alt="A wooden shuttle from an 1800s loom.">
+            <figure class="hero-image">
+                <img width="1672" height="941" src="/assets/raster/shuttle.webp" class="image hero" alt="A wooden shuttle from an 1800s loom.">
                 <figcaption>The Shuttle</figcaption>
             </figure>
         </div>

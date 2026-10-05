@@ -79,12 +79,14 @@
         img {
             max-width: 100%;
             height: auto;
+            display: block;
         }
         figcaption {
-            margin-block: 1.5rem;
+            padding-block: 1.5rem;
+            margin-block-start: 0;
             font-family: var(--body-italic-font-family);;
             font-style: italic;
-            color: var(--color-secondary)
+            color: var(--color-secondary);
         }
     }
 

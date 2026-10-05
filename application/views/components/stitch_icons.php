@@ -12,8 +12,8 @@
                 </ul>
             </div>
             <div>
-                <figure>
-                    <img  width="1672" height="941" src="/assets/raster/stitch.webp" class="image" alt="A human hand stitching a database icon on a piece of cloth.">
+                <figure class="hero-image">
+                    <img  width="1672" height="941" src="/assets/raster/stitch.webp" class="image hero" alt="A human hand stitching a database icon on a piece of cloth.">
                     <figcaption>Stitching</figcaption>
                 </figure>
             </div>

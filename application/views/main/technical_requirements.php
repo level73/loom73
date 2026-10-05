@@ -7,8 +7,8 @@
                 Technical details, requirements and technology choices.
             </p>
         </div>
-        <figure>
-            <img  width="1672" height="941" src="/assets/raster/tech-spec.webp" class="image" alt="Ink drawing of the various components needed to assemble a medieval loom.">
+        <figure class="hero-image">
+            <img  width="1672" height="941" src="/assets/raster/tech-spec.webp" class="image hero" alt="Ink drawing of the various components needed to assemble a medieval loom.">
             <figcaption>The various parts that compose a loom.</figcaption>
         </figure>
     </section>

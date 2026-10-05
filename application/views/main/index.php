@@ -13,7 +13,7 @@
                 <strong>Not a framework to learn.</strong><br />
                 <strong>A <em>foundation</em> to build on.</strong>
             </p>
-            <a class="button" href="/main/architecture">Learn More <span class="stitch stitch--arrow"></span></a>
+            <a class="button" href="/main/architecture">Architecture <span class="stitch stitch--arrow"></span></a>
             <a class="button hollow" href="https://level73.github.io/loom73/">Read the docs <span class="stitch stitch--arrow"></span></a>
         </div>
         <div class="center-block">

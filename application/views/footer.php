@@ -10,6 +10,8 @@
 
             <p>&copy; 2026 Loom73</p>
             <p>Built & Maintained by <a href="https://level73.it">Level73</a></p>
+
+            <p>Current version: <?php echo getLoom73Version(); ?></p>
         </div>
         <div>
             <h3>Explore</h3>

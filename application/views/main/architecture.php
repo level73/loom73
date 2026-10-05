@@ -6,8 +6,8 @@
             <p class="intro">A closer look at the structure and conventions that make <strong>Loom<span class="accent">73</span></strong> clear and maintainable.</p>
         </div>
         <div>
-            <figure>
-                <img  width="1672" height="941" class="img-fluid" src="/assets/raster/medieval-loom-scheme.webp" alt="A schematic depiction of a medieval loom. Main components are labeled and explained, particular attention to the shuttle element.">
+            <figure class="hero-image">
+                <img  width="1672" height="941"  class="image hero" src="/assets/raster/medieval-loom-scheme.webp" alt="A schematic depiction of a medieval loom. Main components are labeled and explained, particular attention to the shuttle element.">
                 <figcaption>A schematic depiction of a medieval loom.</figcaption>
             </figure>
         </div>
