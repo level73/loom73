@@ -340,7 +340,7 @@ Loom73 is publicly available.
 
 Version 6.1 modernized the frontend build and established clearer boundaries between reusable frontend code, themes, and application-specific presentation.
 
-See [the latest release](https://github.com/level73/loom73/releases/tag/6.1.0) for the current version and [the roadmap](https://level73.github.io/loom73/roadmap/) for planned work.
+See [the latest release](https://github.com/level73/loom73/releases/latest) for the current version and [the roadmap](https://level73.github.io/loom73/roadmap/) for planned work.
 
 Future additions are evaluated against three questions:
 
