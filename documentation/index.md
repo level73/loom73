@@ -140,7 +140,7 @@ See the current [frontend documentation](frontend.md).
  - [UI Utilities](frontend/ui.md)
  - [Stitch Icon Library](frontend/stitch.md)
 
-The consolidated frontend documentation will cover:
+The frontend documentation covers:
 
 - form validation and accessible feedback;
 - sortable, searchable and paginated tables;
@@ -150,7 +150,7 @@ The consolidated frontend documentation will cover:
 - in-view behaviors and progressive enhancement;
 - Stitch icons;
 - CSS layers and utility conventions;
-- the planned separation between core behavior, theme and application styles.
+- the boundary between reusable core styles, selectable themes and application-specific presentation.
 
 The public Components pages provide live examples. These Markdown documents provide the complete markup, options, accessibility requirements and implementation notes.
 

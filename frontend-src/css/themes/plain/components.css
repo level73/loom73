@@ -1,0 +1,173 @@
+@layer theme {
+
+    :root {
+        /** Theme related custom properties **/
+        --header-height: 3rem;
+    }
+    header#main-header {
+        position: fixed;
+        top: 0;
+        height: var(--header-height);
+        z-index: 1;
+        background-color: var(--color-background);
+    }
+    .skip-link:focus {
+        transform: translateY(var(--header-height));
+    }
+    main#main-content {
+        margin-block-start: var(--header-height);
+    }
+
+
+
+    .popover-menu {
+        border: none;
+        background-color: var(--color-background);
+        box-shadow: var(--box-shadow);
+        ul .menu-item a {
+            color: var(--color-accent);
+            text-decoration: none;
+            &:hover, &:focus{
+                text-decoration: underline;
+            }
+        }
+    }
+
+    .button {
+        text-decoration: none;
+        border: 1px solid var(--color-accent);
+        background-color: var(--color-accent);
+        color: var(--color-on-accent);
+        font-size: var(--fontsize-0);
+    }
+    .button.hollow {
+        color: var(--color-accent);
+        border: 1px solid var(--color-accent);
+        background-color: transparent;
+        transition: all 0.2s linear;
+        &:hover {
+            cursor: pointer;
+            background-color: var(--color-accent);
+            color: var(--color-background);
+        }
+    }
+
+    hr {
+        background-color: var(--color-accent);
+        border: none;
+        max-width: 10%;
+        height: 4px;
+    }
+
+    .card h2 {
+        font-size: var(--fontsize-1);
+    }
+
+    .badge {
+        background-color: var(--color-secondary-dark);
+        color: var(--color-accent-brightest);
+        font-size: var(--fontsize--1);
+        font-family: var(--monospace-font-family);
+        text-transform: uppercase;
+        letter-spacing: 0.1rem;
+
+        &.badge-status {
+            &.status-active { background-color: var(--color-utility-success); color: var(--color-on-success); }
+            &.status-inactive { background-color: var(--color-secondary); color: var(--color-on-secondary); }
+        }
+        &.badge-role {
+            &.role-admin { background-color: var(--color-utility-info); color: var(--color-on-info); }
+            &.role-editor { background-color: var(--color-utility-info); color: var(--color-on-info); }
+            &.role-user { background-color: var(--color-utility-info); color: var(--color-on-info); }
+        }
+    }
+
+    ul.checklist {
+        font-size: var(--fontsize-1);
+        li::marker {
+            content: url(../assets/checklist-checkmark.png);
+        }
+        &.small {
+            font-size: var(--fontsize-0);
+        }
+    }
+
+    table {
+        border: 1px solid var(--color-border);
+        caption {
+            font-size: var(--fontsize-3);
+            font-weight: 600;
+            text-align: start;
+        }
+        thead {
+            th {
+                text-align: left;
+                font-size: var(--fontsize--1);
+                text-transform: uppercase;
+            }
+        }
+        tr {
+            border: 1px solid var(--color-border);
+        }
+        tbody {
+            tr:nth-child(odd) {
+                background-color: var(--color-surface);
+                &:hover {
+                    background-color: var(--color-accent-brightest);
+                }
+            }
+            tr:hover {
+                background-color: var(--color-accent-brightest);
+            }
+
+        }
+        td {
+            &.full-cell {
+                text-transform: uppercase;
+                font-size: var(--fontsize--1);
+                font-weight: 600;
+                --bg-color: inherit;
+                background-color: var(--bg-color);
+                color: var(--color-on-surface);
+            }
+            &.status-inactive {
+                --bg-color: var(--color-utility-warning);
+                color: var(--color-on-warning);
+            }
+            &.status-active {
+                --bg-color: color-mix(in oklch, var(--color-utility-success) 95%, black 5%);
+                color: var(--color-on-success);
+            }
+            &.role-admin {
+                --bg-color: color-mix(in oklch, var(--color-utility-info) 95%, black 5%);
+                color: var(--color-on-info);
+            }
+            &.role-editor {
+                --bg-color: color-mix(in oklch, oklch( from var(--color-utility-info) l c h / 0.75) 95%, black 5%);
+                color: var(--color-on-info);
+            }
+            &.role-user {
+                --bg-color: color-mix(in oklch, oklch(from var(--color-utility-info) l c h / 0.50) 95%, black 5%);
+                color: var(--color-on-info);
+            }
+        }
+
+        .toolbar {
+            .button {
+                border: 1px solid var(--color-accent);
+                transition: all 0.3s ease-in-out;
+                &:hover, &:focus{
+                    background-color: var(--color-accent-hover);
+                    border: 1px solid var(--color-accent-hover);
+                }
+            }
+        }
+    }
+
+    code {
+        font-size: var(--fontsize--2);
+        font-family: var(--monospace-font-family);
+        border: 1px solid var(--color-border);
+        text-align: left;
+    }
+}

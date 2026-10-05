@@ -32,7 +32,7 @@ Loom73UI.init({
 });
 ```
 
-If the navigation breakpoint changes, update the corresponding media query in `frontend-src/css/005-ui.css` as well.
+If the navigation breakpoint changes, update the corresponding media queries in `frontend-src/css/core/ui.css` and `frontend-src/css/themes/plain/ui.css` as well.
 
 The complete UI initializer should run once. Responsive navigation and tooltips guard against repeated initialization, while dialogs and dismissible elements currently do not.
 

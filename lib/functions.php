@@ -132,3 +132,16 @@ function flashIcon(
             break;
     endswitch;
 }
+
+/** get current version from package.json */
+function getLoom73Version(): ?string
+{
+    $packagePath = dirname(__DIR__, 1) . '/package.json';
+    $package = is_readable($packagePath)
+        ? json_decode((string)file_get_contents($packagePath), true)
+        : null;
+
+    return is_string($package['version'] ?? null)
+        ? $package['version']
+        : null;
+}

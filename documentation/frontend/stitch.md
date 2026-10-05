@@ -206,7 +206,7 @@ Do not depend on an icon's color alone to communicate success, warning or failur
 To extend Stitch:
 
 1. add the optimized SVG to `frontend-src/assets/icons/`;
-2. add its class to `frontend-src/css/008-stitch.css`;
+2. add its class to `frontend-src/css/core/stitch.css`;
 3. run the frontend deployment build.
 
 For an icon named `archive.svg`, the rule is:

@@ -21,21 +21,32 @@ Frontend source files live under:
 
 ```text
 frontend-src/
-├── css/
-├── js/
 ├── assets/
-└── Gruntfile.js
+├── css/
+│   ├── index.css
+│   ├── core/
+│   ├── themes/
+│   │   ├── plain.css
+│   │   └── plain/
+│   └── application/
+│       └── site.css
+├── js/
+│   ├── index.js
+│   ├── forms.js
+│   ├── table.js
+│   └── ui.js
+└── build.mjs
 ```
 
 Compiled browser assets are written to:
 
 ```text
 public_html/public/
-├── css/main.min.css
-├── js/index.min.js
-├── js/forms.min.js
-├── js/table.min.js
-├── js/ui.min.js
+├── css/
+│   ├── main.min.css
+│   └── theme-plain.min.css
+├── js/
+│   └── index.min.js
 └── assets/
 ```
 
@@ -103,84 +114,124 @@ Tooltip text must not be the only place where essential information is available
 
 Critical actions should not depend exclusively on a dialog that cannot be opened without JavaScript.
 
-## CSS layers
+## CSS organization
 
 The layer order is declared explicitly:
 
 ```css
-@layer reset, layout, components, ui, utilities, specific, stitch;
+@layer reset, theme, layout, components, ui, stitch, utilities, application;
 ```
 
-The source files are compiled in the same order:
+The main CSS entry point is:
 
 ```text
-001-layers.css
-    layer order
+frontend-src/css/index.css
+```
+It imports:
 
-002-reset.css
-    browser normalization and document defaults
-
-003-layout.css
-    grids, flex layouts and structural composition
-
-004-components.css
-    reusable visual components
-
-005-ui.css
-    styles associated with JavaScript UI utilities
-
-006-utilities.css
-    small-purpose helpers, feedback and color utilities
-
-007-specific.css
-    application and page-specific presentation
-
-008-stitch.css
-    Stitch icon system
+```text
+core/layers.css
+core/reset.css
+core/layout.css
+core/components.css
+core/ui.css
+core/stitch.css
+core/utilities.css
+application/site.css
 ```
 
-The current baseline includes both structural rules and visual choices. A stronger separation between core behavior, themes and application styles remains planned work rather than part of the current frontend contract.
+The core files provide reusable structure, behavior and utility contracts. Application-specific presentation belongs in application/site.css.
+Themes use separate entry files under:
+
+```text
+frontend-src/css/themes
+```
+
+The supplied Plain theme is organized as:
+
+```text
+themes/plain.css
+themes/plain/foundation.css
+themes/plain/components.css
+themes/plain/ui.css
+```
+
+Every CSS file placed directly under `themes/` is treated as a theme entry point. For example:
+
+```text
+themes/plain.css
+```
+
+is compiled to:
+
+```text
+public_html/public/css/theme-plain.min.css
+```
+
+## Theme selection
+
+The active theme is configured in `config/example.env`:
+
+```env
+LOOM73_THEME='plain'
+```
+
+The shared head template loads `main.min.css` followed by the selected theme stylesheet.
+
+Theme identifiers may contain lowercase letters, numbers and hyphens. An invalid identifier or a theme without a compiled stylesheet falls back to `theme-plain.min.css`.
+
+This convention provides replaceable visual themes without introducing theme inheritance, template overrides or database-managed theme selection.
 
 ## Building the frontend
 
-Install the Node development dependencies from the project root:
+Install the exact Node development dependencies from the project root:
 
 ```console
-npm install
+npm ci
 ```
 
-Compile CSS and JavaScript:
+Run the complete frontend build once:
 
 ```console
 npm run build
 ```
 
-Optimize and copy image, SVG, favicon and font assets:
+Optimize and copy image, SVG, favicon, fonts and other static assets:
 
 ```console
 npm run build:assets
 ```
 
-Run the complete deployment build:
+Run the complete build used during deployment:
 
 ```console
 npm run build:deploy
 ```
 
-Build once and watch the frontend source during development:
+Build the frontend in development mode and watch the sources:
 
 ```console
 npm run watch
 ```
 
-The deployment build:
+The build runner:
 
-1. concatenates the CSS layers;
-2. minifies the resulting stylesheet;
-3. minifies the JavaScript modules;
-4. converts supported raster images to WebP;
-5. optimizes SVG files while preserving their `viewBox`;
-6. copies favicons and fonts without modification.
+1. bundles and minifies the main CSS entry point;
+2. discovers, bundles and minifies every theme entry point;
+3. bundles and minifies the JavaScript module graph into `index.min.js`;
+4. injects the package version into the JavaScript build;
+5. converts supported raster images to WebP;
+6. optimizes SVG files while preserving their `viewBox`;
+7. copies fonts, favicons and static assets;
+8. reports source-aware errors, output savings and task duration.
+
+Browser targets are declared once in `frontend-src/build.mjs` and shared by Lightning CSS and esbuild.
+
+Development watch mode generates linked CSS and JavaScript source maps.
+
+Production CSS and JavaScript builds do not generate source maps and remove stale map files left by a previous watch session.
+
+Do not run `watch` and a production `build` at the same time because both processes write to the same public asset files.
 
 ## Application boundaries
 

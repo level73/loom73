@@ -1,6 +1,6 @@
 <footer>
 
-    <div class="grid grid-4-col with-gap">
+    <div class="grid grid-4 with-gap">
         <div>
             <img src="/assets/loom73.svg" width="16" height="16" alt="Loom73 Logo - Back to homepage">
             <h3>Loom<span class="accent">73</span></h3>
@@ -10,6 +10,8 @@
 
             <p>&copy; 2026 Loom73</p>
             <p>Built & Maintained by <a href="https://level73.it">Level73</a></p>
+
+            <p>Current version: <?php echo getLoom73Version(); ?></p>
         </div>
         <div>
             <h3>Explore</h3>

@@ -1,0 +1,100 @@
+@layer layout {
+    /**
+      * Page Layout Context
+      * These custom properties are inherited by the <section> elements contained in <main>
+      */
+    main {
+        --viewport-distance: clamp(1rem, 5vw, 5rem);
+        --content-max: 98rem;
+        --section-padding: var(--padding);
+        min-block-size: 90vh;
+    }
+
+    /**
+      * Default Page Section
+      * width and internal spacing belong to the layout layer
+      * presentation elements such as borders, backgrounds to the application layer
+      */
+    main > section {
+        inline-size: min(calc(100% - var(--viewport-distance) - var(--viewport-distance)), var(--content-max));
+        margin-inline: auto;
+        padding: var(--section-padding);
+    }
+
+    main > section.breakout {
+        inline-size: 100%;
+        max-inline-size: none;
+        padding-block: 0;
+        padding-inline: max(var(--viewport-distance), calc( (100% - var(--content-max)) / 2));
+        & > .grid {
+            --grid-gap: var(--gap);
+            padding: var(--section-padding);
+        }
+    }
+
+    /**
+      * Grid Foundations
+      * The grid always defines its own template and gap
+      * so nested grids d not inherit the config of their parents
+      */
+    .grid {
+        --grid-template: minmax(0, 1fr);
+        --grid-gap: 0;
+
+        display: grid;
+        grid-template-columns: var(--grid-template);
+        gap: var(--grid-gap);
+
+        & > * {
+            min-inline-size: 0;
+        }
+    }
+    /** Symmetrical Grids **/
+    .grid-2 {
+        --grid-template: repeat(2, minmax(0, 1fr));
+    }
+    .grid-3 {
+        --grid-template: repeat(3, minmax(0, 1fr));
+    }
+    .grid-4 {
+        --grid-template: repeat(4, minmax(0, 1fr));
+    }
+
+    /** Asymmetrical grids **/
+    .grid-1-2 {
+        --grid-template: minmax(0, 1fr) minmax(0, 2fr);
+    }
+    .grid-2-1 {
+        --grid-template: minmax(0, 2fr) minmax(0, 1fr);
+    }
+    .grid-1-3 {
+        --grid-template: minmax(0, 1fr) minmax(0, 3fr);
+    }
+    .grid-3-1 {
+        --grid-template: minmax(0, 3fr) minmax(0, 1fr);
+    }
+
+    /** Content Driven Grid (useful for cards or mosaics) **/
+    .grid-fit {
+        --grid-min: 18rem;
+        --grid-template: repeat(auto-fit, minmax(min(100%, var(--grid-min)), 1fr));
+    }
+
+    /** Optional Spacing **/
+    .with-gap {
+        --grid-gap: var(--gap);
+    }
+
+    /** Responsive Grid **/
+    @media (width <= 48rem) {
+        .grid-2,
+        .grid-3,
+        .grid-4,
+        .grid-1-2,
+        .grid-2-1,
+        .grid-1-3,
+        .grid-3-1 {
+            --grid-template: minmax(0, 1fr);
+        }
+    }
+}

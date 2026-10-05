@@ -15,9 +15,6 @@ Thumbs.db
 # Runtime storage
 /storage/
 
-# Build intermediates
-/frontend-src/concat.css
-
 # Logs
 *.log
 /npm-debug.log*
@@ -28,6 +25,10 @@ Thumbs.db
 /.cache/
 /tmp/
 /temp/
+
+# Frontend Development source maps
+/public_html/public/css/*.map
+/public_html/public/js/*.map
 
 # Generated documentation site
 /site/

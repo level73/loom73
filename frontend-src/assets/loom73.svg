@@ -1,13 +1,50 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
      width="512px" height="512px" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
-    <!-- real fill 446B5A -->
+    <!-- Base Color #446B5A -->
+    <defs>
+        <linearGradient id="gradient-start">
+            <stop  offset="0%" stop-color="#446B5A"></stop>
+            <stop  offset="100%" stop-color="#315444"></stop>
+        </linearGradient>
+        <linearGradient id="gradient-mid">
+            <stop  offset="0%" stop-color="#315444"></stop>
+            <stop  offset="25%" stop-color="#446B5A"></stop>
+            <stop  offset="75%" stop-color="#446B5A"></stop>
+            <stop  offset="100%" stop-color="#315444"></stop>
+        </linearGradient>
+        <linearGradient id="gradient-end">
+            <stop  offset="0%" stop-color="#315444"></stop>
+            <stop  offset="100%" stop-color="#446B5A"></stop>
+        </linearGradient>
+        <linearGradient id="v-gradient-start" x1="0" x2="0" y1="0" y2="1" href="#gradient-start"></linearGradient>
+        <linearGradient id="v-gradient-mid" x1="0" x2="0" y1="0" y2="1" href="#gradient-mid"></linearGradient>
+        <linearGradient id="v-gradient-end" x1="0" x2="0" y1="0" y2="1" href="#gradient-end"></linearGradient>
+    </defs>
     <style>
-    * {
-        fill: #446B5A;
-    }
+        /** Horizontal Rects **/
+        rect#ht1_1, rect#ht2_1, rect#ht3_1 {
+            fill: url('#gradient-start');
+        }
+        rect#ht1_2, rect#ht3_2 {
+            fill: url('#gradient-mid');
+        }
+        rect#ht1_3, rect#ht2_2, rect#ht3_3 {
+            fill: url('#gradient-end');
+        }
+
+        /** Vertical Rects **/
+        rect#vt1_1, rect#vt2_1, rect#vt3_1 {
+            fill: url('#v-gradient-start');
+        }
+        rect#vt2_2 {
+            fill: url('#v-gradient-mid');
+        }
+        rect#vt1_2, rect#vt2_3, rect#vt3_2 {
+            fill: url('#v-gradient-end');
+        }
     </style>
     <g id="loom-73-logo">
-        <rect id="ht1_1" x="2.249"   y="98.383" width="92.631" height="59.158"/>
+        <rect id="ht1_1" x="2.249"   y="98.383" width="92.631" height="59.158" />
         <rect id="ht1_2" x="161.789" y="98.383" width="189.211" height="59.158"/>
         <rect id="ht1_3" x="416.684" y="98.383" width="92.632" height="59.158"/>
 
@@ -18,7 +55,7 @@
         <rect id="ht3_2" x="161.638" y="354.459" width="189.211" height="59.158"/>
         <rect id="ht3_3" x="416.533" y="354.459" width="92.631" height="59.158"/>
 
-        <rect id="vt2_1" x="226.052" y="2" width="59.158" height="92.383"/>
+        <rect id="vt2_1" class="vertical" x="226.052" y="2" width="59.158" height="92.383"/>
         <rect id="vt2_2" x="226.421" y="161.542" width="59.158" height="188.917"/>
         <rect id="vt2_3" x="226.421" y="417.617" width="59.158" height="92.383"/>
 

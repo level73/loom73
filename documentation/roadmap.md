@@ -38,70 +38,99 @@ Version 6.0 should not gain another large subsystem.
 
 ## 6.1 — Frontend Modernization
 
-Replace the current Grunt pipeline with a focused build script while preserving the framework-free browser runtime.
+**Status: in progress**
 
-Target toolset:
+Modernize the frontend architecture and toolchain while preserving the framework-free browser runtime.
 
-```text
-build.mjs
-Lightning CSS
-esbuild
-SVGO
-Sharp
-node:fs
-```
+### Build foundation
 
-### First phase: build parity
+**Status: complete**
+
+The Node.js build runner provides:
 
 ```text
-CSS concatenation and minification
-JavaScript bundling and minification
+CSS import bundling and minification
+automatic theme entry discovery and compilation
+JavaScript module bundling and minification
+package-version injection
 SVG optimization
-WebP conversion
+configurable WebP conversion
 font and static-asset copying
+aggregate build and optimization tasks
 development watch mode
-deployment build
+development-only source maps
+shared browser targets for CSS and JavaScript
+esbuild metadata used for build metrics
+source-aware error reporting
+colored success and failure output
+per-task and aggregate timing
 ```
 
-Grunt and its plugins should be removed only after the new build produces equivalent output.
-
-### Second phase: build improvements
+The legacy Grunt pipeline and its plugins were removed after validating:
 
 ```text
-explicit CSS entry point
-explicit ES module graph
-development source maps
-declared browser targets
-fail-fast builds
-build summary
-esbuild metafile
-optional bundle-size guardrails
+npm clean installation
+one-off frontend build
+deployment build
+development watch mode
+new and modified asset handling
+generated public asset paths
+frontend behavior
 ```
 
-### Theme layer
+### Frontend source contract
 
-The same milestone introduces the first theme boundary:
+**Status: complete**
+
+The frontend now uses explicit source entry points:
+
+```text
+frontend-src/css/index.css
+frontend-src/js/index.js
+```
+
+CSS dependencies are expressed through imports rather than a source list owned by the build runner.
+
+JavaScript modules import their source files directly and are bundled into a single browser entry point.
+
+Production builds generate deployable assets without source maps. Development watch mode generates linked source maps for CSS and JavaScript.
+
+Browser targets are configured once in `frontend-src/build.mjs` and passed to both Lightning CSS and esbuild.
+
+### Layout contract
+
+**Status: complete**
+
+The core layout layer provides reusable page sections, bounded content, breakout sections and adaptable grid patterns.
+
+The contract favors a small set of configurable layout primitives over a large collection of fixed grid combinations. Application-specific spacing, borders and presentation remain outside the reusable layout layer.
+
+### Theme boundary
+
+**Status: complete**
+
+The frontend is divided into:
 
 ```text
 Loom73 core
-    behavior and functional UI contracts
+    reusable structure, behavior and functional UI contracts
 
-plain theme
-    colors, typography and component appearance
+themes
+    colors, typography and component presentation
 
 application
     domain-specific visual decisions
 ```
 
-Planned configuration:
+Loom73 ships with the Plain theme:
 
 ```env
 LOOM73_THEME='plain'
 ```
 
-The first implementation should provide one theme identifier resolved by convention.
+Theme entry files are discovered by convention and compiled to standalone public stylesheets. Invalid or unavailable theme identifiers fall back to Plain.
 
-It should not introduce:
+The theme contract deliberately excludes:
 
 ```text
 theme inheritance
@@ -110,6 +139,22 @@ template overrides
 database theme selection
 plugin lifecycle
 ```
+
+### Remaining release work
+
+Before releasing 6.1:
+
+```text
+run a clean npm installation
+validate production and development builds
+validate watch behavior and source-map cleanup
+run browser and responsive smoke tests
+run the deployment build
+update the project version
+prepare the 6.1 release notes
+```
+
+Optional bundle-size guardrails remain a possible later improvement and are not a 6.1 release requirement.
 
 ## 6.2 — Gauge
 
@@ -221,6 +266,28 @@ empty instance
   → runtime directories
   → loom73.info
 ```
+### Frontend confidence
+
+Add focused browser automation around the public frontend contracts:
+
+```text
+Playwright functional smoke tests
+responsive viewport checks
+navigation and component interactions
+selected visual regression snapshots
+@axe-core/playwright accessibility scans
+```
+
+Accessibility scans should cover both the initial document and meaningful interactive states, including:
+
+```text
+expanded responsive navigation
+open dialogs
+visible tooltips
+form validation feedback
+sorted and paginated tables
+revealed InView content
+```
 
 The target CI matrix is:
 
@@ -238,8 +305,82 @@ PHP lint
 focused tests
 npm clean install
 frontend build
+frontend functional smoke tests
+automated accessibility checks
 deployment validation
 ```
+## 6.5 — Public Discovery
+
+Make search-engine exposure an explicit choice of each installed instance.
+
+### Indexing control
+
+Indexing is disabled by default through two complementary mechanisms:
+
+```text
+robots.txt
+    controls crawler access
+
+X-Robots-Tag
+    controls indexing through the HTTP response
+```
+The versioned `.htaccess` checks for this instance-owned marker: 
+```text
+storage/.loom73-indexing-enabled
+```
+
+Possible shuttle operations: 
+```text
+php shuttle indexing.info
+php shuttle indexing.enable
+php shuttle indexing.disable
+```
+The commands should coordinate both `robots.txt` and the `.loom73-indexing-enabled` marker.
+
+```text
+indexing.info
+    report the marker state
+    inspect the global robots policy
+    warn when the two mechanisms disagree
+
+indexing.enable
+    configure robots.txt to allow crawling
+    create the indexing marker
+
+indexing.disable
+    remove the indexing marker
+    configure robots.txt with Disallow: /
+```
+Implementation should:
+
+- default to indexing disabled
+- preserve unrelated robots.txt directives where possible
+- write robots.txt atomically
+- report unwritable files clearly
+- leave the instance in the safer non-indexable state after partial failure
+
+### Sitemap Generation
+Add a small, explicit sitemap generator for public application resources.
+
+The generator should support:
+
+- explicit static routes
+- application-provided URL sources
+- instance URL from configuration
+- optional last-modified dates
+- URL normalization and deduplication
+- valid XML generation
+- atomic file replacement
+
+Possible Shuttle operations:
+
+```text
+php shuttle sitemap.generate
+php shuttle sitemap.info
+```
+
+The generator must not discover controller methods automatically, infer public access from route names or include protected resources.
+
 
 ## Later — Operational Interfaces
 

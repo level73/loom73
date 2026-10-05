@@ -1,5 +1,5 @@
 <main id="main-content">
-    <section class="grid grid-1_2-col">
+    <section class="grid grid-1-2">
 
             <div>
                 <h1>Stitch <span class="accent">Icons</span></h1>
@@ -12,14 +12,14 @@
                 </ul>
             </div>
             <div>
-                <figure>
-                    <img  width="1672" height="941" src="/assets/raster/stitch.webp" class="image" alt="A human hand stitching a database icon on a piece of cloth.">
+                <figure class="hero-image">
+                    <img  width="1672" height="941" src="/assets/raster/stitch.webp" class="image hero" alt="A human hand stitching a database icon on a piece of cloth.">
                     <figcaption>Stitching</figcaption>
                 </figure>
             </div>
     </section>
-    <section class="grid breakout">
-        <div class="grid grid-1-2-1-col center-content">
+    <section class="breakout">
+        <div class="grid grid-fit center-content inner-border with-gap">
             <p class="intro">Just a <?php echo htmlentities("<span>"); ?> with a few classes.</p>
             <p class="code-snippet">&lt;span <span class="attr">class</span>="<span class="val">stitch stitch--arrow x4 color-info r90</span>"&gt;&lt;/span&gt;</p>
             <span class="stitch stitch--arrow x4 color-info r90"></span>
@@ -31,7 +31,7 @@
             <span class="badge">38 Icons</span>
             <hr/>
         </header>
-            <div class="grid grid-6_5" data-inview="is-visible">
+            <div class="grid grid-fit" data-inview="is-visible">
                 <div class="card icon-container" style="--i: 0"><span class="stitch color-accent x2 stitch--api"></span><span class="icon-name">API</span></div>
                 <div class="card icon-container" style="--i: 1"><span class="stitch color-accent x2 stitch--arrow"></span><span class="icon-name">Arrow</span></div>
                 <div class="card icon-container" style="--i: 2"><span class="stitch color-accent x2 stitch--bin"></span><span class="icon-name">Bin</span></div>
@@ -72,12 +72,12 @@
                 <div class="card icon-container" style="--i: 37"><span class="stitch color-accent x2 stitch--view"></span><span class="icon-name">View</span></div>
             </div>
     </section>
-    <section class="grid grid-3-col with-gap bordered">
+    <section class="grid grid-3 with-gap bordered">
         <div class="">
             <h3>Scale it</h3>
             <hr />
             <p>Utility classes for sizing</p>
-            <div class="flex row justified ">
+            <div class="grid grid-fit" style="--grid-min: 6rem;">
                 <div class=" card">
                     <span class="stitch stitch--search"></span>
                     <span class="label">base</span>
@@ -112,7 +112,7 @@
             <h3>Rotate it</h3>
             <hr />
             <p>Utility classes for rotation, 45° increments</p>
-            <div class="flex row justified">
+            <div class="grid grid-fit" style="--grid-min: 6rem;">
                 <div class=" card">
                     <span class="stitch stitch--arrow x3 r45"></span>
                     <span class="label">.r45</span>
@@ -147,7 +147,7 @@
             <h3>Color follows context</h3>
             <hr />
             <p>Icons inherit the current text color.</p>
-            <div class="flex row justified">
+            <div class="grid grid-fit" style="--grid-min: 6rem;">
                 <div class=" card">
                     <span class="stitch stitch--cube x3 color-accent"></span>
                     <span class="label">accent</span>
@@ -173,12 +173,12 @@
 
     </section>
 
-    <section class="grid grid-2-col with-gap bordered">
+    <section class="grid grid-2 with-gap bordered">
         <div>
             <h3>Arbitrary when you need it</h3>
             <hr />
             <p>Just use CSS variables.</p>
-            <div class="grid grid-1_2-col with-gap">
+            <div class="grid grid-1-2 with-gap">
                 <span class="stitch stitch--leaf" style="--stitch-color: #8B0CC2; --stitch-rotation: -17deg; --stitch-scale: 8;"></span>
 
                     <p class="code-snippet">
@@ -194,7 +194,7 @@
             <h3>Accessible by context</h3>
             <hr />
             <p>Use with labels or aria labels</p>
-            <div class="grid grid-3-col">
+            <div class="grid grid-3">
                 <div class="card">
                     <button type="button" class="button hollow"><span class="stitch stitch--download"></span> Download</button>
                 </div>
@@ -219,13 +219,13 @@
             </div>
         </div>
     </section>
-    <section class="grid grid-1_3 with-gap bordered">
+    <section class="grid grid-1-3 with-gap bordered">
         <div>
             <h3>Selective by design</h3>
             <hr />
             <p>Stitch includes only what you need. No icon fonts. No giant sprites. Just lightweight SVG masks.</p>
         </div>
-        <div class="grid grid-20">
+        <div class="grid grid-fit" style="--grid-min: 14rem;">
             <div>
                 <span class="stitch stitch--arrow x4" style="--stitch-color: #188a00;" aria-hidden="true"></span>
                 <h4>CSS-Driven</h4>

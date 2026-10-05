@@ -1,5 +1,5 @@
 <main id="main-content">
-    <section class="grid grid-1_2-col">
+    <section class="grid grid-1-2">
         <div>
         <h1>Components</h1>
         <hr />
@@ -8,15 +8,15 @@
         </p>
         </div>
         <div>
-            <figure>
-                <img src="/assets/raster/components.webp" width="1672" height="941" class="image" alt="Ink drawing of heddle, shed and warp mechanism in 19th century looms.">
+            <figure class="hero-image">
+                <img src="/assets/raster/components.webp" width="1672" height="941" class="image hero" alt="Ink drawing of heddle, shed and warp mechanism in 19th century looms.">
                 <figcaption>The Heddle/Shuttle/Warp mechanism of 19<sup>th</sup> century looms.</figcaption>
             </figure>
         </div>
     </section>
 
-    <section class="grid breakout">
-        <div class="grid grid-20 with-gap" data-inview="is-visible" data-inview-threshold="0.2">
+    <section class="breakout">
+        <div class="grid grid-fit with-gap inner-border" data-inview="is-visible" data-inview-threshold="0.2">
             <div class="card component backend" style="--i: 0;">
                 <h2>Heddle</h2>
                 <p>Manages authentication, roles, permissions, sessions, abilities and guards.</p>

@@ -1,0 +1,235 @@
+@layer theme {
+    /** Responsive Navs **/
+    .navbar .navbar-menu {
+        a {
+            color: var(--color-accent);
+            text-decoration: none;
+            &:hover, &:focus, &:visited {
+                text-decoration: underline;
+            }
+        }
+    }
+    /** Sub nav dropdown **/
+    ul.sub-nav {
+        background: var(--color-background);
+        border: 1px solid var(--color-border);
+        border-top: none;
+    }
+
+    @media (width < 48rem) {
+        .loom73-ready .navbar-toggler {
+            background: transparent;
+        }
+        .loom73-ready .navbar {
+            background: var(--color-surface);
+        }
+
+        .loom73-ready .navbar-menu {
+            li a { font-size: var(--fontsize-1);}
+        }
+
+        .loom73-ready .navbar-menu ul.sub-nav {
+            background: none;
+            border: none;
+        }
+    }
+
+    /** Plain theme — Tooltip  */
+    .loom73-tooltip {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid rgba(255 255 255 / 10%);
+        border-radius: 0.25rem;
+        background: #202428;
+        color: #ffffff;
+        box-shadow:
+                0 0.25rem 1rem
+                rgba(0 0 0 / 20%);
+
+        font-size: var(--fontsize--1);
+        font-weight: 400;
+        line-height: 1.4;
+        text-align: start;
+    }
+
+    @scope (div.table-pagination){
+        :scope {
+            button {
+                font-size: var(--fontsize-0);
+                border: none;
+                background: none;
+                text-transform: uppercase;
+                color: var(--color-accent);
+                transition: all 0.1s linear;
+                &:hover, &:focus {
+                    transform: scale(1.05);
+                }
+                &[disabled] {
+                    color: var(--color-secondary);
+                    &:hover { transform: none; }
+                }
+            }
+        }
+    }
+
+    @scope (form) {
+        :scope {
+            accent-color: var(--color-accent);
+            legend {
+                font-size: var(--fontsize-1);
+                font-weight: bold;
+            }
+            fieldset {
+                border: none;
+            }
+            .form-group:has(input:focus){
+                outline: 3px solid color-mix(in oklch, var(--color-accent) 20%, transparent 80%);
+                outline-offset: 2px;
+            }
+
+            label, legend { text-align: left; text-wrap: nowrap; }
+            label:has( + *[required])::after {
+                color: var(--color-utility-danger);
+            }
+            input, select, textarea {
+                font-size: var(--fontsize-0);
+                border: 1px solid var(--color-border);
+                font-family: var(--body-font-family);
+                &:user-valid {
+                    border-color: var(--color-utility-success);
+                }
+                &:user-invalid {
+                    border-color: var(--color-utility-danger);
+                }
+            }
+
+
+            input[type="file"]::file-selector-button {
+                border: 1px solid var(--color-accent);
+                background-color: var(--color-accent);
+                color: var(--color-on-accent);
+                font-family: var(--body-font-family);
+                font-size: var(--fontsize-0);
+            }
+
+            .user-invalid-error[data-active-error="true"] {
+                font-size: var(--fontsize--1);
+                color: var(--color-surface);
+                background-color: var(--color-utility-danger);
+            }
+            button[type='submit'] {
+                background-color: var(--color-accent);
+                border: none;
+                font-size: var(--fontsize-0);
+                color: var(--color-on-accent);
+                &:hover, &:focus, &:active {
+                    background-color: var(--color-accent-hover);
+                    color: var(--color-on-accent);
+                }
+            }
+            button[type='reset'] {
+                background-color: var(--color-secondary);
+                border: none;
+                font-size: var(--fontsize-0);
+                color: var(--color-on-secondary);
+                &:hover, &:focus, &:active {
+                    background-color: var(--color-accent-hover);
+                    color: var(--color-on-accent);
+                }
+            }
+
+            .form-helper-text {
+                font-size: var(--fontsize--1);
+                color: var(--color-secondary);
+                font-family: var(--body-italic-font-family);
+            }
+        }
+    }
+
+    @scope(dialog){
+        :scope {
+            &::backdrop {
+                background-image: var(--backdrop);
+                background-size: 0.5rem 0.5rem;
+                background-repeat: repeat;
+            }
+            button.modal-button, button.modal-button[type="submit"] {
+                font-size: var(--fontsize-0);
+                &.close{
+                    background: transparent;
+                    border: 1px solid var(--color-accent);
+                    color: var(--color-accent);
+                    &:hover, &:focus, &:active {
+                        background-color: var(--color-accent);
+                        color: var(--color-on-accent);
+                    }
+                }
+            }
+            button.modal-button[type="submit"]{
+                background-color: var(--color-utility-danger);
+                color: var(--color-on-danger);
+                &:hover, &:focus, &:active {
+                    background-color: oklch(from var(--color-utility-danger) 0.5 c h);
+                    color: var(--color-on-danger);
+                }
+            }
+            button[data-dialog-close] {
+                border: none;
+                background: none;
+            }
+        }
+    }
+
+    figure.hero-image {
+        position: relative;
+        &:after {
+            content: "L";
+            width: calc(100% + 2px);
+            height: calc(100% + 2px);
+            display: block;
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            background-color: var(--color-secondary-dark);
+            mix-blend-mode: screen;
+            z-index: 10000;
+            outline: 1px solid var(--color-border);
+            outline-offset: -1px;
+        }
+        figcaption {
+            background-color: var(--color-surface);
+            border-top: 1px solid var(--color-border);
+            color: var(--color-on-surface);
+        }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        @view-transition {
+            navigation: auto;
+        }
+        main#main-content {
+            view-transition-name: main-content;
+        }
+        ::view-transition-group(main-content){
+            animation-duration: 0.5s;
+            animation-timing-function: ease-in-out;
+        }
+        ::view-transition-old(main-content){
+            animation-name: page-slide-out;
+        }
+        ::view-transition-new(main-content){
+            animation-name: page-slide-in;
+        }
+
+        @keyframes page-slide-out {
+            to {
+                translate: -100vw;
+            }
+        }
+        @keyframes page-slide-in {
+            from {
+                translate: 100vw;
+            }
+        }
+
+    }
+}
