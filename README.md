@@ -330,28 +330,17 @@ vendor/             Composer dependencies
 
 ## Documentation
 
-The documentation is being consolidated into a structured `documentation/` directory as part of the current public-foundation milestone.
-
-It covers:
-
-- requirements, installation, and configuration;
-- architecture and conventions;
-- individual Loom73 components;
-- frontend utilities and theming;
-- API delivery;
-- deployment and runtime storage;
-- forking, releases, and upgrades;
-- optional integrations and extension patterns.
-
-The README remains the entry point. Detailed implementation guidance belongs in the documentation rather than being duplicated here.
+The documentation covers installation and configuration, architecture, backend components, frontend utilities and theming, API delivery, deployment, and extension patterns. This README is the entry point; detailed implementation guidance lives in the documentation.
 
 [Read the documentation](https://level73.github.io/loom73/)
 
 ## Project status
 
-Loom73 6.0 establishes the first public foundation of the project.
+Loom73 is publicly available.
 
-The completed milestone focuses on documentation, the project landing page, repository readiness, and consolidation of the reference implementation.
+Version 6.1 modernized the frontend build and established clearer boundaries between reusable frontend code, themes, and application-specific presentation.
+
+See [the latest release](https://github.com/level73/loom73/releases/tag/6.1.0) for the current version and [the roadmap](https://level73.github.io/loom73/roadmap/) for planned work.
 
 Future additions are evaluated against three questions:
 

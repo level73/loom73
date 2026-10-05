@@ -38,7 +38,7 @@ Version 6.0 should not gain another large subsystem.
 
 ## 6.1 — Frontend Modernization
 
-**Status: in progress**
+**Status: complete**
 
 Modernize the frontend architecture and toolchain while preserving the framework-free browser runtime.
 
@@ -138,20 +138,6 @@ child themes
 template overrides
 database theme selection
 plugin lifecycle
-```
-
-### Remaining release work
-
-Before releasing 6.1:
-
-```text
-run a clean npm installation
-validate production and development builds
-validate watch behavior and source-map cleanup
-run browser and responsive smoke tests
-run the deployment build
-update the project version
-prepare the 6.1 release notes
 ```
 
 Optional bundle-size guardrails remain a possible later improvement and are not a 6.1 release requirement.
