@@ -228,7 +228,7 @@ The generated field is:
 The token belongs to:
 
 ```php
-$_SESSION[$_SERVER['APPNAME']]['xss']
+$_SESSION[codeName()]['xss']
 ```
 
 Destroying the token causes the next form render to generate a new one.

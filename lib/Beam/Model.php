@@ -16,6 +16,8 @@ namespace Loom73\Beam;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
+use Loom73\Gauge\Collector;
+use PDOStatement;
 
 abstract class Model
 {
@@ -76,7 +78,7 @@ abstract class Model
                 $statement->bindValue($placeholder, $value, $type);
             }
 
-            $statement->execute();
+            $this->executeStatement($statement);
 
             if ($insert) {
                 return QueryResult::success(
@@ -350,7 +352,7 @@ abstract class Model
         $sql = 'SHOW COLUMNS FROM ' . $this->tableName();
 
         $statement = $this->pdo->prepare($sql);
-        $statement->execute();
+        $this->executeStatement($statement);
 
         $fields = [];
 
@@ -509,5 +511,21 @@ abstract class Model
         }
 
         return $direction;
+    }
+
+    /** Helper to check if Gauge is active and trigger collection */
+    protected function executeStatement(PDOStatement $statement): bool
+    {
+        if (!Collector::active()):
+            return $statement->execute();
+        endif;
+
+        $started = hrtime(true);
+
+        try {
+            return $statement->execute();
+        } finally {
+            Collector::recordQuery((hrtime(true) - $started) / 1_000_000_000);
+        }
     }
 }

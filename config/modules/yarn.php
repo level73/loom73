@@ -234,9 +234,7 @@ return [
     */
 
     'naming' => [
-
         'stored_name_strategy' => 'uuid',
-
         'preserve_original_name' => false,
     ],
 

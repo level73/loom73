@@ -14,6 +14,7 @@ class Auth extends Session
     protected ?QueryResult $profile = null;
 
     private array $abilities = [
+        'view_gauge'   => ['admin'],
         'manage_users' => ['admin'],
         'edit_content' => ['admin', 'editor'],
         'view_content' => ['admin', 'editor', 'user'],
@@ -99,7 +100,9 @@ class Auth extends Session
             . bin2hex(random_bytes(8))
             . ($_SERVER['SESSION_SALT'] ?? '');
 
-        $token = md5(($_SERVER['APPNAME'] ?? 'Loom73') . bin2hex(random_bytes(8)));
+        $app = \codeName();
+
+        $token = md5(($app ?? 'Loom73') . bin2hex(random_bytes(8)));
 
         return crypt($token, $salt);
     }

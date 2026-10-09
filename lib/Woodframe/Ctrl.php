@@ -4,13 +4,27 @@ namespace Loom73\Woodframe;
 
 use InvalidArgumentException;
 use JetBrains\PhpStorm\NoReturn;
+
+/** Beam */
 use Loom73\Beam\Model;
 use Loom73\Beam\QueryResult;
+
+/** Heddle */
 use Loom73\Heddle\Auth;
+
+/** Ledger */
 use Loom73\Ledger\Ledger;
+
+/** Yarn */
 use Loom73\Yarn\Asset;
 use Loom73\Yarn\AssetUploader;
 use Loom73\Yarn\AssetUploadResult;
+
+/** Gauge  */
+use Loom73\Gauge\Activation;
+use Loom73\Gauge\OptIn;
+use Loom73\Gauge\Collector;
+use Loom73\Gauge\PostCollector;
 
 /**
  * Base Controller
@@ -83,6 +97,19 @@ abstract class Ctrl
         }
 
         $this->set('is_authenticated', $this->isAuthenticated);
+
+        /** Check for Gauge opt-in */
+        $canViewGauge = $this->isAuthenticated
+            && $this->Auth?->can($this->user, 'view_gauge') === true;
+
+        $gaugeAvailable = $canViewGauge && Activation::enabled();
+
+        $this->set('gauge_available', $gaugeAvailable);
+        $this->set(
+            'gauge_opted_in',
+            $gaugeAvailable && OptIn::requested()
+        );
+
     }
 
     public function set(string $name, mixed $value): void
@@ -172,7 +199,7 @@ abstract class Ctrl
     {
         $token = $_POST['csrf'] ?? null;
 
-        $appName = $_SERVER['APPNAME'] ?? null;
+        $appName = \codeName();
 
         if (!$appName) {
             return false;
@@ -227,7 +254,7 @@ abstract class Ctrl
 
     public function destroyToken(): void
     {
-        $appName = $_SERVER['APPNAME'] ?? null;
+        $appName = \codeName();
 
         if (!$appName) {
             return;
@@ -551,6 +578,16 @@ abstract class Ctrl
         $this->shouldRender = false;
 
         header("Location: {$url}");
+
+        if (
+            $this->requestMethod() === 'POST'
+            && $this->isAuthenticated
+            && $this->Auth?->can($this->user, 'view_gauge') === true
+            && Collector::active()
+        ):
+            PostCollector::save();
+        endif;
+
         exit;
     }
 
@@ -643,7 +680,13 @@ abstract class Ctrl
 
     public function __destruct()
     {
-        if ($this->shouldRender) :
+        if ($this->shouldRender):
+            $canRenderGauge = $this->isAuthenticated
+                && $this->Auth?->can($this->user, 'view_gauge') === true
+                && OptIn::requested()
+                && Collector::active();
+
+            $this->set('gauge_render', $canRenderGauge);
             $this->_template->render();
         endif;
     }

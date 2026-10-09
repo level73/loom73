@@ -213,7 +213,7 @@
     }
 
     /** Forms **/
-    @scope (form) {
+    @scope (form:not(.menu-form-action)) {
         :scope {
             &.small {
                 max-width: max(40%, 20rem);
@@ -309,5 +309,64 @@
         }
     }
 
+    /** Gauge **/
+    .gauge {
+        position: fixed;
+        inset-inline-end: calc(0.75rem + env(safe-area-inset-right));
+        inset-block-end: calc(0.75rem + env(safe-area-inset-bottom));
+        z-index: 900;
+        max-inline-size: calc(100vw - 1.5rem);
+        font-size: var(--fontsize--1);
+
+        details {
+            max-block-size: calc(100vh - 1.5rem);
+            overflow: auto;
+        }
+
+        details[open] {
+            inline-size: min(24rem, calc(100vw - 1.5rem));
+        }
+
+        summary {
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            list-style: none;
+            overflow-wrap: anywhere;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .gauge-request-heading {
+            padding: 0.5rem 0.75rem 0;
+            font-size: var(--fontsize--1);
+            letter-spacing: normal;
+            overflow-wrap: anywhere;
+        }
+
+        details:not([open]) summary {
+            max-inline-size: 20rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        dl {
+            padding: 0 0.75rem 0.75rem;
+        }
+
+        dl > div {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            column-gap: 1rem;
+        }
+
+        dt,
+        dd {
+            margin: 0;
+            padding: 0.35rem 0;
+        }
+    }
 
 }

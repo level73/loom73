@@ -40,6 +40,19 @@
             <li class="menu-item"><a href="/user/list">All Users</a></li>
             <li class="menu-item"><a href="/user/create">Add a new User</a></li>
             <li class="menu-item"><a href="/user/profile">Edit your Profile</a></li>
+
+            <?php if ($gauge_available ?? false): ?>
+                <li class="menu-item">
+                    <form method="post" action="<?php echo $gauge_opted_in ? '/gauge/opt-out' : '/gauge/opt-in'; ?>" class="menu-form-action">
+                        <?php csrf(); ?>
+                        <button type="submit">
+                            <?php echo $gauge_opted_in
+                                    ? 'Disable Gauge'
+                                    : 'Enable Gauge'; ?>
+                        </button>
+                    </form>
+                </li>
+            <?php endif; ?>
         </ul>
     </div>
     <?php endif; ?>

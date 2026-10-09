@@ -8,7 +8,8 @@ class Flash
 
     public static function add(string $type, array $message): void
     {
-        $_SESSION[$_SERVER['APPNAME']][self::KEY][] = [
+        $app = \codeName();
+        $_SESSION[$app][self::KEY][] = [
             'type' => $type,
             'message' => $message,
         ];
@@ -36,8 +37,9 @@ class Flash
 
     public static function all(): array
     {
-        $messages = $_SESSION[$_SERVER['APPNAME']][self::KEY] ?? [];
-        unset($_SESSION[$_SERVER['APPNAME']][self::KEY]);
+        $app = \codeName();
+        $messages = $_SESSION[$app][self::KEY] ?? [];
+        unset($_SESSION[$app][self::KEY]);
 
         return $messages;
     }

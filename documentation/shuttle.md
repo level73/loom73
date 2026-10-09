@@ -50,6 +50,9 @@ user.admin
 asset_type.new
 ledger.cleanup
 session.cleaner
+gauge.info
+gauge.enable
+gauge.disable
 ```
 
 ### `loom73.info`
@@ -103,7 +106,25 @@ An unhealthy result exits with status code `1`. A healthy result, including one 
 
 Warnings include incomplete environment values. Errors include a missing `.env`, failed database connection, missing or unwritable runtime directories, missing required extensions, or missing runtime packages.
 
-`Gauge` is reported as `not configured` until the planned component and its configuration are added.
+`Gauge` is reported as `enabled` or `disabled` according to its current instance and environment configuration.
+
+### Gauge commands
+
+Inspect, enable or disable Gauge for the current instance:
+
+```bash
+php shuttle gauge.info
+php shuttle gauge.enable
+php shuttle gauge.disable
+```
+
+Gauge is disabled by default. `gauge.enable` creates `storage/.loom73-gauge-enabled` in development. In production (`SYSTEM_STATUS=production`), explicit activation requires:
+
+```bash
+php shuttle gauge.enable --production
+```
+
+`gauge.info` reports the environment, marker state and whether Gauge is active. `gauge.disable` removes the marker. Activation alone does not display the bar: the authenticated user needs the `view_gauge` ability and must opt in through the browser.
 
 ### `loom73.install`
 

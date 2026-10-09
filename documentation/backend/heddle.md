@@ -15,14 +15,19 @@ Heddle uses:
 
 ```env
 APPNAME='Example'
+CODENAME='EXAMPLE'
 SESSION_KEY=''
 SESSION_SALT=''
 ```
 
-The public bootstrap calls:
+`APPNAME` is the public name. `CODENAME` identifies the PHP session cookie and the application's `$_SESSION` namespace. The public bootstrap calls:
 
 ```php
-session_name($_SERVER['APPNAME']);
+$code = codeName();
+if ($code === null):
+    throw new RuntimeException('CODENAME is required to start the session.');
+endif;
+session_name($code);
 session_start();
 ```
 
@@ -67,7 +72,7 @@ $Session->setSession(
 On a successful database update, the same token is stored in:
 
 ```php
-$_SESSION[$_SERVER['APPNAME']][$_SERVER['SESSION_KEY']]
+$_SESSION[codeName()][$_SERVER['SESSION_KEY']]
 ```
 
 ### Resolving the current user

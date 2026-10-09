@@ -10,8 +10,14 @@ require_once ROOT_DIR . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . '
 
 $dotenv = Dotenv\Dotenv::createImmutable(ROOT_DIR . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR);
 $dotenv->load();
-
-session_name($_SERVER['APPNAME']);
+// Load Helpers
+require_once ROOT_DIR . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'helpers.php';
+$app = codeName();
+if ($app === null):
+    throw new RuntimeException('CODENAME is required to start the session.');
+endif;
+// Session
+session_name($app);
 // Initialize Session
 session_start();
 // Set Timezone
@@ -25,8 +31,6 @@ $url = (isset($_GET['url']) ? $_GET['url'] : "");
 require_once ROOT_DIR . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'Woodframe' . DIRECTORY_SEPARATOR . 'Errata.php';
 // Load base functions lib
 require_once ROOT_DIR . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'functions.php';
-// Load Helpers
-require_once ROOT_DIR . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'helpers.php';
 // Load Main Init function
 require_once ROOT_DIR . DIRECTORY_SEPARATOR . 'lib' . DIRECTORY_SEPARATOR . 'loom73.php';
 

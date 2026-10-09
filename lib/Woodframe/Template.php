@@ -2,6 +2,8 @@
 
 namespace Loom73\Woodframe;
 use Loom73\Woodframe\Errata;
+use Loom73\Gauge\Collector;
+use Loom73\Gauge\PostCollector;
 
 class Template
 {
@@ -31,7 +33,7 @@ class Template
         extract($this->variables);
 
         if(!isset($title)):
-            $title = $_SERVER['APPNAME'];
+            $title = \appName();
         endif;
 
 
@@ -106,7 +108,24 @@ class Template
                 include (ROOT_DIR . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . 'footer.php');
             endif;
 
-            /* Include Base Foot @ view/foot.php */
+            /** Include Gauge */
+            if (($gauge_render ?? false) === true):
+                $gauge = Collector::snapshot();
+
+                if ($gauge !== null):
+                    $postGauge = $gauge['method'] === 'GET'
+                        ? PostCollector::take()
+                        : null;
+
+                    include ROOT_DIR
+                        . DIRECTORY_SEPARATOR . 'application'
+                        . DIRECTORY_SEPARATOR . 'views'
+                        . DIRECTORY_SEPARATOR . '_partials'
+                        . DIRECTORY_SEPARATOR . 'gauge.php';
+                endif;
+            endif;
+
+            /** Include Base Foot @ view/foot.php */
             include (ROOT_DIR . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . 'foot.php');
 
         else:

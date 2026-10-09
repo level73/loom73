@@ -73,8 +73,8 @@ class Session extends Model
         if (!$this->checkKey()) {
             return QueryResult::success();
         }
-
-        $session = $_SESSION[$_SERVER['APPNAME']][$_SERVER['SESSION_KEY']];
+        $app = \codeName();
+        $session = $_SESSION[$app][$_SERVER['SESSION_KEY']];
 
         $sql = '
             SELECT 
@@ -102,7 +102,7 @@ class Session extends Model
 
     protected function storeSessionToken(string $sessionToken): void
     {
-        $appName = $_SERVER['APPNAME'] ?? null;
+        $appName = \codeName();
         $sessionKey = $_SERVER['SESSION_KEY'] ?? null;
 
         if (!$appName || !$sessionKey) {
@@ -118,7 +118,7 @@ class Session extends Model
 
     private function checkKey(): bool
     {
-        $appName = $_SERVER['APPNAME'] ?? null;
+        $appName = \codeName();
         $sessionKey = $_SERVER['SESSION_KEY'] ?? null;
 
         if (!$appName || !$sessionKey) {

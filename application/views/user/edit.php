@@ -1,4 +1,4 @@
-<main>
+<main id="main-content">
     <section>
         <h1><?php echo $title; ?> <span class="hilite"><?php echo $data->data[0]->username; ?></span></h1>
         <?php partial('messages'); ?>
