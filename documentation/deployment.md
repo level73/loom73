@@ -128,6 +128,7 @@ Then configure at least:
 ```text
 APPNAME
 APPURL
+CODENAME
 SYSTEM_STATUS
 database connection
 timezone and locale

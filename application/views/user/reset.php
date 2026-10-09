@@ -1,4 +1,4 @@
-<main>
+<main id="main-content">
     <section>
         <h1><?php echo $title; ?></h1>
         <?php partial('messages'); ?>

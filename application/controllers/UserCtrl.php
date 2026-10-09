@@ -179,10 +179,10 @@ class UserCtrl extends Ctrl
         $mail = Mailman::sendMail(
             [
                 'email' => $_SERVER['APPEMAIL'],
-                'name' => $_SERVER['APPNAME'],
+                'name' => \appName(),
             ],
             $profile->email,
-            $_SERVER['APPNAME'] . ' - Password reset',
+            \appName() . ' - Password reset',
             $emailMessage
         );
 

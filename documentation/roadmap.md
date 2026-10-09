@@ -144,7 +144,7 @@ Optional bundle-size guardrails remain a possible later improvement and are not 
 
 ## 6.2 — Gauge
 
-Gauge is a small, opt-in development profiler for a single request.
+Gauge is a small, opt-in request profiler. The runtime and activation flow are implemented.
 
 Initial measurements:
 
@@ -156,31 +156,33 @@ database query count
 database query time
 PHP version
 HTTP status
-route or controller
+HTTP method and request path
 ```
 
-Gauge should:
+Gauge:
 
 ```text
-remain disabled by default
-run only in an allowed development environment
-store no measurements in the database
-send no remote telemetry
-add minimal overhead
-render a small developer-facing status bar
+remains disabled by default
+can be enabled in development or explicitly in production
+requires an authorized user and browser opt-in
+stores no measurements in the database
+sends no remote telemetry
+adds minimal overhead
+renders a small developer-facing status bar
 ```
 
-Beam can collect query count and timing at the point where it executes statements. Gauge reads the aggregate values at the end of the request.
+Beam records query count and timing when it executes statements. Gauge reads the aggregate values for the current request. After a POST redirect, it can show a one-time snapshot of the previous POST alongside the GET; the snapshot expires after 120 seconds.
 
-Possible Shuttle operations:
+Shuttle operations:
 
 ```text
 php shuttle gauge.info
 php shuttle gauge.enable
+php shuttle gauge.enable --production
 php shuttle gauge.disable
 ```
 
-The exact enablement mechanism must be defined before implementation. A runtime flag and browser opt-in may allow a shared development instance to expose Gauge only to the developer using it.
+Instance activation uses `storage/.loom73-gauge-enabled`. Production requires `--production` while `SYSTEM_STATUS=production`. An authenticated user with `view_gauge` must also opt in through the browser. See the [Shuttle reference](shuttle.md) for the activation commands.
 
 Gauge measures the current request. Logger records operational failures. Ledger records meaningful user actions.
 

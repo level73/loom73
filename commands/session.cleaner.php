@@ -5,7 +5,7 @@ class SessionCleaner
 {
     public function __construct()
     {
-        session_name($_SERVER['APPNAME']);
+        session_name($_SERVER['CODENAME']);
         session_start();
         print_r($_SESSION);
         session_gc();

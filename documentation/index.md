@@ -128,7 +128,7 @@ A dedicated Logger reference is in preparation.
 
 ### Gauge
 
-Gauge is a planned development utility for inspecting request time, memory use and database activity. It belongs to the roadmap and should not be treated as an available component until its runtime contract has been implemented.
+Gauge is an opt-in utility for inspecting request time, memory use and database activity. It is available in development and can be explicitly enabled in production. Access requires the `view_gauge` ability and a browser opt-in. See the [Shuttle commands](shuttle.md) for instance activation.
 
 ## Frontend
 

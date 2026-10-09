@@ -3,6 +3,8 @@ use Loom73\Woodframe\Errata;
 use Loom73\Woodframe\Debugger;
 use Loom73\Woodframe\Config;
 use Loom73\Woodframe\Template;
+use Loom73\Gauge\Collector;
+use Loom73\Gauge\OptIn;
 
 /** Basic Error Reporting Config */
 function errorReporting(): void
@@ -177,7 +179,10 @@ function Loom73(): void {
     // Load module configs
     Config::load(ROOT_DIR . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'modules');
 
-
+    // Check if Gauge is on, then start collecting
+    if (OptIn::requested()):
+        Collector::start();
+    endif;
 
     // Capture URL
     global $url;

@@ -24,3 +24,16 @@ if (!function_exists('env')) {
         };
     }
 }
+
+/** Get AppName or return null */
+function appName(): ?string
+{
+    $app = $_SERVER['APPNAME'] ?? null;
+    return is_string($app) && $app !== '' ? $app : null;
+}
+
+function codeName(): ?string
+{
+    $codename = $_SERVER['CODENAME'] ?? null;
+    return is_string($codename) && $codename !== '' ? $codename : null;
+}

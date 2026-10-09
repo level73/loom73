@@ -1,4 +1,4 @@
-<main>
+<main id="main-content">
     <section>
         <h1>Upload File</h1>
 

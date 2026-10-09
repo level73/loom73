@@ -79,11 +79,12 @@ function component(string $name, ?string $label, ?array $options): void
 /** CSRF Protection Stuff */
 function set_CSRF_Token(): string
 {
-    if(empty($_SESSION[$_SERVER['APPNAME']]['xss'])):
+    $app = \codeName();
+    if(empty($_SESSION[$app]['xss'])):
         $token = bin2hex(random_bytes(32));
-        $_SESSION[$_SERVER['APPNAME']]['xss'] = $token;
+        $_SESSION[$app]['xss'] = $token;
     else:
-        $token = $_SESSION[$_SERVER['APPNAME']]['xss'];
+        $token = $_SESSION[$app]['xss'];
     endif;
     return $token;
 }

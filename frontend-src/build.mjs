@@ -142,9 +142,9 @@ const svgOptimizationOptions = {
     plugins: [
         {
             name: 'preset-default',
-            params: {
+            /* params: {
                 overrides: {removeViewBox: false,},
-            },
+            }, */
         },
     ],
 };
