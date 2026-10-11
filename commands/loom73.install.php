@@ -1,5 +1,6 @@
 <?php
 namespace Loom73\Shuttle;
+use Loom73\Upgrade\UpdateRegistry;
 use Loom73\Woodframe\Config;
 use Loom73\Woodframe\Errata;
 use Loom73\Shuttle\CLI;
@@ -21,7 +22,7 @@ class Loom73Install  {
 
         $cli = new CLI();
 
-        $confirm = $cli->confirm("Are you sure you want to install Loom73? This will delete and reinstall all user tables.");
+        $confirm = $cli->confirm("Are you sure you want to install Loom73? This will delete and reinstall all Loom73 core tables and data. Application-specific tables will remain untouched.");
         if(!$confirm):
             echo "Ok. ".PHP_EOL;
             if (ob_get_level() > 0) {
@@ -30,13 +31,18 @@ class Loom73Install  {
             exit(1);
         endif;
         echo 'Installing the database...' . PHP_EOL;
-        $DNS = $_SERVER['DBTYPE'] . ':dbname=' . $_SERVER['DBNAME'] . ';host=' . $_SERVER['DBHOST'] . ';port=' . $_SERVER['DBPORT'] . ';charset=utf8mb4';
+        $DNS = $_SERVER['DBTYPE'] .
+                ':dbname=' . $_SERVER['DBNAME'] .
+                ';host=' . $_SERVER['DBHOST'] .
+                ';port=' . $_SERVER['DBPORT'] .
+                ';charset=utf8mb4';
 
         $this->pdo = new PDO(
             $DNS,
             $_SERVER['DBUSER'],
             $_SERVER['DBPASS']
         );
+        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         try {
 
@@ -45,6 +51,10 @@ class Loom73Install  {
                 echo $cli->cout_color(" OK", 'green').PHP_EOL;
 
                 $sql = [];
+                // Set up update registry
+                $sql['drop_updates'] = 'DROP TABLE IF EXISTS `core_updates`';
+                $sql['updates'] = UpdateRegistry::CREATE_SQL;
+
                 //Queries for basic tables
                 $sql['drop_user_table'] = "DROP TABLE IF EXISTS `auth_user`";
                 $sql['user'] = "CREATE TABLE `auth_user` (
@@ -201,8 +211,8 @@ class Loom73Install  {
                                     ) ENGINE=InnoDB
                                       DEFAULT CHARSET=utf8mb4
                                       COLLATE=utf8mb4_unicode_ci";
-
-                $sql["add_ledger"] = "CREATE TABLE IF NOT EXISTS `ledger_events` (
+                $sql['drop_ledger'] = "DROP TABLE IF EXISTS `ledger_events`";
+                $sql["add_ledger"] = "CREATE TABLE `ledger_events` (
                                             `idledger_event` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
                                         
                                             `actor_user` BIGINT NULL,
@@ -244,6 +254,13 @@ class Loom73Install  {
                 echo "Enabling Key Checks... ";
                 $this->pdo->exec('SET foreign_key_checks = 1;');
                 echo $cli->cout_color(" OK", 'green').PHP_EOL;
+
+                $version = getLoom73Version();
+                if (!is_string($version) || $version === ''):
+                    throw new \RuntimeException('Loom73 version missing from package.json.');
+                endif;
+
+                UpdateRegistry::recordBaseline($this->pdo, $version);
 
         }
         catch (Errata $e) {

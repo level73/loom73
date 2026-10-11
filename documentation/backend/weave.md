@@ -1,35 +1,32 @@
 # Weave
 
-Weave is Loom73's application orchestration layer.
+Weave is Loom73's HTTP application layer. Its controllers coordinate request handling, authorization, models and services, view data and response selection.
 
-Controllers under:
+Application controllers live in `application/controllers/` and use the `Loom73\Weave\Controllers` namespace. Loom73's upgradeable controllers live in `lib/Weave/Controllers/Core/` and use `Loom73\Weave\Controllers\Core`.
 
-```php
-Loom73\Weave\Controllers
-```
-
-combine request handling, authorization, models, services, views and response selection.
-
-Reusable mechanisms belong to Woodframe, Beam, Heddle, Yarn or Ledger. Decisions about what the application does belong to Weave.
+Reusable mechanisms belong to Woodframe, Beam, Heddle, Yarn or Ledger. Weave decides how an HTTP request uses them.
 
 ## Current controllers
 
-| Controller | Responsibility |
-| --- | --- |
-| `MainCtrl` | Public landing, architecture and requirements pages. |
-| `ComponentsCtrl` | Public component demonstrations. |
-| `UserCtrl` | Authentication, recovery, profiles and user administration. |
-| `AssetCtrl` | Inline and attachment delivery for Yarn assets. |
-| `ApiCtrl` | Explicit read-only JSON resources. |
+| Layer | Controller | Responsibility |
+| --- | --- | --- |
+| Application | `MainCtrl` | Public landing, architecture and requirements pages. |
+| Application | `ComponentsCtrl` | Public component demonstrations. |
+| Core | `ApiCtrl` | Read-only JSON resources. |
+| Core | `AssetCtrl` | Inline and attachment delivery for Yarn assets. |
+| Core | `GaugeCtrl` | Gauge opt-in and opt-out requests. |
+| Core | `UserCtrl` | Authentication, recovery, profiles and user administration. |
 
-These are the blueprint's reference application. A fork should add or replace controllers according to its domain.
+The controller map in `config/modules/routes.php` provides the core defaults. An explicit application override has priority, followed by a matching controller in `application/controllers/`, then the core default. The URL still follows `/controller/method/arguments`. All HTML views remain under `application/views/`. See [MVC routing](../mvc.md#routing) for the dispatch rules.
+
+An application can extend `ApiCtrl`, `AssetCtrl` or `UserCtrl` to customize selected actions while inheriting the others. `GaugeCtrl` is final; an application that needs a different Gauge request flow must provide its own controller.
 
 ## Creating a controller
 
 ```php
 namespace Loom73\Weave\Controllers;
 
-use Loom73\Beam\Article;
+use Loom73\Weave\Models\Article;
 use Loom73\Woodframe\Ctrl;
 
 class ArticleCtrl extends Ctrl
@@ -47,7 +44,9 @@ class ArticleCtrl extends Ctrl
             $method
         );
 
-        $this->Article = new Article();
+        $this->Article = $this->_model instanceof Article
+            ? $this->_model
+            : new Article();
     }
 
     public function index(): void
@@ -205,17 +204,17 @@ $this->recordAction(
 
 ## Application models
 
-Concrete models currently live in:
+New application models belong in:
 
 ```text
 application/models/
 ```
 
-They extend `Loom73\Beam\Model`.
+They extend `Loom73\Beam\Model` and use `Loom73\Weave\Models`.
 
-Although the application models currently use the `Loom73\Beam` namespace, they remain application-specific data-access classes. A future reorganization may place them under `Loom73\Weave\Models`, matching the model name assembled by the router.
+The `Ctrl` class makes the corresponding model available in `$_model` for compatibility, while core models like `Loom73\Beam\User` live in `lib/Beam`.
 
-Controllers already prefer explicit model construction, so they do not depend on automatic model creation.
+Controllers can reuse the matching model initialized by `Ctrl` or construct other named dependencies explicitly.
 
 ## Response safety
 

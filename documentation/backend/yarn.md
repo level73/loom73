@@ -94,54 +94,48 @@ PHP must also permit the configured upload size through `upload_max_filesize` an
 
 ## Owner registry
 
-Owner and slot rules live in:
+Yarn separates three decisions:
 
 ```text
-config/modules/owners.php
+owners configuration     which application object owns an asset, and in which slot
+asset_types table         the asset's semantic type, such as project_note
+yarn.allowed_mimes        which detected MIME types and extensions may be uploaded
 ```
 
-Example:
+Loom73 defines the baseline `user.avatar` owner in `config/modules/owners.php`. An application extends it through `application/config/modules/owners.php`. The application file is loaded after the baseline file and only needs to declare the values it changes or adds.
+
+For example, an application with a `Project` model can add a project owner and a notes slot:
 
 ```php
-use Loom73\Beam\User;
+<?php
+
+/** This is an example */
 use Loom73\Yarn\Asset;
 
 return [
-    'user' => [
-        'label' => 'User',
-        'model' => User::class,
-        'primary_key' => 'idauth_user',
-
+    'project' => [
+        'label' => 'Project',
+        'model' => Project::class,
+        'primary_key' => 'idproject',
         'assets' => [
-            'avatar' => [
-                'label' => 'Avatar',
-                'multiple' => false,
-                'replace_existing' => true,
-                'allowed_asset_types' => [
-                    'image_avatar',
-                ],
-                'default_asset_type' => 'image_avatar',
-                'default_visibility' =>
-                    Asset::VISIBILITY_RESTRICTED,
+            'notes' => [
+                'label' => 'Notes',
+                'multiple' => true,
+                'replace_existing' => false,
+                'allowed_asset_types' => ['project_note'],
+                'default_asset_type' => 'project_note',
+                'default_visibility' => Asset::VISIBILITY_PRIVATE,
             ],
         ],
     ],
 ];
 ```
 
-Owner types and slots are application vocabulary. Add them deliberately rather than accepting arbitrary request values.
+`project` becomes an owner type and `notes` an asset slot. An application can add `budget` and `timeline` as further slots, each with its own permitted asset types and behavior. The `project_note` slug must exist in `asset_types`; create application-specific types with `php shuttle asset_type.new`. The baseline installation creates `image_avatar`.
 
-Asset types are database records. The baseline installation creates:
+An override key selects the exact value to replace. The `project` key above adds a complete owner definition without changing `user`. To add a slot to the baseline user, use a path such as `user.assets.documents`; overriding `user` itself would replace the entire user definition. An empty `allowed_asset_types` list permits any registered asset type, so specify the list when a slot must be restricted.
 
-```text
-image_avatar
-```
-
-Additional types can be created with:
-
-```console
-php shuttle asset_type.new
-```
+Assets store `owner_type`, `owner_id` and `owner_slot`. `OwnerRegistry` defines known owners and slots; `AssetPolicy` checks their asset-type and visibility rules. The registry does **not** verify that a particular project exists or that the current user may access it. The application must enforce those checks. MIME and extension validation is handled separately by Yarn’s upload validator.
 
 ## Uploading a file
 

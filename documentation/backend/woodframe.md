@@ -50,17 +50,46 @@ $retention = Config::get('ledger.retention', 0);
 
 The application bootstrap loads the module directory before dispatching the controller.
 
+### Application overrides
+
+Loom73 loads the defaults from `config/modules/*.php`, then the optional application overrides from `application/config/modules/*.php`. The override filename selects the module. An override file must return an array; `return [];` leaves the defaults unchanged.
+
+Each override key identifies one value to replace. Other values remain unchanged:
+
+```php
+// application/config/modules/ledger.php
+return [
+    'retention' => 30,
+];
+```
+
+This changes `ledger.retention` without changing `ledger.enabled`. Keys may use dot notation to select a nested value, such as `delivery.force_download_by_default`. An array supplied at a selected path replaces the entire array at that path; arrays are not merged.
+
+When a *literal key* contains dots, enclose that path segment in braces:
+
+```php
+// application/config/modules/yarn.php
+return [
+    'allowed_mimes.{application/vnd.openxmlformats-officedocument.wordprocessingml.document}' => ['docx'],
+];
+```
+
+This changes only the DOCX entry and preserves the other allowed MIME types. The braces are path syntax, not part of the stored key. The same syntax works when reading it with `Config::get()`.
+
+To replace the entire MIME map instead, override `allowed_mimes` directly. Application override files belong to the fork; server-specific secrets remain in `config/.env`.
+
 ### Public methods
 
-| Method | Result |
-| --- | --- |
-| `Config::load(string $path)` | Loads every PHP file in a directory. |
-| `Config::loadFile(string $file)` | Loads one PHP configuration file. |
-| `Config::get(string $key, mixed $default = null)` | Reads a value using dot notation. |
-| `Config::set(string $key, mixed $value)` | Sets or overrides a value in memory. |
-| `Config::has(string $key)` | Reports whether a key exists, including keys containing `null`. |
-| `Config::all()` | Returns all loaded configuration. |
-| `Config::clear()` | Removes all configuration held in memory. |
+| Method | Result                                                           |
+| --- |------------------------------------------------------------------|
+| `Config::load(string $path)` | Loads every PHP file in a directory.                             |
+| `Config::loadFile(string $file)` | Loads one PHP configuration file.                                |
+| `Config::get(string $key, mixed $default = null)` | Reads a value using dot notation.                                |
+| `Config::set(string $key, mixed $value)` | Sets or overrides a value in memory.                             |
+| `Config::has(string $key)` | Reports whether a key exists, including keys containing `null`.  |
+| `Config::all()` | Returns all loaded configuration.                                |
+| `Config::clear()` | Removes all configuration held in memory.                        |
+| `Config::loadOverrides(string $path)` | Override default configuration with application-specific values. |
 
 An empty key returns the complete configuration collection:
 
@@ -68,9 +97,11 @@ An empty key returns the complete configuration collection:
 $configuration = Config::get('');
 ```
 
-Missing directories, missing files and module files that do not return arrays throw `RuntimeException`.
+The default `config/modules/` directory is required; the application override directory is optional. Files that do not return an array raise `RuntimeException`. Changes made with `Config::set()` last only for the current PHP process; override files are loaded on each request or command.
 
-`set()` and `clear()` are useful for tests or an intentional re-bootstrap. Overrides last only for the current PHP process.
+The core `config\modules` directory is mandatory. The application-specific `application\config\modules` directory is optional.
+
+`set()` and `clear()` are useful for tests or an intentional re-bootstrap. Overrides last only for the current PHP process by changes performed by the `set()` method.
 
 ### Environment values
 

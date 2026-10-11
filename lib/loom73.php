@@ -141,22 +141,28 @@ if (str_starts_with($method, '__')):
 endif;
 
 /*
- * Exclude methods inherited from Ctrl or another parent.
- * Only actions declared by the concrete controller are routable.
+ * Exclude methods inherited from Ctrl or another parent, but allows methods
+ * inherited by controllers registered in routes.core config module.
+ * Actions declared by the concrete controller or inherited
+ * from a registered core controller are routable.
  */
+$declaringClass = $reflection->getDeclaringClass()->getName();
+$coreControllers = Config::get('routes.core', []);
+
 if (
-    $reflection->getDeclaringClass()->getName()
-    !== $controller
+    $declaringClass !== $controller
+    && !in_array(
+        $declaringClass,
+        is_array($coreControllers) ? $coreControllers : [],
+        true
+    )
 ):
     return false;
 endif;
 
 $parameterCount = count($parameters);
 
-if (
-    $parameterCount
-    < $reflection->getNumberOfRequiredParameters()
-):
+if ($parameterCount < $reflection->getNumberOfRequiredParameters()):
     return false;
 endif;
 
@@ -171,13 +177,48 @@ endif;
 return true;
 }
 
+/** Resolve the controller to the Core namespace or to the Application  */
+function resolveController(string $route, string $baseClassName): string
+{
+    $applicationController =
+        'Loom73\\Weave\\Controllers\\' . $baseClassName . 'Ctrl';
+
+    $overrides = Config::get('routes.overrides', []);
+    $override = is_array($overrides) ? ($overrides[$route] ?? null) : null;
+
+    if (is_string($override) && $override !== ''):
+        return $override;
+    endif;
+
+    $applicationFile = ROOT_DIR
+        . DIRECTORY_SEPARATOR . 'application'
+        . DIRECTORY_SEPARATOR . 'controllers'
+        . DIRECTORY_SEPARATOR . $baseClassName . 'Ctrl.php';
+
+    if (is_file($applicationFile)):
+        return $applicationController;
+    endif;
+
+    $core = Config::get('routes.core', []);
+    $coreController = is_array($core) ? ($core[$route] ?? null) : null;
+
+    if (is_string($coreController) && $coreController !== ''):
+        return $coreController;
+    endif;
+
+    return $applicationController;
+}
+
+
 /** Start the Application */
 function Loom73(): void {
     // Set error reporting levels
     errorReporting();
 
-    // Load module configs
+    // Load Loom73 config defaults
     Config::load(ROOT_DIR . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'modules');
+    // Load App-specific config overrides
+    Config::loadOverrides(ROOT_DIR . DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'modules');
 
     // Check if Gauge is on, then start collecting
     if (OptIn::requested()):
@@ -220,7 +261,8 @@ function Loom73(): void {
 
     // Parse the route to set up the Controller and Model name to load
     $baseClassName = toMachine($route);
-    $controller = 'Loom73\Weave\Controllers\\' . $baseClassName . 'Ctrl';
+    //$controller = 'Loom73\Weave\Controllers\\' . $baseClassName . 'Ctrl';
+    $controller = resolveController($route, $baseClassName);
     $model = 'Loom73\Weave\Models\\' . $baseClassName;
 
     // avoid dispatching for JavaScript, CSS and Resources
@@ -250,20 +292,5 @@ function Loom73(): void {
             [$dispatch, $method],
             $queryString
         );
-        /*if(class_exists($controller)):
-            try
-            {
-                $dispatch = new $controller($model, $route, $method);
-                if (method_exists($controller, $method)):
-                    // Execute method
-                    call_user_func_array(array($dispatch, $method), $queryString);
-                else:
-                    throw new Errata('This page does not exist.', 500);
-                endif;
-            }
-            catch (Errata $e) {
-                $e->errorMessage();
-            }
-        endif;*/
     endif;
 }

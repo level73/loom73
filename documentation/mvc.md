@@ -3,7 +3,7 @@
 
 Loom73 uses a small, explicit MVC architecture.
 
-It does not hide the request flow behind a route registry, service container or automatic controller wiring.
+The URL convention keeps the request flow explicit. A small controller map selects Loom73's core controllers and allows application overrides.
 
 ```text
 URL
@@ -50,16 +50,24 @@ second fragment      method
 remaining fragments  method arguments
 ```
 
+The first fragment selects a controller in this order:
+
+1. An explicit application override in `routes.overrides`;
+2. a matching controller in `application/controllers/`;
+3. a Loom73 controller registered in `routes.core`.
+
+The defaults live in `config/modules/routes.php`. Applications can set explicit overrides through `application/config/modules/routes.php`. The second fragment still names a method, and subsequent fragments remain its arguments. Views are always looked up under `application/views/`.
+
 For example:
 
 ```text
 /user/profile
 ```
 
-dispatches to:
+dispatches by default to:
 
 ```php
-Loom73\Weave\Controllers\UserCtrl::profile()
+\Loom73\Weave\Controllers\Core\UserCtrl::profile()
 ```
 
 and:
@@ -68,10 +76,10 @@ and:
 /asset/view/550e8400-e29b-41d4-a716-446655440000
 ```
 
-dispatches to:
+dispatches by default to:
 
 ```php
-Loom73\Weave\Controllers\AssetCtrl::view(
+\Loom73\Weave\Controllers\Core\AssetCtrl::view(
     '550e8400-e29b-41d4-a716-446655440000'
 );
 ```
@@ -102,7 +110,7 @@ The base URL therefore normally resolves to:
 ```php
 MainCtrl::index()
 ```
-Only the public methods declared in the controllers can be dispatched. 
+Only public, non-static controller actions with a valid number of arguments can be dispatched. Actions inherited from a controller registered in `routes.core` are allowed; helpers inherited from `Ctrl` are not.
 
 ## Missing routes and views
 
@@ -158,6 +166,8 @@ Controllers extend:
 Loom73\Woodframe\Ctrl
 ```
 
+Loom73's upgradeable controllers live in `lib/Weave/Controllers/Core/` and use the `Loom73\Weave\Controllers\Core` namespace. Application controllers keep the `Loom73\Weave\Controllers` namespace. An application controller can extend its core counterpart to customize an action while inheriting the others.
+
 A controller coordinates the request. It may:
 
 ```text
@@ -181,7 +191,7 @@ use Loom73\Beam\User;
 use Loom73\Woodframe\Ctrl;
 use Loom73\Yarn\Asset;
 
-class UserCtrl extends Ctrl
+class AccountCtrl extends Ctrl
 {
     protected User $User;
     protected Asset $Asset;
@@ -356,51 +366,27 @@ This keeps route access visible in the action that requires it.
 
 ## Models
 
-Application data-access classes live in:
+Application data-access classes belong in `application/models/`. They use the `Loom73\Weave\Models` namespace and extend `Loom73\Beam\Model`.
 
-```text
-application/models/
-```
-
-They extend:
+This `Article` model illustrates an application-defined class; it is not included in the blueprint:
 
 ```php
-Loom73\Beam\Model
-```
+namespace Loom73\Weave\Models;
 
-A model defines at least its table and normally its primary key:
+use Loom73\Beam\Model;
 
-```php
-namespace Loom73\Beam;
-
-class User extends Model
+class Article extends Model
 {
-    protected string $table = 'auth_user';
-    protected string $pkey = 'idauth_user';
-    protected bool $dates = true;
-    protected bool $softDeletes = true;
+    protected string $table = 'articles';
+    protected string $pkey = 'idarticle';
 }
 ```
 
-Use the common Model methods for ordinary persistence. Write explicit SQL in the concrete model when it expresses the domain more clearly.
+A model must define its table. If it does not specify a primary key, `Model` derives one from the table name.
 
-```php
-public function apiByUsername(string $username): QueryResult
-{
-    $sql = '
-        SELECT username, role
-        FROM auth_user
-        WHERE username = :username
-        LIMIT 1
-    ';
+`Ctrl` can initialize a model matching the route and expose it through `$_model` for compatibility. Controllers may reuse that instance through a named property or construct other dependencies explicitly. A route does not require a matching model.
 
-    return $this->query($sql, [
-        'username' => $username,
-    ]);
-}
-```
-
-SQL belongs in models or dedicated data-access services, not in views.
+Core models such as `Loom73\Beam\User` live in `lib/Beam/` and are updated with Loom73. Models can use the common CRUD methods for ordinary persistence and write explicit SQL for domain-specific queries. Keep SQL in models or dedicated data-access services, rather than views. See [Beam](backend/beam.md#model) for the model API.
 
 ## QueryResult handling
 

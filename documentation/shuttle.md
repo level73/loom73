@@ -35,6 +35,7 @@ config/system.php
 config/labels.php
 config/.env
 config/modules/*.php
+application/config/modules/*.php
 ```
 
 before resolving the requested command.
@@ -46,6 +47,7 @@ The current command set is:
 ```text
 loom73.info
 loom73.install
+loom73.update
 user.admin
 asset_type.new
 ledger.cleanup
@@ -134,7 +136,9 @@ Install the database structure and runtime directories:
 php shuttle loom73.install
 ```
 
-This is a destructive clean-install command. It asks for confirmation and may drop and recreate Loom73 tables.
+This is a destructive clean-install command. It asks for confirmation and may drop and recreate Loom73 core tables.
+
+Application-specific tables are left untouched.
 
 It currently initializes:
 
@@ -144,6 +148,7 @@ roles and seed data
 asset types
 assets
 Ledger events
+core updates registry
 storage/
 storage/uploads/
 storage/logs/
@@ -153,8 +158,6 @@ storage/cache/
 Use it for a new instance or a deliberately disposable development database.
 
 Do not use it as an update mechanism for an existing production database.
-
-The future release path will distinguish:
 
 ```text
 loom73.install
@@ -169,6 +172,25 @@ After installation, run:
 ```bash
 php shuttle user.admin
 ```
+
+### `loom73.update`
+
+Inspect and apply Loom73 core database updates:
+
+```bash
+php shuttle loom73.update --plan
+php shuttle loom73.update
+```
+
+`--plan` reports the registered baseline, applied scripts and pending scripts without changing the database. Run it before applying an update.
+
+On an existing 6.2.0 database without `core_updates`, the command first checks the expected core schema. If it finds missing structures or additional columns in core tables, it stops for manual review. Otherwise, a normal run creates the registry, records the 6.2.0 baseline and applies pending core scripts in order.
+
+A fresh `loom73.install` already records the version from `package.json` as its baseline. Version 6.3.0 ships without additional schema scripts.
+
+Each script is recorded only after successful execution. If one fails, execution stops; inspect the database before retrying because a database schema change may have taken effect even though the script was not recorded. Back up the database and test the update on a non-production instance first.
+
+`loom73.update` does not merge changes into application code, update application-specific tables or deploy files.
 
 ### `user.admin`
 

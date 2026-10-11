@@ -330,7 +330,6 @@ It currently runs for pushes to:
 
 ```text
 main
-master
 ```
 
 and uses:
@@ -423,7 +422,7 @@ The final result should be:
 HEALTHY
 ```
 
-or a understood `HEALTHY WITH WARNINGS` result.
+or an understood `HEALTHY WITH WARNINGS` result.
 
 ## Indexing policy
 
@@ -511,21 +510,23 @@ Inspect an uploaded asset through its application route rather than through a fi
 
 ## Updating a fork
 
-Loom73 does not yet provide a finalized automatic update or migration system.
+Loom73 provides `loom73.update` for ordered core database changes. Updating a fork still requires reviewing and merging code changes made upstream with the application’s own changes.
 
-Until the release and upgrade milestone is complete:
+Core controllers and models supplied by Loom73 live under `lib/` and can receive upstream changes. Application controllers, models, configuration overrides and views remain under `application/`. Core controllers may depend on those views, so review view compatibility in each release. `loom73.update` handles ordered database scripts; merging code remains a separate Git operation.
 
-```text
-review upstream changes
-review database changes
-test the update on a non-production instance
-preserve config/.env and storage/
-deploy only after the application-specific merge is understood
-```
+Before updating an existing instance:
 
-When tagged releases and `loom73.update` become available, the documentation will define the supported upgrade path.
+1. Review the release notes and changes to core files, configuration and deployment rules.
+2. Back up the database and instance-owned files, including `config/.env` and `storage/`.
+3. Test the merged code and database update on a non-production copy.
+4. With the new code in place, run `php shuttle loom73.update --plan`, review its output, then run `php shuttle loom73.update`.
+5. Run the plan again and complete the application smoke test.
 
-Do not run `loom73.install` to update an existing production instance.
+For an existing 6.2.0 database without `core_updates`, the command verifies the known core schema before recording the 6.2.0 baseline. If verification stops for manual review, resolve the difference before applying updates. Version 6.3.0 contains no additional schema scripts.
+
+The supplied deployment workflow runs on pushes to `main` and does not run `loom73.update`. For a release that changes the database schema, coordinate the code deployment and database step according to that release’s compatibility notes. A failed script may leave a partial database change; inspect the database before retrying.
+
+`loom73.update` does not merge fork-specific code or migrate application-specific tables. Never use `loom73.install` to update an existing instance.
 
 ## Deployment rule
 
