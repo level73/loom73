@@ -255,9 +255,13 @@ Current commands include:
 ```bash
 php shuttle loom73.info
 php shuttle loom73.install
+php shuttle loom73.update
 php shuttle user.admin
 php shuttle asset_type.new
 php shuttle ledger.cleanup
+php shuttle gauge.info
+php shuttle gauge.enable
+php shuttle gauge.disable
 ```
 
 Additional commands follow a simple file and class naming convention:
@@ -317,12 +321,12 @@ These elements are excluded from deployment and are never overwritten by a core 
 ## Repository structure
 
 ```text
-application/        application controllers, models, and views
+application/        application controllers, models, config overrides, and views
 commands/           Shuttle commands
 config/             configuration files and .env example
 deploy/             deployment scripts and rsync exclusions
 frontend-src/       frontend source files and build configuration
-lib/                reusable Loom73 components
+lib/                Loom73 core, including upgradeable controllers and models
 public_html/public/ public web root
 storage/            runtime-only uploads, logs, and cache
 vendor/             Composer dependencies

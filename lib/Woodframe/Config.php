@@ -19,13 +19,13 @@ class Config
     {
         $path = rtrim($path, DIRECTORY_SEPARATOR);
 
-        if (!is_dir($path)) {
+        if (!is_dir($path)) :
             throw new RuntimeException("Config directory not found: {$path}");
-        }
+        endif;
 
-        foreach (glob($path . DIRECTORY_SEPARATOR . '*.php') as $file) {
+        foreach (glob($path . DIRECTORY_SEPARATOR . '*.php') as $file) :
             self::loadFile($file);
-        }
+        endforeach;
     }
 
     /**
@@ -33,16 +33,16 @@ class Config
      */
     public static function loadFile(string $file): void
     {
-        if (!is_file($file)) {
+        if (!is_file($file)) :
             throw new RuntimeException("Config file not found: {$file}");
-        }
+        endif;
 
         $key = basename($file, '.php');
         $config = require $file;
 
-        if (!is_array($config)) {
+        if (!is_array($config)) :
             throw new RuntimeException("Config file must return an array: {$file}");
-        }
+        endif;
 
         self::$items[$key] = $config;
     }
@@ -56,20 +56,20 @@ class Config
      */
     public static function get(string $key, mixed $default = null): mixed
     {
-        if ($key === '') {
+        if ($key === '') :
             return self::$items;
-        }
+        endif;
 
-        $segments = explode('.', $key);
+        $segments = self::parsePath($key);
         $value = self::$items;
 
-        foreach ($segments as $segment) {
-            if (!is_array($value) || !array_key_exists($segment, $value)) {
+        foreach ($segments as $segment) :
+            if (!is_array($value) || !array_key_exists($segment, $value)) :
                 return $default;
-            }
+            endif;
 
             $value = $value[$segment];
-        }
+        endforeach;
 
         return $value;
     }
@@ -81,16 +81,16 @@ class Config
      */
     public static function set(string $key, mixed $value): void
     {
-        $segments = explode('.', $key);
+        $segments = self::parsePath($key);
         $items = &self::$items;
 
-        foreach ($segments as $segment) {
-            if (!isset($items[$segment]) || !is_array($items[$segment])) {
+        foreach ($segments as $segment) :
+            if (!isset($items[$segment]) || !is_array($items[$segment])) :
                 $items[$segment] = [];
-            }
+            endif;
 
             $items = &$items[$segment];
-        }
+        endforeach;
 
         $items = $value;
     }
@@ -121,5 +121,77 @@ class Config
     {
         self::$items = [];
     }
+
+    /**
+     * Parse a key allowing for dots in it to be
+     * treated as strings. Useful for MIME types
+     * that contain dots.
+     * @param string $key
+     * @return array
+     */
+    private static function parsePath(string $key): array
+    {
+        if (!preg_match(
+            '/\A(?:[^.{}]+|\{[^{}]+\})(?:\.(?:[^.{}]+|\{[^{}]+\}))*\z/',
+            $key
+        )) :
+            throw new RuntimeException("Invalid config path: {$key}");
+        endif;
+
+        preg_match_all(
+            '/\{([^{}]+)\}|([^.{}]+)/',
+            $key,
+            $matches,
+            PREG_SET_ORDER | PREG_UNMATCHED_AS_NULL
+        );
+
+        return array_map(
+            static fn(array $part): string => $part[1] ?? $part[2],
+            $matches
+        );
+    }
+
+    public static function loadOverrides(string $path): void
+    {
+        if (!file_exists($path)) :
+            return;
+        endif;
+
+        if (!is_dir($path)) :
+            throw new RuntimeException("Config override path is not a directory: {$path}");
+        endif;
+
+        $files = glob($path . DIRECTORY_SEPARATOR . '*.php');
+
+        if ($files === false) :
+            throw new RuntimeException("Cannot read config overrides: {$path}");
+        endif;
+
+        foreach ($files as $file) :
+            if (!is_file($file)) :
+                throw new RuntimeException("Invalid config override: {$file}");
+            endif;
+
+            $override = require $file;
+
+            if (!is_array($override)) :
+                throw new RuntimeException("Config override must return an array: {$file}");
+            endif;
+
+            $module = basename($file, '.php');
+
+            foreach ($override as $key => $value):
+                if (!is_string($key)) :
+                    throw new RuntimeException(
+                        "Config override keys must be strings: {$file}"
+                    );
+                endif;
+
+                self::set($module . '.' . $key, $value);
+            endforeach;
+        endforeach;
+    }
+
+
 
 }

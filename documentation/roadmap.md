@@ -226,6 +226,15 @@ stop and report failures
 
 A full migration framework is not required.
 
+Keep the code update boundary explicit:
+
+- Loom73 controllers and models live under `lib/` and can receive upstream updates.
+- Core configuration lives under `config/modules/`; application-specific overrides live under `application/config/modules/`.
+- Application controllers and models, and all views, remain under `application/`. Release notes must identify changes to the view contract.
+- Plain should remain upgradeable by separating theme defaults from instance-specific styling.
+
+Code updates still require a reviewed Git merge. `loom73.update` applies database scripts only.
+
 ## 6.4 — Automated Confidence
 
 Add focused tests around stable contracts.

@@ -171,6 +171,9 @@ config/.env
 
 config/modules/*.php
     structured component configuration
+
+application/config/modules/*.php
+    application specific overrides
 ```
 
 ### Security boundaries

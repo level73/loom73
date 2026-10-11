@@ -94,7 +94,9 @@ Connection failures from `pdo()` and `make()` throw exceptions. `ping()` convert
 Concrete database models extend `Loom73\Beam\Model`.
 
 ```php
-namespace Loom73\Beam;
+namespace Loom73\Weave\Models;
+
+use Loom73\Beam\Model;
 
 class Article extends Model
 {

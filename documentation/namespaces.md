@@ -73,14 +73,20 @@ Application code does not have to live under `lib/`. A class may be physically a
 For example:
 
 ```text
-application/controllers/UserCtrl.php
-    → Loom73\Weave\Controllers\UserCtrl
+application/controllers/ArticleCtrl.php
+    → Loom73\Weave\Controllers\ArticleCtrl
 
-application/models/User.php
+application/models/Article.php
+    → Loom73\Weave\Models\Article
+
+lib/Weave/Controllers/Core/UserCtrl.php
+    → Loom73\Weave\Controllers\Core\UserCtrl
+
+lib/Beam/User.php
     → Loom73\Beam\User
 ```
 
-The first coordinates an HTTP request. The second performs persistence work for the application.
+The `Article` pair illustrates application code; the `User` pair is supplied by Loom73.
 
 ## `Loom73\Woodframe\`
 
@@ -159,15 +165,16 @@ Woodframe must not depend on Yarn or Ledger to understand what an owner is.
 
 Beam is the persistence and data-access layer.
 
+Core models such as `Loom73\Beam\User` live in `Beam`. Application models should use `Loom73\Weave\Models` and extend `Loom73\Beam\Model`, keeping their class names separate from future core models.
+
 Current core classes include:
 
 ```php
 Loom73\Beam\Connection
 Loom73\Beam\Model
 Loom73\Beam\QueryResult
+Loom73\Beam\User
 ```
-
-Concrete application models may also use the Beam namespace when their primary responsibility is data access.
 
 Beam provides:
 

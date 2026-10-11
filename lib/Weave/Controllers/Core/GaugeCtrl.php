@@ -1,6 +1,6 @@
 <?php
 
-namespace Loom73\Weave\Controllers;
+namespace Loom73\Weave\Controllers\Core;
 
 use Loom73\Gauge\OptIn;
 use Loom73\Woodframe\Ctrl;
