@@ -42,5 +42,10 @@ jobs:
       - name: Check platform requirements
         run: composer check-platform-reqs
 
+      - name: Check PHP syntax
+        run: |
+          git ls-files -z -- '*.php' | xargs -0 -r -n 1 php -l
+          php -l shuttle
+
       - name: Run tests
         run: composer test -- --testdox
