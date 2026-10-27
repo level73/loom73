@@ -25,6 +25,7 @@ Thumbs.db
 /.cache/
 /tmp/
 /temp/
+/.phpunit.cache/
 
 # Frontend Development source maps
 /public_html/public/css/*.map

@@ -4,6 +4,9 @@
   "type": "project",
   "license": "Apache-2.0",
   "homepage": "https://github.com/level73/loom73",
+  "scripts": {
+    "test": "@php vendor/bin/phpunit"
+  },
   "require": {
     "php": "^8.3",
     "vlucas/phpdotenv": "^5.6.3",
@@ -16,5 +19,8 @@
     "ext-readline": "Required only for interactive CLI commands.",
     "ext-gd": "Useful for future image resize/crop support.",
     "ext-imagick": "Optional alternative to GD for advanced image processing."
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^12.5"
   }
 }
