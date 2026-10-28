@@ -495,7 +495,7 @@ abstract class Model
 
     protected function identifier(string $identifier): string
     {
-        if (!preg_match('/^[a-zA-Z0-9_]+$/', $identifier)) {
+        if (!preg_match('/\A[a-zA-Z0-9_]+\z/', $identifier)) {
             throw new InvalidArgumentException("Invalid SQL identifier: {$identifier}");
         }
 
